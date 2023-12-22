@@ -1,8 +1,9 @@
 [bits 16]
 
-%define ENDL 0x0a, 0x0d
-
 start:
+    ; Save the drive number from stack
+    mov byte [driveNumber], dl
+
     call resetTextMode
 
     ; Print start message
@@ -14,7 +15,7 @@ input:
     mov si, prompt
     call print
     mov di, userInput
-    mov byte [inputLen], 0
+    xor cx, cx
 .loop:
     xor ax, ax      ; Clear ax
     int 0x16        ; Get a character
@@ -26,12 +27,14 @@ input:
     je .enter
 
     mov [di], al    ; Add the input to userInput
+    inc cl
     inc di
     jmp .loop
 .enter:
     mov al, 0x0a    ; Print LF
     int 0x10
-    mov byte [di], 0; NULL terminate userInput (Replaces CR)
+    mov byte [di], 0 ; NULL terminate userInput (Replaces CR)
+    mov byte [inputLen], cl
 
     mov al, [userInput]
     cmp al, 'H'
@@ -46,23 +49,101 @@ input:
 ; Load Program - Takes userInput and tries to run that file
 ;
 loadProgram:
-    mov ax, userInput
-    ; Get filetable into [es:di]
+    mov di, userInput
     mov bx, FILETAB_LOC
     mov es, bx
-    xor bx, bx
-    mov di, bx
+    xor bx, bx      ; Get [es:bx] to be start of filetable
+.nextCh:
+    mov al, [es:bx]
+    cmp al, '}'     ; Check for end of filetable
+    je .notFound
 
-    repne scasb     ; Scan for string at ax, in string at di
-    je .found
+    cmp al, [di]    ; Check for starting character
+    je .beginSearch
 
-    mov si, notFoundMsg
+    inc bx
+    jmp .nextCh
+.beginSearch:
+    push bx         ; Save position, if it doesn't equal
+    mov byte cl, [inputLen]
+.searchLoop:
+    mov al, [es:bx]
+    inc bx
+    cmp al, [di]
+    jne .restartSearch
+
+    dec cl
+    jz .match
+    inc di
+    jmp .searchLoop
+.match:
+    mov al, [es:bx]
+    cmp al, ':'     ; Check if we are at the end of a filename
+    je executeProgram
+.restartSearch:
+    mov di, userInput
+    pop bx
+    inc bx
+    jmp .nextCh
+.notFound:
+    mov si, fileNotFoundMsg
+    call print
+    jmp input
+    
+; Expects [es:bx] to point to a sector number folowed by a comma ('XX,' where X is 0-9)
+executeProgram:
+    mov cl, 10      ; Get 10 to multiply with
+    xor al, al      ; Reset al
+    inc bx          ; Skip ':'
+.getSectorNum:
+    mov dl, [es:bx]
+    inc bx
+    cmp dl, ','     ; Check if its end of sector number
+    je .load
+    cmp dl, '0'     ; Check if it is a digit 0-9
+    jl .notFound
+    cmp dl, '9'
+    jg .notFound
+    sub dl, '0'     ; Convert ASCII char to an integer
+    mul cl          ; ax *= cl (al *= 10)
+    add al, dl      ; al += dl
+    jmp .getSectorNum
+.notFound:
+    mov si, sectorNotFoundMsg
+    call print
+    jmp input
+.load:
+    mov cl, al      ; Sector
+
+    mov ah, 0       ; Reset disk system
+    mov dl, byte [driveNumber]
+    int 0x13
+
+    mov bx, PROGRAM_LOC
+    mov es, bx
+    xor bx, bx      ; [es:bx] - Place to load out program
+
+    mov ah, 2       ; Read sectors into memory
+    mov dl, byte [driveNumber]
+    mov al, 1       ; Read 1 sector
+    mov ch, 0       ; Cylinder
+    mov dh, 0       ; Head
+    int 0x13
+    jnc .loaded     ; Loaded file successfully
+
+    mov si, programLoadFailMsg
     call print
 
     jmp input
-.found:
+.loaded:
+    mov ax, PROGRAM_LOC
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
 
-    jmp input
+    jmp PROGRAM_LOC:0x0000
 
 ;
 ; Help - Prints the help message (helpMsg)
@@ -163,10 +244,13 @@ reboot: jmp 0xffff:0x0000
 ; --------
 ;   Data
 ; --------
+driveNumber: db 0
+
 startMsg: db "kern.", ENDL, ENDL, 0 ; The bootup message
 prompt: db "> ", 0 ; Prompt for input
-newline: db ENDL, 0 ; CRLF
-notFoundMsg: db "File not found!", ENDL, 0
+fileNotFoundMsg: db "File not found!", ENDL, 0 ; User tries to load nonexistent file
+sectorNotFoundMsg: db "Sector not found!", ENDL, 0 ; File in an incorrect sector in filetable
+programLoadFailMsg: db "Failed while loading program!", ENDL, 0 ; File load fail
 
 browserMsg: db " Filename         Sector ", ENDL, \
                "----------       --------", ENDL, 0
@@ -177,9 +261,10 @@ helpMsg: db "Available Commands:", ENDL, \
             "H - Help", ENDL, \
             "R - Reboot", ENDL, 0
 
-userInput: db 0
 inputLen: db 0
+userInput: db 0
 
 FILETAB_LOC equ 0x1000
+PROGRAM_LOC equ 0x8000
 
 times 2*512-($-$$) db 0

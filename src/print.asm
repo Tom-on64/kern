@@ -47,3 +47,7 @@ printHex:
     ret
 
 hexString: db "0x0000", 0
+
+; Usefull definitions
+%define ENDL 0x0a, 0x0d
+newline: db ENDL, 0 ; CRLF
