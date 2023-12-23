@@ -1,3 +1,10 @@
+#!/bin/bash
+
+# Create build dir if it doesn't exist
+if !(test -d ./build); then
+    mkdir ./build
+fi
+
 # Bootloader
 nasm -fbin src/boot.asm -o build/boot.bin
 nasm -fbin src/filetable.asm -o build/filetable.bin
