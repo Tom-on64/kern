@@ -46,7 +46,43 @@ printHex:
     popa
     ret
 
+;
+; Prints a hex byte
+; dl - Hex byte
+;
+printHexByte:
+    pusha
+    xor cx, cx
+.loop:
+    mov al, dl
+    and al, 0xF0
+    ror al, 4
+    add al, '0'
+    cmp al, '9'
+    jle .hexNum
+    add al, 7
+.hexNum:
+    mov ah, 0x0e
+    int 0x10
+    inc cx
+    cmp cx, 2
+    je .done
+    ror dl, 4
+    jmp .loop
+.done:
+    popa
+    ret
+
 hexString: db "0x0000", 0
+
+;
+; Clears the screen
+;
+clear:
+    pusha
+    ; TODO: Make this function
+    popa
+    ret
 
 ; Usefull definitions
 %define ENDL 0x0a, 0x0d

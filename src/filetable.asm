@@ -1,8 +1,20 @@
-; Simple Filetable
-db "{"  ; Start
-db "kernel.bin:03,"
-db "calc:05,"
-db "coolThing:06"
-db "}"  ; End
+; ------------------
+;  Simple Filetable
+; ------------------
+;
+; 16 Byte entries
+; 0-9   - Filename
+; 10-12 - File extension (type)
+; 13    - Number of filetable entries
+; 14    - Starting Sector
+; 15    - Filesize in sectors (n * 512)
+;
+; ------------------
+
+filetable:
+    db 'boot',0,0,0,0,0,0,'bin',0,1,1   ; boot.bin      - start: 1, size: 1
+    db 'filetable',0,'txt',0,2,1        ; filetable.txt - start: 2, size: 1
+    db 'kernel',0,0,0,0,'bin',0,3,2     ; kernel.bin    - start: 3, size: 2
+    db 'calc',0,0,0,0,0,0,'bin',0,5,1   ; calc.bin      - start: 5, size: 1
 
 times 512-($-$$) db 0
