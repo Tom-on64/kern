@@ -4,7 +4,6 @@ start:
     ; Save the drive number from stack
     mov byte [driveNumber], dl
 
-
     mov bx, 0x8000
     mov es, bx
     xor bx, bx
@@ -112,7 +111,7 @@ loadProgram:
 .match:
     mov al, [es:bx]
     cmp al, 0       ; Check if we are at the end of a filename
-    je executeProgram
+    je foundProgram
 .restartSearch:
     mov di, userInput
     pop bx
@@ -123,19 +122,29 @@ loadProgram:
     call print
     jmp input
     
-executeProgram:
+foundProgram:
     mov al, [es:bx]
     cmp al, 0       ; Loop until we find the extension
     jne .getMetadata    
     inc bx
-    jmp executeProgram
+    jmp foundProgram
 .getMetadata:
-    add bx, 3       ; Skip the file extension
+    mov al, [es:bx]
+    mov [fileExt], al
+    inc bx
+    mov al, [es:bx]
+    mov [fileExt+1], al
+    inc bx
+    mov al, [es:bx]
+    mov [fileExt+2], al
+    inc bx
+
     inc bx          ; Ignore Number of FT entries for now
 
     mov cl, [es:bx] ; Starting sector
     inc bx
     mov al, [es:bx] ; Number of sectors to read
+    push ax         ; Save file size
 
     mov ah, 0       ; Reset disk system
     mov dl, byte [driveNumber]
@@ -157,6 +166,17 @@ executeProgram:
 
     jmp input
 .loaded:
+    ; Check file extension. If 'bin', then run, if 'txt', print
+    pop ax      ; Restore file size
+
+    mov cx, 3   ; Check file extension
+    mov si, fileExt 
+    mov ax, 0x2000
+    mov es, ax
+    mov di, binExt
+    repe cmpsb
+    jne .printText  ; TODO: Check for more file extensions
+
     mov ax, PROGRAM_LOC
     mov ds, ax
     mov es, ax
@@ -165,6 +185,27 @@ executeProgram:
     mov ss, ax
 
     jmp PROGRAM_LOC:0x0000
+.printText:
+    mov bx, PROGRAM_LOC
+    mov es, bx
+    xor bx, bx
+    mov cx, 512
+    mul cx
+    mov cx, ax
+    mov ah, 0x0e
+.textLoop:
+    mov al, [es:bx]
+    cmp al, 0
+    je .rep
+    int 0x10
+.rep:
+    inc bx
+    dec cx
+    jnz .textLoop
+
+    mov si, newline
+    call print
+    jmp input
 
 ;
 ; Help - Prints the help message (helpMsg)
@@ -259,6 +300,8 @@ printFiletable:
     inc bx
     mov al, ' '
     int 0x10
+    int 0x10
+    int 0x10
     ; File size
     mov al, [es:bx]
     inc bx
@@ -347,8 +390,8 @@ sectorLenText: db "512B", 0
 kilobyteText: db "kB", 0
 oneHalfText: db ".5kB", 0
 
-fileListMsg: db " Filename      E# St Size ", ENDL, \
-                "----------    ------------", ENDL, 0
+fileListMsg: db " Filename      E# St   Size ", ENDL, \
+                "----------    ------- ------", ENDL, 0
 
 helpMsg: db "Available Commands:", ENDL, \
             "clear - Clears the screen", ENDL, \
@@ -365,10 +408,15 @@ gfxCmd: db "gfx", 0
 rebootCmd: db "reboot", 0
 clearCmd: db "clear", 0
 
+; Files
+fileExt: db "   ", 0
+binExt: db "bin", 0
+txtExt: db "txt", 0
+
 inputLen: db 0
 userInput: db 0
 
 FILETAB_LOC equ 0x1000
 PROGRAM_LOC equ 0x8000
 
-times 2*512-($-$$) db 0
+times 3*512-($-$$) db 0

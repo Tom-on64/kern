@@ -43,7 +43,7 @@ start:
     xor bx, bx
 
     mov ah, 2           ; Read from disk
-    mov al, 2           ; Read 2 sectors (1024B)
+    mov al, 3           ; Read 3 sectors (1.5kB)
 
     mov dl, byte [driveNumber] ; Drive number
     mov ch, 0           ; Cylinder
