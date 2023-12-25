@@ -17,7 +17,7 @@ start:
 
     jmp 0x2000:0x0000
 
-%include "./src/print.asm"
+%include "./src/lib/print.asm"
 
 msg: db "Hello!", ENDL, 0
 

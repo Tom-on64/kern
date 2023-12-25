@@ -374,8 +374,8 @@ reboot: jmp 0xffff:0x0000
 ; ----------
 ;  Includes
 ; ----------
-%include "./src/print.asm"
-%include "./src/screen.asm"
+%include "./src/lib/print.asm"
+%include "./src/lib/screen.asm"
 
 ; --------
 ;   Data
@@ -402,11 +402,12 @@ helpMsg: db "Available Commands:", ENDL, \
 
 ; Commands
 ; TODO: Put these into a file or something
-lsCmd: db "ls", 0
-helpCmd: db "help", 0
-gfxCmd: db "gfx", 0
-rebootCmd: db "reboot", 0
 clearCmd: db "clear", 0
+editCmd: db "edit", 0
+gfxCmd: db "gfx", 0
+helpCmd: db "help", 0
+lsCmd: db "ls", 0
+rebootCmd: db "reboot", 0
 
 ; Files
 fileExt: db "   ", 0

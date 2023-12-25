@@ -72,7 +72,7 @@ readFail:
     cli
     hlt
 
-%include "./src/print.asm"
+%include "./src/lib/print.asm"
 
 driveNumber: db 0
 

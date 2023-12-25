@@ -13,10 +13,14 @@ cat build/boot.bin build/filetable.bin > build/bootloader.bin
 # Kernel
 nasm -fbin src/kernel.asm -o build/kernel.bin
 
+# Programs
+nasm -fbin src/fs/calc.asm -o build/calc.bin
+nasm -fbin src/fs/edit.asm -o build/edit.bin
+
+cat build/calc.bin build/edit.bin > build/files.bin
+
 # Final binary
-nasm -fbin src/calc.asm -o build/calc.bin
-nasm -fbin src/message.asm -o build/message.bin
-cat build/bootloader.bin build/kernel.bin build/calc.bin build/message.bin > build/os.bin
+cat build/bootloader.bin build/kernel.bin build/files.bin > build/os.bin
 
 # Run QEMU
 qemu-system-x86_64 -drive format=raw,file="./build/os.bin",index=0,media=disk -m 256M
