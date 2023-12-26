@@ -26,20 +26,38 @@ input:
 .loop:
     xor ax, ax      ; Clear ax
     int 0x16        ; Get a character
-    mov ah, 0x0e    ; Echo back input
-    mov bh, 0
-    int 0x10
 
     cmp al, 0x0d    ; Compare with CR
     je .enter
+    cmp al, 0x08    ; Compare with BS
+    je .backspace
+
+    mov ah, 0x0e    ; Echo back input
+    mov bh, 0
+    int 0x10
 
     mov [si], al    ; Add the input to userInput
     inc cx
     inc si
     jmp .loop
-.enter:
-    mov al, 0x0a    ; Print LF
+.backspace:
+    cmp cx, 0       ; Check if we can backspace
+    je .loop
+    mov byte [si], 0
+    dec si
+    dec cx
+    mov al, 0x08
     int 0x10
+    mov al, ' '
+    int 0x10
+    mov al, 0x08
+    int 0x10
+    jmp .loop
+.enter:
+    push si
+    mov si, newline
+    call print
+    pop si
     mov byte [si], 0 ; NULL terminate userInput (Replaces CR)
     mov byte [inputLen], cl
 
