@@ -1,5 +1,0 @@
-mov ax, 0x0e41
-int 0x10
-xor ax, ax
-int 0x16
-ret

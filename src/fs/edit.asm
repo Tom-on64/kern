@@ -1,9 +1,16 @@
 [bits 16]
 
 launch:
+    pusha
     call resetTextMode
-    mov si, headerMsg
-    call print
+
+    mov di, 0x0e60      ; Offset in vidmem (2nd to last line)
+    mov si, statusBarMsg
+    call drawString
+    mov di, 0x0f00      ; Last line
+    mov si, controlsMsg
+    call drawString
+
     xor cx, cx
     mov di, hexCode
 
@@ -34,10 +41,9 @@ getHexCh:
     rol byte [hexByte], 4
     or byte [hexByte], al
     mov al, [hexByte]
-    mov [di], al
+    stosb
     mov dx, [hexByte]
     call printHexByte
-    inc di
     xor cx, cx
     mov al, ' '
     mov ah, 0x0e
@@ -54,9 +60,14 @@ getHexCh:
     call print
     jmp getHexCh
 .runInput:
-    mov si, runMsg
+    pusha
+    call hexCode       ; Call the code
+    popa
+
+    mov si, ranMsg
     call print
-    call hexBegin       ; Call the code
+    xor ax, ax
+    int 0x16
     jmp launch
 
 ; Expects al to contain an ASCII character, will set bx to it's hex equivalent
@@ -69,13 +80,24 @@ asciiToHex:
     ret
 
 return:
+    mov cx, 256
+    mov di, hexCode
+.loop:
+    mov byte [di], 0
+    inc di
+    dec cx
+    jnz .loop
+
+    popa
+
     mov ax, 0x2000
+    mov es, bx
+    xor bx, bx
+
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov ss, ax
-
     jmp 0x2000:0x0000
 
 ; - Includes -
@@ -83,19 +105,15 @@ return:
 %include "./src/lib/print.asm"
 ; ------------
 
-headerMsg: db   " - EDITOR - ", ENDL, \
-                "Type '$' to run your code or '!' to exit", ENDL, ENDL, 0
-runMsg: db ENDL, " -- Executing -- ", ENDL, ENDL, 0
+statusBarMsg: db " -- HEX -- ", 0
+controlsMsg: db "'$' to execute code; '!' to quit", 0
+ranMsg: db ENDL, ENDL, " - Finished Execution - ", ENDL, 0
 
-backChars: db 8, 8, 8, '  ', 8, 8, 0
+backChars: db 8,8,8,'  ',8,8,0
 
 hexByte: db 0
 
-hexBegin: ; The label we jump to
-    pusha
-hexCode: times 256 db 0     ; Code buffer (user input code)
-hexEnd: 
-    popa
+hexCode: times 256 db 0     ; Code buffer
     ret
 
 times 2*512-($-$$) db 0

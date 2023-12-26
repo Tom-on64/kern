@@ -59,6 +59,11 @@ start:
     mov es, ax
     mov fs, ax
     mov gs, ax
+
+    ; Setup stack
+    mov bp, 0xffff
+    mov sp, bp
+    mov ax, 0x9000
     mov ss, ax
 
     mov bl, byte [driveNumber]

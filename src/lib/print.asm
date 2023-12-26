@@ -5,7 +5,7 @@
 print:
     pusha
     mov ah, 0x0e
-    mov bl, 0x0f
+    mov bl, 0x1f
     mov bh, 0
 .loop:
     lodsb           ; Load [si] into al; Increment si
@@ -53,6 +53,8 @@ printHex:
 printHexByte:
     pusha
     xor cx, cx
+    mov bh, 0
+    mov bl, 0x1f    ; White on blue
 .loop:
     mov al, dl
     and al, 0xF0
@@ -84,6 +86,29 @@ clear:
     popa
     ret
 
+;
+; Writes a string into video memory
+; di - Video memory offset
+; si - string
+;
+drawString:
+    pusha
+    push es         ; For some reason doesn't get stored in pusha
+    mov ax, VIDMEM
+    mov es, ax
+.loop:
+    cmp byte [si], 0
+    je .after
+    movsb
+    mov byte [es:di], 0x1f  ; White on blue
+    inc di
+    jmp .loop
+.after:
+    pop es
+    popa
+    ret
+
 ; Usefull definitions
 %define ENDL 0x0a, 0x0d
+VIDMEM equ 0x0b800
 newline: db ENDL, 0 ; CRLF

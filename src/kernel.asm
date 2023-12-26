@@ -182,7 +182,6 @@ foundProgram:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov ss, ax
 
     jmp PROGRAM_LOC:0x0000
 .printText:
@@ -385,7 +384,7 @@ driveNumber: db 0
 startMsg: db "kern.", ENDL, ENDL, 0 ; The bootup message
 prompt: db "> ", 0 ; Prompt for input
 fileNotFoundMsg: db "File not found!", ENDL, 0 ; User tries to load nonexistent file
-programLoadFailMsg: db "Failed while loading program!", ENDL, 0 ; File load fail
+programLoadFailMsg: db "Couldn't load file!", ENDL, 0 ; File load fail
 sectorLenText: db "512B", 0
 kilobyteText: db "kB", 0
 oneHalfText: db ".5kB", 0
@@ -394,16 +393,16 @@ fileListMsg: db " Filename      E# St   Size ", ENDL, \
                 "----------    ------- ------", ENDL, 0
 
 helpMsg: db "Available Commands:", ENDL, \
-            "clear - Clears the screen", ENDL, \
-            "gfx - Graphics mode test", ENDL, \
-            "help - Prints this message", ENDL, \
-            "ls - List all files", ENDL, \
-            "reboot - Reboots the system", ENDL, 0
+            " clear  | Clears the screen", ENDL, \
+            " edit   | Opens the code editor", ENDL, \
+            " gfx    | Graphics mode test", ENDL, \
+            " help   | Prints this message", ENDL, \
+            " ls     | List all files", ENDL, \
+            " reboot | Reboots the system", ENDL, ENDL, 0
 
 ; Commands
 ; TODO: Put these into a file or something
 clearCmd: db "clear", 0
-editCmd: db "edit", 0
 gfxCmd: db "gfx", 0
 helpCmd: db "help", 0
 lsCmd: db "ls", 0
