@@ -9,6 +9,7 @@ start:
     xor bx, bx
 
     call resetTextMode
+    call clearText
 
     ; Print start message
     mov si, startMsg
@@ -84,7 +85,7 @@ runCommand:
 
     mov di, clearCmd
     call .cmp
-    je clearScreen
+    je clear
 
     mov di, exitCmd
     call .cmp
@@ -239,8 +240,8 @@ help:
 ;
 ; Clears the screen
 ;
-clearScreen:
-    call resetTextMode
+clear:
+    call clearText
     jmp input
 
 ;

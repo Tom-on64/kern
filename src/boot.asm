@@ -68,7 +68,14 @@ start:
 
     mov bl, byte [driveNumber]
 
-    ; Far jump to the kernel
+    ; Setup video mode
+    mov ax, 0x0003
+    int 0x10
+    mov ah, 0x0b
+    mov bx, 0x0001
+    int 0x10
+
+    ; Far jump to the kernel (never returns)
     jmp KERNEL_LOC:0x0000
 
 readFail:

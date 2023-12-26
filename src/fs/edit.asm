@@ -2,7 +2,7 @@
 
 launch:
     pusha
-    call resetTextMode
+    call clearText
 
     mov di, 0x0e60      ; Offset in vidmem (2nd to last line)
     mov si, statusBarMsg
@@ -36,7 +36,7 @@ getHexCh:
     mov [hexByte], al
     jmp getHexCh
 .putByte:
-    cmp di, hexCode+256 
+    cmp di, hexCode+256
     jge getHexCh    ; Max length reached
     rol byte [hexByte], 4
     or byte [hexByte], al
@@ -60,6 +60,9 @@ getHexCh:
     call print
     jmp getHexCh
 .runInput:
+    mov si, runMsg
+    call print
+
     pusha
     call hexCode       ; Call the code
     popa
@@ -101,12 +104,12 @@ return:
     jmp 0x2000:0x0000
 
 ; - Includes -
-%include "./src/lib/screen.asm"
 %include "./src/lib/print.asm"
 ; ------------
 
 statusBarMsg: db " -- HEX -- ", 0
 controlsMsg: db "'$' to execute code; '!' to quit", 0
+runMsg: db ENDL, ENDL, 0
 ranMsg: db ENDL, ENDL, " - Finished Execution - ", ENDL, 0
 
 backChars: db 8,8,8,'  ',8,8,0

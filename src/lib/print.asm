@@ -78,11 +78,26 @@ printHexByte:
 hexString: db "0x0000", 0
 
 ;
-; Clears the screen
+; Clears the screen in text mode
+; Assumes VGA text 3 - 80x25, 16 color
 ;
-clear:
+clearText:
     pusha
-    ; TODO: Make this function
+    push es
+    mov ax, 0x0b800
+    mov es, ax
+    xor di, di      ; es:di - b800:0000
+
+    mov al, ' '     ; Fill with spaces
+    mov ah, 0x17    ; White on blue
+    mov cx, 80*25 
+    rep stosw 
+
+    mov ah, 2
+    xor dx, dx      ; Set cursor to 0,0
+    int 0x10
+
+    pop es
     popa
     ret
 
