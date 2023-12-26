@@ -68,6 +68,10 @@ runCommand:
     call .cmp
     je clearScreen
 
+    mov di, exitCmd
+    call .cmp
+    je shutdown
+
     jmp .end
 .cmp:
     push cx
@@ -220,6 +224,15 @@ help:
 clearScreen:
     call resetTextMode
     jmp input
+
+;
+; Shuts the system down
+; Only works for QEMU
+;
+shutdown:
+    mov ax, 0x2000
+    mov dx, 0x0604
+    out dx, ax
 
 ;
 ; File list (ls)
@@ -395,6 +408,7 @@ fileListMsg: db " Filename      E# St   Size ", ENDL, \
 helpMsg: db "Available Commands:", ENDL, \
             " clear  | Clears the screen", ENDL, \
             " edit   | Opens the code editor", ENDL, \
+            " exit   | Shuts the system down", ENDL, \
             " gfx    | Graphics mode test", ENDL, \
             " help   | Prints this message", ENDL, \
             " ls     | List all files", ENDL, \
@@ -406,6 +420,7 @@ clearCmd: db "clear", 0
 gfxCmd: db "gfx", 0
 helpCmd: db "help", 0
 lsCmd: db "ls", 0
+exitCmd: db "exit"
 rebootCmd: db "reboot", 0
 
 ; Files
