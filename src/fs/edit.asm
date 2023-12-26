@@ -11,9 +11,8 @@ launch:
     mov si, controlsMsg
     call drawString
 
-    xor cx, cx
     mov di, hexCode
-
+    xor cx, cx      ; Clear counter
 getHexCh:
     xor ax, ax
     int 0x16
@@ -44,6 +43,7 @@ getHexCh:
     stosb
     mov dx, [hexByte]
     call printHexByte
+    inc byte [codeLen]
     xor cx, cx
     mov al, ' '
     mov ah, 0x0e
@@ -51,6 +51,7 @@ getHexCh:
     jmp getHexCh
 .backspace:
     mov byte [hexByte], 0
+    dec byte [codeLen]
     xor cx, cx
     cmp di, hexByte     ; Check if there's anything to delete
     je getHexCh         ; If not, ignore
@@ -116,6 +117,7 @@ backChars: db 8,8,8,'  ',8,8,0
 
 hexByte: db 0
 
+codeLen: db 0
 hexCode: times 256 db 0     ; Code buffer
     ret
 

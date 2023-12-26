@@ -22,5 +22,8 @@ cat build/calc.bin build/edit.bin > build/files.bin
 # Final binary
 cat build/bootloader.bin build/kernel.bin build/files.bin > build/kern.bin
 
+# Cleanup
+rm build/*[!kern].bin
+
 # Run QEMU
 qemu-system-x86_64 -drive format=raw,file="./build/kern.bin",index=0,media=disk -m 256M

@@ -4,7 +4,7 @@ start:
     ; Save the drive number from stack
     mov byte [driveNumber], dl
 
-    mov bx, 0x8000
+    mov bx, 0x2000
     mov es, bx
     xor bx, bx
 
