@@ -1,11 +1,10 @@
 ;
 ; Loads a file from the filetable into a memory location
-; dl - Disk number
 ; Params:
+;   dl - Disk number
 ;   Filename (Null terminated)
 ;   Destination location segment
 ;   Destination location offset
-;   Disk number
 ;
 ; Returns:
 ;   al - Exit code : 0 - Success; 1 - File not found; 2 - Disk error
@@ -16,13 +15,13 @@ loadFile:
     mov bp, sp
     pusha
 
-    mov byte [driveNum], dl
+    mov byte [diskNum], dl
     mov bx, [bp+4]   ; dest Offset
     mov fs, [bp+6]   ; dest Segment
     mov si, [bp+8]   ; Filename
 
     mov cx, 10
-    mov di, filename
+    mov di, fileName
 .getFilename:
     lodsb           ; mov byte al, [si]; inc si
     cmp al, 0       ; End of filename
@@ -33,8 +32,8 @@ loadFile:
     mov ax, FILETAB_LOC
     mov es, ax
     xor di, di      ; es:di - Filetable location
-    mov si, filename
-.filenameCheck:
+    mov si, fileName
+.fileNameCheck:
     mov al, [di]
     cmp al, 0       ; End of filetable
     je .notFound
@@ -43,7 +42,7 @@ loadFile:
     je .beginCmp
 
     add di, 16
-    jmp .filenameCheck
+    jmp .fileNameCheck
 .beginCmp:
     push di
     mov cl, 10
@@ -58,10 +57,10 @@ loadFile:
     inc si
     jmp .cmpLoop
 .redoCheck:
-    mov si, filename
+    mov si, fileName
     pop di
     inc di
-    jmp .filenameCheck
+    jmp .fileNameCheck
 .notFound:
     mov byte [exitCode], NOT_FOUND
     jmp .done
@@ -75,7 +74,7 @@ loadFile:
     inc di          ; Skip Number of entries
 
     xor ax, ax      ; Reset disk
-    mov dl, [driveNum]
+    mov dl, [diskNum]
     int 0x13
 
     push fs
@@ -96,6 +95,7 @@ loadFile:
     popa
     mov sp, bp
     pop bp
+    mov byte al, [exitCode]
     ret
 
 ;
@@ -117,11 +117,11 @@ saveFile:
     mov bp, sp
     pusha
 
-    mov byte [driveNum], dl
-    pop bx          ; src Offset
-    pop fs          ; src Segment
-    pop cx          ; Filesize 
-    pop ax          ; Filetype
+    mov byte [diskNum], dl
+    mov bx, [bp+4]      ; src Offset
+    mov fs, [bp+6]      ; src Segment
+    mov cx, [bp+8]      ; Filesize 
+    mov ax, [bp+10]     ; Filetype
 
     push bx
 
@@ -131,17 +131,17 @@ saveFile:
     mov cx, 3
 .filetype:
     lodsb
-    cmp al, 0       ; End of filename
+    cmp al, 0       ; End of fileName
     dec si          ; Fill the rest with Null
     stosb
     loop .getFilename
 
-    pop si          ; Filename
+    mov si, [bp+12] ; Filename
     mov cx, 10
-    mov di, filename
+    mov di, fileName
 .getFilename:
     lodsb           ; mov byte al, [si]; inc si
-    cmp al, 0       ; End of filename
+    cmp al, 0       ; End of fileName
     dec si          ; Fill the rest with Null
     stosb
     loop .getFilename
@@ -149,8 +149,8 @@ saveFile:
     mov ax, FILETAB_LOC
     mov es, ax
     xor di, di      ; es:di - Filetable location
-    mov si, filename
-.filenameCheck:
+    mov si, fileName
+.fileNameCheck:
     mov byte al, [es:di+14]
     mov byte [availableSector], al
     mov byte al, [es:di+15]
@@ -164,7 +164,7 @@ saveFile:
     je .beginCmp
 
     add di, 16
-    jmp .filenameCheck
+    jmp .fileNameCheck
 .beginCmp:
     push di
     mov cl, 10
@@ -179,10 +179,10 @@ saveFile:
     inc si
     jmp .cmpLoop
 .redoCheck:
-    mov si, filename
+    mov si, fileName
     pop di
     add di, 16
-    jmp .filenameCheck
+    jmp .fileNameCheck
 .found:             ; File already exists (override)
     ; TODO: Ask user if they want to override file
     mov al, [es:di]
@@ -194,7 +194,7 @@ saveFile:
     inc di          ; Skip Number of entries
 
     xor ax, ax      ; Reset disk
-    mov dl, [driveNum]
+    mov dl, [diskNum]
     int 0x13
 
     ; TODO: Override current file
@@ -215,8 +215,8 @@ saveFile:
 
 createFile:             ; Appends a file to the filetable.
     mov cx, 10
-    mov si, filename
-    rep movsb           ; Append the filename
+    mov si, fileName
+    rep movsb           ; Append the fileName
     mov cx, 3
     mov si, filetype
     rep movsb           ; Append the extension
@@ -229,7 +229,7 @@ createFile:             ; Appends a file to the filetable.
     ; Write changed filetable to disk
     ;! If filetable size changes, this will have to change (probably)
     xor bx, bx          ; es:bx - Filetable location
-    mov dl, [driveNum]
+    mov dl, [diskNum]
     mov ah, 3           ; Write to disk
     mov al, 1           ; Write 1 sector
     mov ch, 0           ; Cylinder
@@ -248,7 +248,7 @@ writeFileData:          ; Writes file data to the disk
     pop bx              ; es:bx - Source
     mov ah, 3           ; Write to disk
     mov byte al, [filesize]
-    mov dl, [driveNum]
+    mov dl, [diskNum]
     mov ch, 0           ; Cylinder
     mov dh, 0           ; Head
     mov byte cl, [availableSector]
@@ -270,10 +270,10 @@ returnToCaller:
 availableSector: db 0
 exitCode: db 0
 
-driveNum: db 0
+diskNum: db 0
 filesize: db 0
 filetype: times 3 db 0
-filename: times 10 db 0
+fileName: times 10 db 0
 
 ;; Constants
 FILETAB_LOC equ 0x1000

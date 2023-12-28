@@ -2,7 +2,7 @@
 
 start:
     ; Save the drive number from stack
-    mov byte [driveNumber], dl
+    mov byte [driveNum], dl
 
     mov bx, 0x2000
     mov es, bx
@@ -170,7 +170,7 @@ foundProgram:
     push ax         ; Save file size
 
     mov ah, 0       ; Reset disk system
-    mov dl, byte [driveNumber]
+    mov dl, byte [driveNum]
     int 0x13
 
     mov bx, PROGRAM_LOC
@@ -178,7 +178,7 @@ foundProgram:
     xor bx, bx      ; [es:bx] - Place to load out program
 
     mov ah, 2       ; Read sectors into memory
-    mov dl, byte [driveNumber]
+    mov dl, byte [driveNum]
     mov ch, 0       ; Cylinder
     mov dh, 0       ; Head
     int 0x13
@@ -199,6 +199,8 @@ foundProgram:
     mov di, binExt
     repe cmpsb
     jne .printText  ; TODO: Check for more file extensions
+
+    mov dl, [driveNum]
 
     mov ax, PROGRAM_LOC
     mov ds, ax
@@ -407,7 +409,7 @@ reboot: jmp 0xffff:0x0000
 %include "./src/lib/screen.asm"
 
 ;; Variables
-driveNumber: db 0
+driveNum: db 0
 
 startMsg: db "kern.", ENDL, ENDL, 0 ; The bootup message
 prompt: db "> ", 0 ; Prompt for input
