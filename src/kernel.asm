@@ -402,15 +402,11 @@ graphicsTest:
 ;
 reboot: jmp 0xffff:0x0000
 
-; ----------
-;  Includes
-; ----------
+;; Includes
 %include "./src/lib/print.asm"
 %include "./src/lib/screen.asm"
 
-; --------
-;   Data
-; --------
+;; Variables
 driveNumber: db 0
 
 startMsg: db "kern.", ENDL, ENDL, 0 ; The bootup message
@@ -450,7 +446,8 @@ txtExt: db "txt", 0
 inputLen: db 0
 userInput: db 0
 
+;; Constants
 FILETAB_LOC equ 0x1000
 PROGRAM_LOC equ 0x8000
 
-times 3*512-($-$$) db 0
+times 4*512-($-$$) db 0

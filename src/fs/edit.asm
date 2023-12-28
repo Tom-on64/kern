@@ -104,12 +104,15 @@ return:
     mov gs, ax
     jmp 0x2000:0x0000
 
-; - Includes -
+;; Includes
 %include "./src/lib/print.asm"
-; ------------
+%include "./src/lib/disk.asm"
 
+;; Variables
 statusBarMsg: db " -- HEX -- ", 0
-controlsMsg: db "'$' to execute code; '!' to quit", 0
+controlsMsg: db "'$' to execute code; '!' to quit; 's' to save", 0
+fileChoiceMsg: db "'n' for new file; 'o' to open a file", 0
+chooseModeMsg: db "'x' for Hex mode; 't' for Text mode", 0
 runMsg: db ENDL, ENDL, 0
 ranMsg: db ENDL, ENDL, " - Finished Execution - ", ENDL, 0
 
@@ -121,4 +124,4 @@ codeLen: db 0
 hexCode: times 256 db 0     ; Code buffer
     ret
 
-times 2*512-($-$$) db 0
+times 3*512-($-$$) db 0
