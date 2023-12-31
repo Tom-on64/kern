@@ -93,11 +93,10 @@ return:
     popa
 
     mov ax, 0x2000
-    mov es, bx
+    mov es, ax
     xor bx, bx
 
     mov ds, ax
-    mov es, ax
     mov fs, ax
     mov gs, ax
     jmp 0x2000:0x0000
@@ -115,12 +114,12 @@ save:
     mov byte dl, [driveNum]
     push word filename
     ; TODO: More filetypes other than .bin
-    push word binFile
+    push word binFile   ; Filetype
     push word 1         ; TODO: Dynamic filesize
     push word 0x8000    ; Program location (this segment)
-    push word hexCode
+    push word hexCode   ; Offset (hex code location)
     call saveFile       ; Returns exit code in al
-    add sp, 8           ; Stack bs
+    add sp, 10          ; Stack bs
 
     cmp al, 0           ; Won't be 1 (File not found) so must be disk error
     jne .error
@@ -142,14 +141,12 @@ open:
     je getHexCh
 
     ; Call loadFile
-    ; TODO: The same stuff as in save
     mov byte dl, [driveNum]
     push word filename
-    push word 0x8000
-    push word hexCode
+    push 0x8000
+    push hexCode
     call loadFile
-
-    add sp, 6       ; Stack bs
+    add sp, 8
 
     cmp al, 1
     je .notFound
@@ -159,10 +156,10 @@ open:
     jmp getHexCh
 .notFound:
     mov si, notFoundMsg
-    jmp .error
+    jmp .err
 .diskErr:
     mov si, diskErrMsg
-.error:
+.err:
     mov di, 0x0f00
     call drawString
     jmp getHexCh
@@ -175,6 +172,7 @@ open:
 ;
 getFilename:
     pusha
+    push es
 
     mov di, 0x0f00      ; Last line
     call drawString     ; si should contain the string
@@ -226,6 +224,7 @@ getFilename:
     xor dx, dx      ; 0,0
     int 0x10
 
+    pop es
     popa
     ret
 

@@ -13,7 +13,12 @@ loadFile:
     ; Func prologue
     push bp
     mov bp, sp
-    pusha
+    push bx
+    push fs
+    push cx
+    push dx
+    push si
+    push es
 
     mov byte [diskNum], dl
     mov bx, [bp+4]   ; dest Offset
@@ -24,19 +29,25 @@ loadFile:
     mov di, fileName
 .getFilename:
     lodsb           ; mov byte al, [si]; inc si
-    cmp al, 0       ; End of filename
-    dec si          ; Fill the rest with Null
+    cmp al, 0       ; End of fileName
+    je .filenamePad
     stosb
     loop .getFilename
-
+    jmp .filenameDone
+.filenamePad: 
+    dec si          ; Fill the rest with Null
+.filenamePadLoop:
+    stosb
+    loop .filenamePadLoop
+.filenameDone:
     mov ax, FILETAB_LOC
     mov es, ax
     xor di, di      ; es:di - Filetable location
     mov si, fileName
 .fileNameCheck:
-    mov al, [di]
+    mov al, [es:di]
     cmp al, 0       ; End of filetable
-    je .notFound
+    je .notFound   ; File doesn't exist, create new one
 
     cmp al, [si]
     je .beginCmp
@@ -59,7 +70,7 @@ loadFile:
 .redoCheck:
     mov si, fileName
     pop di
-    inc di
+    add di, 16
     jmp .fileNameCheck
 .notFound:
     mov byte [exitCode], NOT_FOUND
@@ -77,14 +88,14 @@ loadFile:
     mov dl, [diskNum]
     int 0x13
 
-    push fs
+    mov ax, fs
+    mov es, ax
     mov ch, 0       ; Cylinder
     mov dh, 0       ; Head
     mov cl, [es:di] ; Sector
     inc di
     mov al, [es:di] ; Length in sectors
     mov ah, 2       ; Read from disk
-    pop es          ; es:bx - Destination
     int 0x13
 
     jnc .done
@@ -92,7 +103,12 @@ loadFile:
     mov byte [exitCode], DISK_ERROR
 .done:
     ; Func epilogue
-    popa
+    pop es
+    pop si
+    pop dx
+    pop cx
+    pop fs
+    pop bx
     mov sp, bp
     pop bp
     mov byte al, [exitCode]
@@ -115,7 +131,12 @@ saveFile:
     ; Func prologue
     push bp
     mov bp, sp
-    pusha
+    push bx
+    push fs
+    push cx
+    push dx
+    push si
+    push es
 
     mov byte [diskNum], dl
     mov bx, [bp+4]      ; src Offset
@@ -127,14 +148,10 @@ saveFile:
 
     mov byte [filesize], cl
 
+    mov si, ax
     mov di, filetype
     mov cx, 3
-.filetype:
-    lodsb
-    cmp al, 0       ; End of fileName
-    dec si          ; Fill the rest with Null
-    stosb
-    loop .getFilename
+    rep movsb
 
     mov si, [bp+12] ; Filename
     mov cx, 10
@@ -142,21 +159,29 @@ saveFile:
 .getFilename:
     lodsb           ; mov byte al, [si]; inc si
     cmp al, 0       ; End of fileName
-    dec si          ; Fill the rest with Null
+    je .filenamePad
     stosb
     loop .getFilename
-
+    jmp .filenameDone
+.filenamePad: 
+    dec si          ; Fill the rest with Null
+.filenamePadLoop:
+    stosb
+    loop .filenamePadLoop
+.filenameDone:
     mov ax, FILETAB_LOC
     mov es, ax
     xor di, di      ; es:di - Filetable location
     mov si, fileName
 .fileNameCheck:
-    mov byte al, [es:di+14]
-    mov byte [availableSector], al
-    mov byte al, [es:di+15]
-    add byte [availableSector], al
+    mov byte al, [es:di+14] ; Starting sector
+    cmp al, 0       ; No file, create one
+    je createFile
 
-    mov al, [di]
+    add byte al, [es:di+15] ; Filesize 
+    mov byte [availableSector], al
+
+    mov al, [es:di]
     cmp al, 0       ; End of filetable
     je createFile   ; File doesn't exist, create new one
 
@@ -214,6 +239,16 @@ saveFile:
     jmp return           ; TODO: Fix this
 
 createFile:             ; Appends a file to the filetable.
+    mov di, FILETAB_LOC
+    mov es, di
+    xor di, di
+
+.filetabEnd:            ; Move to the end of filetable
+    cmp byte [es:di], 0
+    je .filetabEndDone
+    add di, 16
+    jmp .filetabEnd
+.filetabEndDone:
     mov cx, 10
     mov si, fileName
     rep movsb           ; Append the fileName
@@ -221,6 +256,7 @@ createFile:             ; Appends a file to the filetable.
     mov si, filetype
     rep movsb           ; Append the extension
     mov byte [es:di], 0 ; Number of entries
+    inc di
     mov byte al, [availableSector]
     stosb               ; Starting sector
     mov byte al, [filesize]
@@ -228,13 +264,15 @@ createFile:             ; Appends a file to the filetable.
 
     ; Write changed filetable to disk
     ;! If filetable size changes, this will have to change (probably)
+    mov bx, FILETAB_LOC
+    mov es, bx
     xor bx, bx          ; es:bx - Filetable location
     mov dl, [diskNum]
     mov ah, 3           ; Write to disk
     mov al, 1           ; Write 1 sector
     mov ch, 0           ; Cylinder
     mov dh, 0           ; Head
-    mov cl, 1           ; Sector
+    mov cl, 2           ; Sector
     int 0x13
 
     jnc writeFileData
@@ -243,7 +281,7 @@ createFile:             ; Appends a file to the filetable.
     jmp returnToCaller
 
 writeFileData:          ; Writes file data to the disk
-    mov ax, fs          ; Source segment
+    mov ax, 0x8000          ; Source segment
     mov es, ax
     pop bx              ; es:bx - Source
     mov ah, 3           ; Write to disk
@@ -260,10 +298,30 @@ writeFileData:          ; Writes file data to the disk
 
 returnToCaller:
     ; Func epilogue
-    popa
+    pop es
+    pop si
+    pop dx
+    pop cx
+    pop fs
+    pop bx
     mov sp, bp
     pop bp
     mov byte al, [exitCode]
+    ret
+
+debug:
+    pusha
+    mov ah, 0x0e
+    mov bl, 0x1f
+    mov bh, 0
+.loop:
+    lodsb           ; Load [si] into al; Increment si
+    or al, al
+    jz .done
+    int 0x10
+    jmp .loop
+.done:
+    popa
     ret
 
 ;; Variables

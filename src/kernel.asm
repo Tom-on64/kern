@@ -259,6 +259,18 @@ shutdown:
 ; File list (ls)
 ;
 fileList:
+    mov bx, FILETAB_LOC
+    mov es, bx
+    xor bx, bx
+
+    mov al, 2       ; Read from disk
+    mov byte dl, [driveNum]
+    mov ch, 0       ; Cylinder
+    mov dh, 0       ; Head
+    mov cl, 2       ; Sector
+    mov al, 1       ; Read 1 sector
+    int 0x13        ; Move filetable to es:bx
+
     mov si, fileListMsg
     call print
 
