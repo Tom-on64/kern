@@ -21,9 +21,11 @@ loadFile:
     push es
 
     mov byte [diskNum], dl
-    mov bx, [bp+4]   ; dest Offset
-    mov fs, [bp+6]   ; dest Segment
-    mov si, [bp+8]   ; Filename
+    mov bx, [bp+4]      ; src Offset
+    mov fs, [bp+6]      ; src Segment
+    mov si, [bp+8]      ; Filename
+
+    push bx
 
     mov cx, 10
     mov di, fileName
@@ -47,7 +49,7 @@ loadFile:
 .fileNameCheck:
     mov al, [es:di]
     cmp al, 0       ; End of filetable
-    je .notFound   ; File doesn't exist, create new one
+    je .notFound
 
     cmp al, [si]
     je .beginCmp
@@ -76,11 +78,6 @@ loadFile:
     mov byte [exitCode], NOT_FOUND
     jmp .done
 .found:
-    mov al, [es:di]
-    inc di
-    cmp al, 0       ; Skip NULLs untill extension
-    je .found
-
     add di, 3       ; Skip extension
     inc di          ; Skip Number of entries
 
@@ -88,13 +85,16 @@ loadFile:
     mov dl, [diskNum]
     int 0x13
 
-    mov ax, fs
-    mov es, ax
     mov ch, 0       ; Cylinder
     mov dh, 0       ; Head
     mov cl, [es:di] ; Sector
     inc di
     mov al, [es:di] ; Length in sectors
+    mov bx, fs
+    mov es, bx
+    pop bx
+    mov dx, bx
+    call printHexByte
     mov ah, 2       ; Read from disk
     int 0x13
 
@@ -210,11 +210,6 @@ saveFile:
     jmp .fileNameCheck
 .found:             ; File already exists (override)
     ; TODO: Ask user if they want to override file
-    mov al, [es:di]
-    inc di
-    cmp al, 0       ; Skip NULLs untill extension
-    je .found
-
     add di, 3       ; Skip extension
     inc di          ; Skip Number of entries
 
@@ -236,7 +231,7 @@ saveFile:
     ; jnc returnToCaller
 
     mov byte [exitCode], DISK_ERROR
-    jmp return           ; TODO: Fix this
+    jmp returnToCaller  ; TODO: Fix this
 
 createFile:             ; Appends a file to the filetable.
     mov di, FILETAB_LOC
@@ -309,20 +304,14 @@ returnToCaller:
     mov byte al, [exitCode]
     ret
 
-debug:
-    pusha
-    mov ah, 0x0e
-    mov bl, 0x1f
-    mov bh, 0
-.loop:
-    lodsb           ; Load [si] into al; Increment si
-    or al, al
-    jz .done
-    int 0x10
-    jmp .loop
-.done:
-    popa
-    ret
+;
+; Removes a file from the disk/filetable
+;
+; Params:
+;   Filename
+;
+removeFile:
+    
 
 ;; Variables
 availableSector: db 0

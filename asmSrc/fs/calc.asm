@@ -1,12 +1,21 @@
 [bits 16]
 
 start:
+    pusha
+    
     mov si, msg
     call print
 
     xor ax, ax
     int 0x16
 
+    mov dl, ah
+    call printHexByte
+
+    xor ax, ax
+    int 0x16
+
+    popa
 .return:
     mov ax, 0x2000
     mov ds, ax

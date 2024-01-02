@@ -65,7 +65,27 @@ input:
     cmp byte [inputLen], 0 ; Check if user input something
     je input
 
+tokenize:           ; Tokenize 
+    mov byte cl, [inputLen]
+    mov di, tokens
+.tokenLoop:
+    lodsb
+    cmp al, 0       ; Check for end of input
+    je runCommand
+.wsLoop:
+    cmp al, ' '     ; Compare with whitespace
+    jne .stringLoop
+    lodsb
+    jmp .wsLoop
+.stringLoop:
+    cmp al, ' '
+    je .next
+    
+.next:
+    
+
 ; Runs a command in userInput
+; Expects tokenized input
 runCommand:
     mov di, lsCmd
     call .cmp
@@ -90,6 +110,10 @@ runCommand:
     mov di, exitCmd
     call .cmp
     je shutdown
+
+    mov di, rmCmd
+    call .cmp
+    je rmFile
 
     jmp .end
 .cmp:
@@ -256,6 +280,13 @@ shutdown:
     out dx, ax
 
 ;
+; Remove file (rm)
+;
+rmFile:
+    call removeFile
+    jmp input
+
+;
 ; File list (ls)
 ;
 fileList:
@@ -419,6 +450,7 @@ reboot: jmp 0xffff:0x0000
 ;; Includes
 %include "./src/lib/print.asm"
 %include "./src/lib/screen.asm"
+%include "./src/lib/disk.asm"
 
 ;; Variables
 driveNum: db 0
@@ -441,24 +473,29 @@ helpMsg: db "Available Commands:", ENDL, \
             " gfx    | Graphics mode test", ENDL, \
             " help   | Prints this message", ENDL, \
             " ls     | List all files", ENDL, \
-            " reboot | Reboots the system", ENDL, ENDL, 0
+            " reboot | Reboots the system", ENDL, \
+            " rm     | Removes a file", ENDL, ENDL, 0
 
 ; Commands
 ; TODO: Put these into a file or something
 clearCmd: db "clear", 0
+exitCmd: db "exit"
 gfxCmd: db "gfx", 0
 helpCmd: db "help", 0
 lsCmd: db "ls", 0
-exitCmd: db "exit"
 rebootCmd: db "reboot", 0
+rmCmd: db "rm", 0
 
 ; Files
 fileExt: db "   ", 0
 binExt: db "bin", 0
 txtExt: db "txt", 0
 
+tokens: times 50 db 0 ; char[10][5] (List of 5 strings that are 10 chars long each or null terminated) 
+tokenLen: times 5 db 0 ; 5 lengths for each token
+tokenCount: db 0
 inputLen: db 0
-userInput: db 0
+userInput: times 80 db 0
 
 ;; Constants
 FILETAB_LOC equ 0x1000

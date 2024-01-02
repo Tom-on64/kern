@@ -11,16 +11,16 @@ nasm -fbin src/boot.asm -o ./build/boot.bin
 nasm -fbin src/filetable.asm -o ./build/filetable.bin
 
 # Kernel
-# nasm -fbin src/kernel.asm -o ./build/kernel.bin
+nasm -fbin src/kernel.asm -o ./build/kernel.bin
 
 # Programs
-# nasm -fbin src/fs/calc.asm -o ./build/calc.bin
-# nasm -fbin src/fs/edit.asm -o ./build/edit.bin
+nasm -fbin src/fs/calc.asm -o ./build/calc.bin
+nasm -fbin src/fs/edit.asm -o ./build/edit.bin
 
-# cat ./build/calc.bin ./build/edit.bin > ./build/files.bin
+cat ./build/calc.bin ./build/edit.bin > ./build/files.bin
 
 # Final binary
-cat ./build/boot.bin ./build/filetable.bin > ./build/temp.bin
+cat ./build/boot.bin ./build/filetable.bin ./build/kernel.bin ./build/files.bin > ./build/temp.bin
 dd if=/dev/zero of=./build/kern.iso bs=512 count=2880
 dd if=./build/temp.bin of=./build/kern.iso conv=notrunc
 rm -rf ./build/**.bin

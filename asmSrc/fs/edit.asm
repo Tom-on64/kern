@@ -1,10 +1,10 @@
 [bits 16]
 
 start:
+    pusha
     mov byte [driveNum], dl
 
 hexEditor:
-    pusha
     call clearText
 
     mov di, 0x0e60      ; Offset in vidmem (2nd to last line)
@@ -16,6 +16,29 @@ hexEditor:
 
     mov di, hexCode
     xor cx, cx      ; Clear counter
+
+    mov dx, [codeLen]
+    call printHexByte
+    mov si, bytesMsg
+    call print
+    mov si, newline
+    call print
+
+    cmp word [codeLen], 0
+    je getHexCh
+
+    mov cx, [codeLen]
+.printCode:  
+    mov dl, [di]
+    call printHexByte
+    mov ah, 0x0e
+    mov al, ' '
+    int 0x10
+    inc di
+    dec cx
+    jnz .printCode
+
+    mov cx, [codeLen]
 getHexCh:
     xor ax, ax
     int 0x16
@@ -42,7 +65,7 @@ getHexCh:
     mov [hexByte], al
     jmp getHexCh
 .putByte:
-    cmp di, hexCode+256
+    cmp di, hexCode+510
     jge getHexCh    ; Max length reached
     rol byte [hexByte], 4
     or byte [hexByte], al
@@ -50,18 +73,18 @@ getHexCh:
     stosb
     mov dx, [hexByte]
     call printHexByte
-    inc byte [codeLen]
+    inc word [codeLen]
     xor cx, cx
     mov al, ' '
     mov ah, 0x0e
     int 0x10
     jmp getHexCh
 .backspace:
-    mov byte [hexByte], 0
-    dec byte [codeLen]
-    xor cx, cx
-    cmp di, hexByte     ; Check if there's anything to delete
+    cmp word [codeLen], 0 ; Check if there's anything to delete
     je getHexCh         ; If not, ignore
+    mov byte [hexByte], 0
+    dec word [codeLen]
+    xor cx, cx
     mov byte [di], 0
     dec di
     mov si, hexBackspace
@@ -72,7 +95,9 @@ getHexCh:
     call print
 
     pusha
-    call hexCode       ; Call the code
+    push es
+    call hexCode       ;! Runs arbitrary code (may break everything)
+    pop es
     popa
 
     mov si, ranMsg
@@ -80,16 +105,7 @@ getHexCh:
     xor ax, ax
     int 0x16
     jmp hexEditor
-
 return:
-    mov cx, 256
-    mov di, hexCode
-.loop:
-    mov byte [di], 0
-    inc di
-    dec cx
-    jnz .loop
-
     popa
 
     mov ax, 0x2000
@@ -105,7 +121,7 @@ return:
 save:
     mov dl, 9
     mov si, saveFileMsg
-    call getFilename
+    call getInput
     mov byte al, [filename]
     cmp byte al, 0
     je getHexCh
@@ -113,13 +129,16 @@ save:
     ; Call saveFile
     mov byte dl, [driveNum]
     push word filename
-    ; TODO: More filetypes other than .bin
-    push word binFile   ; Filetype
+    push word binFile   ; Filetype, TODO: More filetypes other than .bin
     push word 1         ; TODO: Dynamic filesize
     push word 0x8000    ; Program location (this segment)
-    push word hexCode   ; Offset (hex code location)
+    push word savedData ; Offset (hex code location)
     call saveFile       ; Returns exit code in al
     add sp, 10          ; Stack bs
+
+    mov ax, 0x8000
+    mov es, ax
+    mov fs, ax
 
     cmp al, 0           ; Won't be 1 (File not found) so must be disk error
     jne .error
@@ -129,13 +148,14 @@ save:
     mov si, diskErrMsg
     mov di, 0x0f00      ; Last line
     call drawString
+    
     jmp getHexCh
 
 ; Opens a file
 open:
     mov dl, 11
     mov si, openFileMsg
-    call getFilename
+    call getInput
     mov byte al, [filename]
     cmp byte al, 0
     je getHexCh
@@ -143,17 +163,21 @@ open:
     ; Call loadFile
     mov byte dl, [driveNum]
     push word filename
-    push 0x8000
-    push hexCode
+    push word 0x8000
+    push word hexCode
     call loadFile
-    add sp, 8
+
+    mov ax, 0x8000
+    mov es, ax
+    mov fs, ax
 
     cmp al, 1
     je .notFound
     cmp al, 2
     je .diskErr
 
-    jmp getHexCh
+    ; Success
+    jmp hexEditor
 .notFound:
     mov si, notFoundMsg
     jmp .err
@@ -162,7 +186,9 @@ open:
 .err:
     mov di, 0x0f00
     call drawString
-    jmp getHexCh
+    xor ax, ax
+    int 0x16
+    jmp hexEditor
 
 ;
 ; Gets a filename (10 chars, If less, padded with Nulls)
@@ -170,7 +196,7 @@ open:
 ; si - Prompt string (Null terminated)
 ; dl - String offset
 ;
-getFilename:
+getInput:
     pusha
     push es
 
@@ -247,6 +273,9 @@ textModeMsg: db " -- Text -- ", 0
 controlsMsg: db "'$' Execute; ^Q Quit; ^S Save; ^O Open", 0
 saveFileMsg: db "Save as:                              ", 0 ; Make sure to erase the controls
 openFileMsg: db "Open file:                            ", 0
+bytesMsg: db " Bytes", 0
+; savedMsg: db "Saved file as '", 0
+; oepenedMsg: db "Editing file '", 0
 runMsg: db ENDL, ENDL, 0
 ranMsg: db ENDL, ENDL, " - Finished Execution - ", ENDL, 0
 notFoundMsg: db "File not found!           ", 0 ; Erase the user input
@@ -264,7 +293,6 @@ hexByte: db 0
 
 filenameLen: db 0
 filename: times 10 db 0
-codeLen: db 0
 
 ;; Constants
 RUN_CODE equ '$'
@@ -275,5 +303,6 @@ OPEN_FILE equ 'o'
 
 times 3*512-($-$$) db 0
 
-hexCode: times 511 db 0     ; Code buffer
-    ret
+savedData:
+    hexCode: times 510 db 0     ; Code buffer
+    codeLen: dw 0               ; Hopefully we don't overflow :)

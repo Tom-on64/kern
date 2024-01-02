@@ -2,8 +2,6 @@
 [bits 16]
 [global start]
 
-%define ENDL 0x0A, 0x0D
-
 start:
     ; Setup
     xor ax, ax
@@ -19,7 +17,7 @@ start:
     mov si, bootMsg
     call print
     mov dl, byte [driveNumber]
-    call printHexByte
+    call printHex
     mov si, newline
     call print
 
@@ -86,60 +84,12 @@ readFail:
     cli
     hlt
 
-;
-; Prints a string
-; si - Pointer to NULL terminated string
-;
-print:
-    pusha
-    mov ah, 0x0e
-    mov bl, 0x1f
-    mov bh, 0
-.loop:
-    lodsb           ; Load [si] into al; Increment si
-    or al, al
-    jz .done
-    int 0x10
-    jmp .loop
-.done:
-    popa
-    ret    
-
-;
-; Prints a hex byte
-; dl - Hex byte
-;
-printHexByte:
-    pusha
-    xor cx, cx
-    mov bh, 0
-    mov bl, 0x1f    ; White on blue
-.loop:
-    mov al, dl
-    and al, 0xF0
-    ror al, 4
-    add al, '0'
-    cmp al, '9'
-    jle .hexNum
-    add al, 7
-.hexNum:
-    mov ah, 0x0e
-    int 0x10
-    inc cx
-    cmp cx, 2
-    je .done
-    ror dl, 4
-    jmp .loop
-.done:
-    popa
-    ret
+%include "./src/lib/print.asm"
 
 driveNumber: db 0
 
-bootMsg: db ENDL, "Booting kern.", ENDL, "Booting from drive 0x", 0
+bootMsg: db ENDL, "Booting kern.", ENDL, "Booting from drive ", 0
 diskErrorMsg: db "Disk Error!", ENDL, 0
-
-newline: db ENDL
 
 FILETAB_LOC equ 0x1000
 KERNEL_LOC equ 0x2000
