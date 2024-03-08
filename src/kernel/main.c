@@ -1,6 +1,8 @@
 #include "screen.h"
+#include "idt.h"
 
 void main() {
-    print("Hello, World!", 0x0f);
+    setupIdt();
+    print("kern.\n", 0x0f);
 }
 
