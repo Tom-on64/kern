@@ -1,98 +1,149 @@
-[org 0x7c00]
 [bits 16]
+[org 0x7c00]
 [global start]
 
+%define KERNEL_LOC 0x1000
+%define KERNEL_SIZE 20      ; 20 Sectors -> 10kB
+%define ENDL 0x0a, 0x0d
+%define VIDMEM 0xb800
+
 start:
-    ; Setup
+    mov [driveNum], dl   ; Store the drive number
+
+    ; Set up the stack
     xor ax, ax
     mov es, ax
     mov ds, ax
     mov bp, 0x7c00
     mov sp, bp
 
-    ; Save drive number
-    mov byte [driveNumber], dl
+    ; Setup screen
+    mov ax, 3       ; 80x25 Text mode
+    int 0x10
+    mov ah, 1       ; Hide cursor
+    mov cx, 0x2607
+    int 0x10
 
-    ; Print boot message
-    mov si, bootMsg
-    call print
-    mov dl, byte [driveNumber]
-    call printHex
-    mov si, newline
-    call print
+    mov byte [0xb800], 'A'
+.read:
+    ; Location
+    mov bx, KERNEL_LOC
 
-    ; Read filetable from disk
-    mov bx, FILETAB_LOC ; Filetable location in memory
-    mov es, bx
-    xor bx, bx
+    ; CHS Location
+    mov al, KERNEL_SIZE
+    mov ch, 0   ; Cylinder
+    mov dh, 0   ; Head
+    mov cl, 2   ; Sector
+    mov dl, [driveNum]
 
-    mov ah, 2           ; Read from disk
-    mov al, 1           ; Read 1 sector (512B)
+    mov ah, 2   ; Read from disk
+    int 0x13    ; Read interrupt
 
-    mov dl, byte [driveNumber] ; Drive number
-    mov ch, 0           ; Cylinder
-    mov dh, 0           ; Head
-    mov cl, 2           ; Sector
-    int 0x13            ; INT 0x13 - Disk operations
+    jc .diskErr
 
-    jc readFail         ; CF will be set if the read fails
+    cli
+    lgdt [GDT_Descriptor]
+    ; Enable protected mode
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
 
-    ; Read filetable from disk
-    mov bx, KERNEL_LOC ; Filetable location in memory
-    mov es, bx
-    xor bx, bx
+    ; Far jump to 32 bit mode!!
+    jmp CODE_SEG:protected_start
 
-    mov ah, 2           ; Read from disk
-    mov al, 4           ; Read 4 sectors (2kB)
+.diskErr:
+    dec byte [counter]
+    jnz .read
 
-    mov dl, byte [driveNumber] ; Drive number
-    mov ch, 0           ; Cylinder
-    mov dh, 0           ; Head
-    mov cl, 3           ; Sector
-    int 0x13            ; INT 0x13 - Disk operations
+    mov si, diskErrMsg
+    mov bl, 0x04
+    call puts
 
-    jc readFail         ; CF will be set if the read fails
+    cli
+    hlt
 
-    ; Setup segmentation
-    mov ax, KERNEL_LOC
-    mov ds, ax
+;
+; Prints a string
+; si: char* - String to print
+; bl: byte  - Color attribute
+;
+puts:
+    push ax
+    push es
+
+    mov ax, VIDMEM
+    mov es, ax
+    mov word di, [cursor]
+
+    mov ah, bl
+.loop:
+    lodsb               ; mov al, [si]; inc si
+    cmp al, 0
+    je .done
+    mov [es:di], ax     ; Really smart thing
+    add di, 2
+    jmp .loop
+.done:
+    mov [cursor], di
+    pop es
+    pop ax
+    ret
+
+;; Data
+driveNum: db 3
+counter: db 0
+cursor: dw 0
+
+; Strings
+msg: db "Booting...", 0
+diskErrMsg: db "Failed while reading from disk!", 0
+
+;; 32 Bit entry code
+[bits 32]
+protected_start:
+    ; Set up data and stack segments
+    mov ax, DATA_SEG 
+    mov ds, ax 
+    mov ss, ax 
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    ; Setup stack
-    mov bp, 0xffff
-    mov sp, bp
-    mov ax, 0x9000
-    mov ss, ax
+    ; Set up the stack pointer in protected mode
+    mov ebp, 0x90000
+    mov esp, ebp
 
-    mov bl, byte [driveNumber]
+    ; Perform the far jump
+    jmp KERNEL_LOC
+    
+;; GDT
+GDT_Start:
+    null_descriptor:    ; No clue why this exists
+        dd 0
+        dd 0
+    code_descriptor:    ; Memory for code
+        dw 0xffff       ; First 16 bits of limit
+        dw 0            ; 16 bits +
+        db 0            ; + 8 bits = 24 bits
+        db 0b10011010   ; p, dpl, s, type flags
+        db 0b11001111   ; Other flags, last 4 bits of limit
+        db 0            ; Base
+    data_descriptor:    ; Memory for data
+        dw 0xffff       ; First 16 bits of limit
+        dw 0            ; 16 bits +
+        db 0            ; + 8 bits = 24 bits
+        db 0b10010010   ; p, dpl, s, type flags
+        db 0b11001111   ; Other flags, last 4 bits of limit
+        db 0            ; Base
+GDT_End:
 
-    ; Setup video mode
-    mov ax, 0x0003
-    int 0x10
-    mov ah, 0x0b
-    mov bx, 0x0001
-    int 0x10
+GDT_Descriptor:
+    dw GDT_End - GDT_Start - 1  ; Size
+    dd GDT_Start        ; GDT Pointer
 
-    ; Far jump to the kernel (never returns)
-    jmp KERNEL_LOC:0x0000
-
-readFail:
-    mov si, diskErrorMsg
-    call print
-    cli
-    hlt
-
-%include "./src/lib/print.asm"
-
-driveNumber: db 0
-
-bootMsg: db ENDL, "Booting kern.", ENDL, "Booting from drive ", 0
-diskErrorMsg: db "Disk Error!", ENDL, 0
-
-FILETAB_LOC equ 0x1000
-KERNEL_LOC equ 0x2000
+CODE_SEG equ code_descriptor - GDT_Start
+DATA_SEG equ data_descriptor - GDT_Start
 
 times 510-($-$$) db 0
 dw 0xaa55
+

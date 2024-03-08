@@ -1,32 +1,27 @@
 #!/bin/bash
 
-# Create ./build dir if it doesn't exist
-if !(test -d ./build); then
-    mkdir ./build
-    echo "Created ./build/ directory!"
-fi
+[[ -d ./build ]] || mkdir build
+
+rm -rf ./build/**
 
 # Bootloader
-nasm -fbin src/boot.asm -o ./build/boot.bin
-nasm -fbin src/filetable.asm -o ./build/filetable.bin
+nasm -fbin ./src/boot.asm -o ./build/boot.bin
 
 # Kernel
-nasm -fbin src/kernel.asm -o ./build/kernel.bin
+nasm -felf32 ./src/kernel/entry.asm -o ./build/entry.o
 
-# Programs
-nasm -fbin src/fs/calc.asm -o ./build/calc.bin
-nasm -fbin src/fs/edit.asm -o ./build/edit.bin
+for file in ./src/kernel/**.c; do
+    filename=$(basename "$file" .c)
+    i386-elf-gcc -ffreestanding -Wall -Wextra -m32 -c $file -o ./build/$filename.o
+done
 
-cat ./build/calc.bin ./build/edit.bin > ./build/files.bin
+i386-elf-ld -o ./build/kernel.bin -Ttext 0x1000 --oformat binary ./build/**.o
 
-# Final binary
-cat ./build/boot.bin ./build/filetable.bin ./build/kernel.bin ./build/files.bin > ./build/temp.bin
-dd if=/dev/zero of=./build/kern.iso bs=512 count=2880
-dd if=./build/temp.bin of=./build/kern.iso conv=notrunc
-rm -rf ./build/**.bin
-
-echo "Built kern.iso!"
+# OS Image
+cat build/boot.bin build/kernel.bin > build/os.bin
+dd if=/dev/zero of=./kern.iso bs=512 count=2880
+dd if=./build/os.bin of=./kern.iso conv=notrunc
 
 # Run QEMU
-echo "Running QEMU..."
-qemu-system-x86_64 -drive format=raw,file="./build/kern.iso",index=0,media=disk -m 256M
+qemu-system-x86_64 -drive format=raw,file="./kern.iso",index=0,media=disk -m 256M -accel tcg
+
