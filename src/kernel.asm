@@ -66,23 +66,16 @@ input:
     je input
 
 tokenize:           ; Tokenize 
-    mov byte cl, [inputLen]
-    mov di, tokens
-.tokenLoop:
-    lodsb
-    cmp al, 0       ; Check for end of input
-    je runCommand
-.wsLoop:
-    cmp al, ' '     ; Compare with whitespace
-    jne .stringLoop
-    lodsb
-    jmp .wsLoop
-.stringLoop:
-    cmp al, ' '
-    je .next
-    
-.next:
-    
+    mov si, userInput
+.loop:
+    inc si
+    cmp byte [si], 0
+    je .done
+    cmp byte [si], ' '
+    jne .loop
+    mov byte [si], 0
+    jmp .loop
+.done:
 
 ; Runs a command in userInput
 ; Expects tokenized input
@@ -188,25 +181,33 @@ foundProgram:
 
     inc bx          ; Ignore Number of FT entries for now
 
-    mov cl, [es:bx] ; Starting sector
-    inc bx
-    mov al, [es:bx] ; Number of sectors to read
-    push ax         ; Save file size
+    ; mov cl, [es:bx] ; Starting sector
+    ; inc bx
+    ; mov al, [es:bx] ; Number of sectors to read
+    ; push ax         ; Save file size
 
-    mov ah, 0       ; Reset disk system
-    mov dl, byte [driveNum]
-    int 0x13
+    ; mov ah, 0       ; Reset disk system
+    ; mov dl, byte [driveNum]
+    ; int 0x13
 
-    mov bx, PROGRAM_LOC
-    mov es, bx
-    xor bx, bx      ; [es:bx] - Place to load out program
+    ; mov bx, PROGRAM_LOC
+    ; mov es, bx
+    ; xor bx, bx      ; [es:bx] - Place to load out program
 
-    mov ah, 2       ; Read sectors into memory
-    mov dl, byte [driveNum]
-    mov ch, 0       ; Cylinder
-    mov dh, 0       ; Head
-    int 0x13
-    jnc .loaded     ; Loaded file successfully
+    ; mov ah, 2       ; Read sectors into memory
+    ; mov dl, byte [driveNum]
+    ; mov ch, 0       ; Cylinder
+    ; mov dh, 0       ; Head
+    ; int 0x13
+
+    mov byte dl, [driveNum] ; Drive number
+    push word userInput     ; Filename
+    push word PROGRAM_LOC   ; Dest. segment
+    push word 0x0000        ; Dest. offset
+    call loadFile
+
+    cmp byte al, 0
+    je .loaded     ; Loaded file successfully
 
     mov si, programLoadFailMsg
     call print
@@ -491,10 +492,8 @@ fileExt: db "   ", 0
 binExt: db "bin", 0
 txtExt: db "txt", 0
 
-tokens: times 50 db 0 ; char[10][5] (List of 5 strings that are 10 chars long each or null terminated) 
-tokenLen: times 5 db 0 ; 5 lengths for each token
-tokenCount: db 0
 inputLen: db 0
+tokenCount: db 0
 userInput: times 80 db 0
 
 ;; Constants

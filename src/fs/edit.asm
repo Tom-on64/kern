@@ -256,6 +256,10 @@ getInput:
 
 ; Expects al to contain an ASCII character, will set bx to it's hex equivalent
 asciiToHex:
+    cmp al, 'F'
+    jle .upperCase
+    sub al, 32
+.upperCase:
     cmp al, '9'
     jle .getHex
     sub al, 7
@@ -275,7 +279,7 @@ saveFileMsg: db "Save as:                              ", 0 ; Make sure to erase
 openFileMsg: db "Open file:                            ", 0
 bytesMsg: db " Bytes", 0
 ; savedMsg: db "Saved file as '", 0
-; oepenedMsg: db "Editing file '", 0
+; openedMsg: db "Editing file '", 0
 runMsg: db ENDL, ENDL, 0
 ranMsg: db ENDL, ENDL, " - Finished Execution - ", ENDL, 0
 notFoundMsg: db "File not found!           ", 0 ; Erase the user input

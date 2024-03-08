@@ -1,7 +1,7 @@
 ;
 ; Loads a file from the filetable into a memory location
 ; Params:
-;   dl - Disk number
+;   dl - Disk number (byte)
 ;   Filename (Null terminated)
 ;   Destination location segment
 ;   Destination location offset
@@ -42,6 +42,9 @@ loadFile:
     stosb
     loop .filenamePadLoop
 .filenameDone:
+    mov si, fileName
+    call print
+
     mov ax, FILETAB_LOC
     mov es, ax
     xor di, di      ; es:di - Filetable location
@@ -311,8 +314,8 @@ returnToCaller:
 ;   Filename
 ;
 removeFile:
+    ret
     
-
 ;; Variables
 availableSector: db 0
 exitCode: db 0
