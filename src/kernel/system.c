@@ -25,3 +25,15 @@ char* memset(char* dst, char value, uint16_t length) {
     return dst;
 }
 
+void cli() {
+    asm volatile("cli");
+}
+
+void sti() {
+    asm volatile("sti");
+}
+
+void hlt() {
+    asm volatile("hlt");
+}
+

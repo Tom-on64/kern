@@ -11,11 +11,9 @@ void outb(uint16_t port, uint8_t data);
 char* memcopy(char* src, char* dst, uint16_t length);
 char* memset(char* dst, char data, uint16_t length);
 
-struct regs {
-    unsigned int gs, fs, es, ds;
-    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    unsigned int intNo, errCode;
-    unsigned int eip, cs, eflags, useresp, ss;
-};
+// Assembly stuff
+void cli();
+void sti();
+void hlt();
 
 #endif

@@ -50,6 +50,16 @@ void clear(uint8_t attr) {
     }
 }
 
+void printHex(uint8_t d, uint8_t attr) {
+    char digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    
+    uint8_t low = d & 0x0f;
+    uint8_t high = (d & 0xf0) >> 4;
+
+    putc(digits[low], attr);
+    putc(digits[high], attr);
+}
+
 void setCursorPos(uint16_t offset) {
     cursor = offset;
 }

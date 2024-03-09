@@ -21,6 +21,7 @@ void print(char* s, uint8_t attr);
 void putcAt(char c, uint8_t attr, uint8_t row, uint8_t col);
 void printAt(char* s, uint8_t attr, uint8_t row, uint8_t col);
 void clear(uint8_t attr);
+void printHex(uint8_t d, uint8_t attr);
 
 void setCursorPos(uint16_t offset);
 uint16_t getCursorPos();
