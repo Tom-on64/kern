@@ -3,6 +3,9 @@
 
 void main() {
     setupIdt();
-    print("kern.\n", 0x0f);
+    clear(0x0f);
+
+    print("kern.\n\n", 0x0f);
+    print("> ", 0x0e);
 }
 

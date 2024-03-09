@@ -1,8 +1,15 @@
 #include "screen.h"
+#include "stdint.h"
 
-unsigned int cursor = 0;
+uint16_t cursor = 0;
 
-void putc(char c, char attr) {
+void putc(char c, uint8_t attr) {
+    if (c == '\n') {
+        uint16_t line = cursor - (cursor % COLS);
+        setCursorPos(line + COLS);
+        return;
+    }
+    
     int mem = VIDMEM + cursor * 2;
     *(char*)(mem) = c;
     *(char*)(mem+1) = attr;
@@ -10,12 +17,48 @@ void putc(char c, char attr) {
     cursor++;
 }
 
-void print(char* s, char attr) {
-    int i = 0;
+void print(char* s, uint8_t attr) { 
     char c = *s;
     while (c != '\0') {
         putc(c, attr);
-        c = *(s + ++i);
+        c = *(++s);
     }
+}
+
+void putcAt(char c, uint8_t attr, uint8_t col, uint8_t row) {
+    uint16_t offset = calcOffset(col, row);
+    *(char*)(VIDMEM + offset * 2) = c;
+    *(char*)(VIDMEM + offset * 2 + 1) = attr;
+}
+
+void printAt(char* s, uint8_t attr, uint8_t col, uint8_t row) {
+    uint16_t offset = calcOffset(col, row);
+    
+    char c = *s;
+    while (c != '\0') {
+        *(char*)(VIDMEM + offset * 2) = c;
+        *(char*)(VIDMEM + offset * 2 + 1) = attr;
+        c = *(++s);
+        offset++;
+    }
+}
+
+void clear(uint8_t attr) {
+    for (int i = 0; i < CHARS*2; i += 2) {
+        *(char*)(VIDMEM + i) = ' ';
+        *(char*)(VIDMEM + i + 1) = attr;
+    }
+}
+
+void setCursorPos(uint16_t offset) {
+    cursor = offset;
+}
+
+uint16_t getCursorPos() {
+    return cursor;
+}
+
+uint16_t calcOffset(uint8_t col, uint8_t row) {
+    return row * COLS + col;
 }
 
