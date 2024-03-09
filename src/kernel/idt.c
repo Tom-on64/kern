@@ -28,5 +28,7 @@ void idtSetGate(uint8_t i, uint32_t offset, uint16_t selector, uint8_t typeAttr)
 void setupIdt() {
     idtp.limit = sizeof(struct idtEntry) * 256;
     idtp.base = (uint32_t)&idt;
+
+    idtLoad();
 }
 
