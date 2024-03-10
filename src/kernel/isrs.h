@@ -3,14 +3,6 @@
 
 void setupIsrs();
 
-// Contains values of registers and exception info from isrs
-struct regs {
-    unsigned int gs, fs, es, ds;
-    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    unsigned int intNo, errCode;
-    unsigned int eip, cs, eflags, useresp, ss;
-};
-
 // Repetative isr definitions
 extern void isr0();
 extern void isr1();

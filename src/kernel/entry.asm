@@ -4,17 +4,23 @@
 [extern main]
 [extern idtp]
 [extern faultHandler]
+[extern irqHandler]
 
+;; Calls the main function in 'main.c'
 _start:
     call main
     cli
     hlt
 
+;;
+;; --- IDT ---
+;;
 [global idtLoad]
 idtLoad:
     lidt [idtp]
     ret
 
+;; Isrs (exceptions)
 [global isr0]
 isr0:
     cli
@@ -216,6 +222,128 @@ isrCommon:      ; No clue how this works, i'm pretty sure it calls the C functio
     mov eax, esp
     push eax
     mov eax, faultHandler
+    call eax
+    pop eax
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    popa
+    add esp, 8
+    iret
+
+;; IRQs
+[global irq0]
+irq0:
+    cli
+    push 0
+    push 32
+    jmp irqCommon
+[global irq1]
+irq1:
+    cli
+    push 0
+    push 33
+    jmp irqCommon
+[global irq2]
+irq2:
+    cli
+    push 0
+    push 34
+    jmp irqCommon
+[global irq3]
+irq3:
+    cli
+    push 0
+    push 35
+    jmp irqCommon
+[global irq4]
+irq4:
+    cli
+    push 0
+    push 36
+    jmp irqCommon
+[global irq5]
+irq5:
+    cli
+    push 0
+    push 37
+    jmp irqCommon
+[global irq6]
+irq6:
+    cli
+    push 0
+    push 38
+    jmp irqCommon
+[global irq7]
+irq7:
+    cli
+    push 0
+    push 39
+    jmp irqCommon
+[global irq8]
+irq8:
+    cli
+    push 0
+    push 40
+    jmp irqCommon
+[global irq9]
+irq9:
+    cli
+    push 0
+    push 41
+    jmp irqCommon
+[global irq10]
+irq10:
+    cli
+    push 0
+    push 42
+    jmp irqCommon
+[global irq11]
+irq11:
+    cli
+    push 0
+    push 43
+    jmp irqCommon
+[global irq12]
+irq12:
+    cli
+    push 0
+    push 44
+    jmp irqCommon
+[global irq13]
+irq13:
+    cli
+    push 0
+    push 45
+    jmp irqCommon
+[global irq14]
+irq14:
+    cli
+    push 0
+    push 46
+    jmp irqCommon
+[global irq15]
+irq15:
+    cli
+    push 0
+    push 47
+    jmp irqCommon
+
+irqCommon: ; Simular to isrCommon, probaly calls the C function
+    pusha
+    push ds
+    push es
+    push fs
+    push gs
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov eax, esp
+    push eax
+    mov eax, irqHandler
     call eax
     pop eax
     pop gs

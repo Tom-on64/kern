@@ -1,5 +1,6 @@
 #include "idt.h"
 #include "stdint.h"
+#include "system.h"
 
 struct idtEntry {
     uint16_t offsetLow;
@@ -30,5 +31,6 @@ void setupIdt() {
     idtp.base = (uint32_t)&idt;
 
     idtLoad();
+    sti();
 }
 
