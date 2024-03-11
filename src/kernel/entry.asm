@@ -9,8 +9,7 @@
 ;; Calls the main function in 'main.c'
 _start:
     call main
-    cli
-    hlt
+    jmp $       ;; If we used cli, hlt we wouldn't have interrupts :/
 
 ;;
 ;; --- IDT ---

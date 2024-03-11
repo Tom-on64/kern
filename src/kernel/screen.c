@@ -8,6 +8,12 @@ void putc(char c, uint8_t attr) {
         uint16_t line = cursor - (cursor % COLS);
         setCursorPos(line + COLS);
         return;
+    } else if (c == '\b') {
+        cursor--;
+        int mem = VIDMEM + cursor * 2;
+        *(char*)(mem) = ' ';
+        *(char*)(mem+1) = attr;
+        return;
     }
     
     int mem = VIDMEM + cursor * 2;
@@ -48,7 +54,9 @@ void clear(uint8_t attr) {
         *(char*)(VIDMEM + i) = ' ';
         *(char*)(VIDMEM + i + 1) = attr;
     }
+    cursor = 0;
 }
+
 
 void printHex(uint8_t d, uint8_t attr) {
     char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };

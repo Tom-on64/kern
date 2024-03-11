@@ -31,6 +31,5 @@ void setupIdt() {
     idtp.base = (uint32_t)&idt;
 
     idtLoad();
-    sti();
 }
 

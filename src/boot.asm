@@ -20,11 +20,9 @@ start:
     ; Setup screen
     mov ax, 3       ; 80x25 Text mode
     int 0x10
-    mov ah, 1       ; Hide cursor
-    mov cx, 0x2607
-    int 0x10
 
-    mov byte [0xb800], 'A'
+    mov si, msg
+    call puts
 .read:
     ; Location
     mov bx, KERNEL_LOC
