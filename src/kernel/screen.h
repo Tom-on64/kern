@@ -14,8 +14,6 @@
 #define COLS 80
 #define CHARS (ROWS*COLS)
 
-#define CURSOR '_'
-
 void putc(char c, uint8_t attr);
 void print(char* s, uint8_t attr);
 void putcAt(char c, uint8_t attr, uint8_t row, uint8_t col);
@@ -27,7 +25,7 @@ void setCursorPos(uint16_t offset);
 uint16_t getCursorPos();
 uint16_t calcOffset(uint8_t row, uint8_t col);
 
-void setCursorChar(char cursor);
-char getCursorChar();
+void enableCursor(uint8_t start, uint8_t end);
+void disableCursor();
 
 #endif

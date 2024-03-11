@@ -16,6 +16,7 @@ void main() {
     setupKeyboard();
     setupTimer();
     timerPhase(100); // 1 tick per 10ms
+    enableCursor(14, 15);
 
     clear(0x0f);
     print("kern.\n\n", 0x0f);
