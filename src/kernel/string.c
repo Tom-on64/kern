@@ -1,5 +1,6 @@
 #include "string.h"
 
+// Source: http://www.strudel.org.uk/itoa/
 char* itoa(uint32_t val, uint8_t base) {
     static char buf[32] = { 0 };
 
