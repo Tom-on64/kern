@@ -4,6 +4,7 @@
 #include "system.h"
 #include "screen.h"
 #include "stdint.h"
+#include "stdbool.h"
 
 const char US_Keyboard[2][128] = {
     {
@@ -27,6 +28,12 @@ const char US_Keyboard[2][128] = {
 
 uint8_t shift = 0;
 
+uint16_t bufferLen = 0;
+char buffer[MAX_BUFFER_SIZE + 1] = { 0 };
+bool echo = false;
+uint8_t echoAttr = 0x0f;
+bool canBackspace = false;
+
 void keyboardHandler() {
     uint8_t scancode;
     scancode = inb(0x60);
@@ -38,12 +45,31 @@ void keyboardHandler() {
 
     if (scancode & 0x80) { // Keyup
     } else if (c != 0) {
-        putc(c, 0x07);
+        if (!canBackspace && c == '\b') return;
+        if (echo) putc(c, echoAttr);
+
+        buffer[bufferLen] = c;
+
+        if (c == '\b') bufferLen--;
+        else bufferLen++;
+
+        if (bufferLen > 0) canBackspace = true;
+        else canBackspace = false;
     }
 }
 
 char* read(char terminator, uint8_t attr) {
-    // TODO: This
+    bufferLen = 0;
+    echo = true;
+    echoAttr = attr;
+
+    while (buffer[bufferLen-1] != terminator && bufferLen < MAX_BUFFER_SIZE);
+
+    echo = false;
+    canBackspace = false;
+    buffer[bufferLen] = '\0';
+
+    return buffer;
 }
 
 void setupKeyboard() {

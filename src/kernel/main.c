@@ -22,8 +22,12 @@ void main() {
 
     clear(0x0f);
     print("kern.\n\n", 0x0f);
-    print("Drive: 0x", 0x0f);
-    print(itoa(driveNum, 16), 0x0f);
-    putc('\n', 0x00);
+
+    while (1) {
+        print("> ", 0x0e);
+        char* input = read('\n', 0x0f);
+        if (*input == '\n') continue;
+        print(input, 0x0b);
+    }
 }
 
