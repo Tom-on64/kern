@@ -4,6 +4,14 @@
 
 uint16_t cursor = 0;
 
+void updateCursor() {
+    outb(0x3d4, 0x0f); // Low byte
+    outb(0x3d5, cursor & 0xff);
+    outb(0x3d4, 0x0e); // High byte
+    outb(0x3d5, cursor >> 8);
+}
+
+
 void putc(char c, uint8_t attr) {
     if (c == '\n') {
         uint16_t line = cursor - (cursor % COLS);
@@ -14,6 +22,7 @@ void putc(char c, uint8_t attr) {
         int mem = VIDMEM + cursor * 2;
         *(char*)(mem) = ' ';
         *(char*)(mem+1) = attr;
+        updateCursor();
         return;
     }
     
@@ -22,6 +31,8 @@ void putc(char c, uint8_t attr) {
     *(char*)(mem+1) = attr;
 
     cursor++;
+
+    updateCursor();
 }
 
 void print(char* s, uint8_t attr) { 
@@ -30,6 +41,8 @@ void print(char* s, uint8_t attr) {
         putc(c, attr);
         c = *(++s);
     }
+
+    updateCursor();
 }
 
 void putcAt(char c, uint8_t attr, uint8_t col, uint8_t row) {
@@ -56,6 +69,8 @@ void clear(uint8_t attr) {
         *(char*)(VIDMEM + i + 1) = attr;
     }
     cursor = 0;
+
+    updateCursor();
 }
 
 
@@ -66,10 +81,13 @@ void printHex(uint8_t d, uint8_t attr) {
 
     putc(hexDigits[low], attr);
     putc(hexDigits[high], attr);
+
+    updateCursor();
 }
 
 void setCursorPos(uint16_t offset) {
     cursor = offset;
+    updateCursor();
 }
 
 uint16_t getCursorPos() {
