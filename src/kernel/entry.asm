@@ -8,8 +8,13 @@
 
 ;; Calls the main function in 'main.c'
 _start:
+    pop ax
+    mov [driveNum], al
     call main
     jmp $       ;; If we used cli, hlt we wouldn't have interrupts :/
+
+[global driveNum]
+driveNum: db 0
 
 ;;
 ;; --- IDT ---

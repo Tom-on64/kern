@@ -88,7 +88,7 @@ puts:
     ret
 
 ;; Data
-driveNum: db 3
+driveNum: db 0
 counter: db 0
 cursor: dw 0
 
@@ -112,6 +112,8 @@ protected_start:
     mov esp, ebp
 
     ; Perform the far jump
+    mov al, [driveNum]
+    push ax
     jmp KERNEL_LOC
     
 ;; GDT

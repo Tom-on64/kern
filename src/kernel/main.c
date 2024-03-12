@@ -5,6 +5,8 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "system.h"
+#include "disk.h"
+#include "string.h"
 
 void main() {
     // Interrupts
@@ -20,5 +22,8 @@ void main() {
 
     clear(0x0f);
     print("kern.\n\n", 0x0f);
+    print("Drive: 0x", 0x0f);
+    print(itoa(driveNum, 16), 0x0f);
+    putc('\n', 0x00);
 }
 
