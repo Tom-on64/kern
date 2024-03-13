@@ -23,6 +23,11 @@ start:
 
     mov si, msg
     call puts
+
+    ; Reset disk
+    mov ah, 0x0
+    mov dl, [driveNum]
+    int 0x13
 .read:
     ; Location
     mov bx, KERNEL_LOC
