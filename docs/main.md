@@ -3,7 +3,7 @@
 Kern is a 32-bit x86 based operating system.
 
 What does that mean? 
-Well, 32-bit means that it can access $2^32$ different memory addresses.
+Well, 32-bit means that it can access $2^{32}$ different memory addresses.
 x86 is the processor architecture it is built upon.
 
 ## Command Line
