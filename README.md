@@ -7,6 +7,8 @@ Idk why i called it that it was 3am and i needed sleep
 Kern is a 32-bit OS based on the x86 architecture written in NASM Assembly and C. 
 I'm working on a basic command line as well as a custom filesystem (filetable for now).
 
+More info can be found in [The Docs](./docs/main.md)
+
 _Since 32-bit switch, a lot of features have been removed because they were dependent on BIOS interrupts_
 
 ## Usage
