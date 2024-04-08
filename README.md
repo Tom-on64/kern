@@ -43,6 +43,5 @@ _These images may be outdated, Idk_
 ## Known issues
 - If you run the kernel.bin, loading files sorta breaks, because the program is running at 0x8000, but it thinks that it's at 0x2000 (i think)
 - If you run anything in the code editor and return to the kernel, you won't be able to load any files
-- If you type only the starting letters of a command, it will still run (i.e. 'he' will run help)
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)
