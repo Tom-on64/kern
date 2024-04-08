@@ -60,7 +60,7 @@ void keyboardHandler() {
 
 char* read(char terminator, uint8_t attr) {
     bufferLen = 0;
-    echo = true;
+    echo = attr ? true : false;
     echoAttr = attr;
 
     while (buffer[bufferLen-1] != terminator && bufferLen < MAX_BUFFER_SIZE);

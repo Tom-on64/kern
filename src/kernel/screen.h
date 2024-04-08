@@ -21,9 +21,10 @@ void printAt(char* s, uint8_t attr, uint8_t row, uint8_t col);
 void clear(uint8_t attr);
 void printHex(uint8_t d, uint8_t attr);
 
-void setCursorPos(uint16_t offset);
-uint16_t getCursorPos();
-uint16_t calcOffset(uint8_t row, uint8_t col);
+void setCursorPos(uint32_t offset);
+uint32_t getCursorPos();
+uint32_t calcOffset(uint8_t row, uint8_t col);
+void scroll();
 
 void enableCursor(uint8_t start, uint8_t end);
 void disableCursor();

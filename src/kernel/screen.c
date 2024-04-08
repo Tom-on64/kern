@@ -2,20 +2,38 @@
 #include "stdint.h"
 #include "system.h"
 
-uint16_t cursor = 0;
+uint32_t cursor = 0;
 
 void updateCursor() {
+    // Move visual cursor position
     outb(0x3d4, 0x0f); // Low byte
     outb(0x3d5, cursor & 0xff);
     outb(0x3d4, 0x0e); // High byte
     outb(0x3d5, cursor >> 8);
 }
 
+void scroll() {
+    if (cursor < COLS * ROWS) return;
+
+    for (int i = 1; i < ROWS; i++) {
+        memcopy((char*)(calcOffset(0, i)*2)+VIDMEM, (char*)(calcOffset(0, i-1)*2)+VIDMEM, COLS*2);
+    }
+
+    char* lastRow = (char*)(calcOffset(0, ROWS-1)*2)+VIDMEM;
+    for (int i = 0; i < COLS*2; i += 2) {
+        lastRow[i] = '\0';
+        lastRow[i+1] = 0x0f;
+    }
+
+    cursor = calcOffset(0, ROWS-1);
+}
 
 void putc(char c, uint8_t attr) {
     if (c == '\n') {
         uint16_t line = cursor - (cursor % COLS);
         setCursorPos(line + COLS);
+        scroll();
+        updateCursor();
         return;
     } else if (c == '\b') {
         cursor--;
@@ -32,6 +50,7 @@ void putc(char c, uint8_t attr) {
 
     cursor++;
 
+    scroll();
     updateCursor();
 }
 
@@ -42,6 +61,7 @@ void print(char* s, uint8_t attr) {
         c = *(++s);
     }
 
+    scroll();
     updateCursor();
 }
 
@@ -73,28 +93,16 @@ void clear(uint8_t attr) {
     updateCursor();
 }
 
-
-void printHex(uint8_t d, uint8_t attr) {
-    char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-    uint8_t low = d & 0x0f;
-    uint8_t high = (d & 0xf0) >> 4;
-
-    putc(hexDigits[low], attr);
-    putc(hexDigits[high], attr);
-
-    updateCursor();
-}
-
-void setCursorPos(uint16_t offset) {
+void setCursorPos(uint32_t offset) {
     cursor = offset;
     updateCursor();
 }
 
-uint16_t getCursorPos() {
+uint32_t getCursorPos() {
     return cursor;
 }
 
-uint16_t calcOffset(uint8_t col, uint8_t row) {
+uint32_t calcOffset(uint8_t col, uint8_t row) {
     return row * COLS + col;
 }
 

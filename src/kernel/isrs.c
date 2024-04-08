@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "screen.h"
 #include "system.h"
+#include "string.h"
 
 char* exceptionMessages[] = {
     "Divide By Zero Error",
@@ -79,7 +80,7 @@ void faultHandler(struct regs* r) {
 
         if (r->errCode) { 
             print(": 0x", 0x04);
-            printHex(r->errCode, 0x04);
+            print(itoa(r->errCode, 16), 0x04);
         }
 
         cli();
