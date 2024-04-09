@@ -11,16 +11,6 @@ void outb(uint16_t port, uint8_t data) {
     asm volatile("out %0, %1" :: "a"(data), "Nd"(port));
 }
 
-uint16_t inw(uint16_t port) {
-    uint8_t result;
-    asm volatile("in %1, %0" : "=a"(result) : "Nd"(port));
-    return result;
-}
-
-void outw(uint16_t port, uint16_t data) {
-    asm volatile("out %0, %1" :: "a"(data), "Nd"(port));
-}
-
 char* memcopy(char* src, char* dst, uint16_t length) {
     for (int i = 0; i < length; i++) {
         *(dst + i) = *(src + i);
@@ -45,9 +35,5 @@ void sti() {
 
 void hlt() {
     asm volatile("hlt");
-}
-
-void exit() {
-    outw(0x0604, 0x2000);
 }
 

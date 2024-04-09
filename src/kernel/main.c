@@ -8,6 +8,8 @@
 #include "disk.h"
 #include "string.h"
 
+#define PROMPT "#> "
+
 void main() {
     // Interrupts
     setupIdt();
@@ -22,12 +24,42 @@ void main() {
 
     clear(0x0f);
     print("kern.\n\n", 0x0f);
+    
+    // Run Interactive Shell Program
+    // TODO: Make it in another file
 
     while (1) {
-        print("> ", 0x0e);
+        print(PROMPT, 0x0a);
         char* input = read('\n', 0x0f);
-        if (*input == '\n') continue;
-        print(input, 0x0b);
+        
+        if (input[0] == '\n') continue;
+        
+        char* args;
+        if ((args = strchr(input, ' ')) == NULL) {
+            args = strchr(input, '\n');
+        }
+
+        *args = '\0';
+        args++;
+
+        if (strcmp(input, "clear") == 0) {
+            clear(0x0f);
+        } else if (strcmp(input, "echo") == 0) {
+            print(args, 0x0f);
+        } else if (strcmp(input, "exit") == 0) {
+            break;
+        } else if (strcmp(input, "help") == 0) {
+            print("Available Commands:\n", 0x0f);
+            print(" clear      | Clears the screen\n", 0x0f);
+            print(" echo       | Prints a message to stdout\n", 0x0f);
+            print(" exit       | Exits program\n", 0x0f);
+            print(" help       | Prints this message\n", 0x0f);
+            // TODO: print(" ls         | Lists all available files\n", 0x0f);
+            // TODO: print(" reboot     | Reboots the system\n", 0x0f);
+        } else {
+            print("Command not found: ", 0x0c);
+            print(input, 0x0c);
+            putc('\n', 0x0f);
+        }
     }
 }
-
