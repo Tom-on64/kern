@@ -1,5 +1,6 @@
 [bits 32]
 [global _start]
+[global driveNum]
 
 [extern main]
 [extern idtp]
@@ -19,7 +20,6 @@ _start:
 
     jmp $       ;; If we used cli, hlt we wouldn't have interrupts :/
 
-[global driveNum]
 driveNum: db 0
 
 ;;

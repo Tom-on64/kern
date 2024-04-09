@@ -29,19 +29,17 @@ If you don't know how to do something, try the 'help' command!
 
 ## Some images
 
+Interactive Shell: \
+![Example Shell Output](other/shell.png)
+
 Text editor **concept**: \
 ![Vim like editor](other/editor.png)
-
-Available character set: \
-![IBM VGA 8x16 Character set](other/charset.png)
-
-Available colors: \
-![16 VGA Colors](other/colors.png)
 
 _These images may be outdated, Idk_
 
 ## Known issues
 - If you run the kernel.bin, loading files sorta breaks, because the program is running at 0x8000, but it thinks that it's at 0x2000 (i think)
 - If you run anything in the code editor and return to the kernel, you won't be able to load any files
+- For some unknown reason, i cannot name the f\_disk.c file just disk.c. It breaks the OS. No idea why. In fact, anything starting with a character that is before f doesn't work. Help me
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)

@@ -52,10 +52,20 @@ void main() {
             print("Available Commands:\n", 0x0f);
             print(" clear      | Clears the screen\n", 0x0f);
             print(" echo       | Prints a message to stdout\n", 0x0f);
-            print(" exit       | Exits program\n", 0x0f);
+            print(" exit       | Exits shell\n", 0x0f);
             print(" help       | Prints this message\n", 0x0f);
             // TODO: print(" ls         | Lists all available files\n", 0x0f);
             // TODO: print(" reboot     | Reboots the system\n", 0x0f);
+            print(" test       | Tests the latest feature [DEBUG]\n", 0x0f);
+        } else if (strcmp(input, "test") == 0) {
+            char buf[512];
+            print("Reading from drive 0x", 0x0f);
+            print(itoa(driveNum, 16), 0x0f);
+            print("...\n", 0x0f);
+            diskRead(22, 1, driveNum, buf);
+
+            print(buf, 0x0f);
+            putc('\n', 0x0f);
         } else {
             print("Command not found: ", 0x0c);
             print(input, 0x0c);
