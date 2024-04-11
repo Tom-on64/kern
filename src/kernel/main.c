@@ -113,8 +113,28 @@ void main() {
             print(" help       | Prints this message\n", 0x0f);
             // TODO: print(" ls         | Lists all available files\n", 0x0f);
             // TODO: print(" reboot     | Reboots the system\n", 0x0f);
-            print(" test       | Tests the latest feature [DEBUG]\n", 0x0f);
+            print(" test       | Performs tests\n", 0x0f);
         } else if (strcmp(input, "test") == 0) {
+            print("Running Tests...\n", 0x0f);
+            uint8_t buf[512];
+            
+            print("Read Test .......... ", 0x0f);
+            diskRead(0, 1, (char*)buf);
+            if (buf[510] == 0x55 && buf[511] == 0xaa) {
+                print("[ DONE ]\n", 0x0a);
+            } else {
+                print("[ FAIL ]\n", 0x0c);
+            }
+            print("Write Test ......... ", 0x0f);
+            buf[510] = 0x55; buf[511] = 0xaa;
+            diskWrite(0, 1, (char*)buf);
+            diskRead(0, 1, (char*)buf); // Idk how else to test if the right data was written (also could break the bootloader if it fails)
+            if (buf[510] == 0x55 && buf[511] == 0xaa) {
+                print("[ DONE ]\n", 0x0a);
+            } else {
+                print("[ FAIL ]\n", 0x0c);
+            }
+            print("Tests Finished!\n", 0x0f);
         } else {
             print("Command not found: ", 0x0c);
             print(input, 0x0c);
