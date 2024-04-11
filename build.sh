@@ -12,14 +12,15 @@ nasm -fbin ./src/boot.asm -o ./build/boot.bin
 echo "Assembling ./src/kernel/entry.asm..."
 nasm -felf32 ./src/kernel/entry.asm -o ./build/entry.o
 
-for file in ./src/kernel/**.c; do
+for file in ./src/kernel/*.c; do
     filename=$(basename "$file" .c)
     echo "Compiling $file..."
-    i386-elf-gcc -ffreestanding -Wall -Wextra -m32 -c $file -o ./build/$filename.o
+    i386-elf-gcc -ffreestanding -Wall -Wextra -m32 -c "$file" -o "./build/$filename.o"
 done
 
 echo "Linking kernel object files..."
-i386-elf-ld -o ./build/kernel.bin -Ttext 0x1000 --oformat binary ./build/**.o
+mv ./build/disk.o ./build/f_disk.o # Very temporary fix to issue with disk.o not linking or something weird
+i386-elf-ld -o ./build/kernel.bin -Ttext 0x1000 --oformat binary ./build/*.o
 
 # OS Image
 echo "Creating kern.iso disk image..."
