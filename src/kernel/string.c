@@ -18,6 +18,18 @@ char* itoa(uint32_t val, uint8_t base) {
     return &buf[i + 1];
 }
 
+uint32_t atoi(const char* str) {
+    uint32_t res = 0;
+
+    // TODO: Add error checking
+
+    while (*str >= '0' && *str <= '9') {
+        res = res * 10 + (*str++ - '0');
+    }
+
+    return res;
+}
+
 // Some implementations taken from https://en.wikibooks.org/wiki/C_Programming/String_manipulation
 char* strcat(char* str1, const char* str2) {
     char* s = str1;
