@@ -30,6 +30,11 @@ uint32_t atoi(const char* str) {
     return res;
 }
 
+int isSpace(char c) {
+    if (c == ' ' || c == '\t' || c == '\n') return 1;
+    else return 0;
+}
+
 // Some implementations taken from https://en.wikibooks.org/wiki/C_Programming/String_manipulation
 char* strcat(char* str1, const char* str2) {
     char* s = str1;

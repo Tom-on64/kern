@@ -39,42 +39,67 @@ void main() {
             args = strchr(input, '\n');
         }
 
-        *args = '\0'; // Separate command from args
-        args++;
+        *args++ = '\0'; // Separate command from args
 
         if (strcmp(input, "clear") == 0) {
             clear(0x0f);
         } else if (strcmp(input, "disk") == 0) {
-            static char buf[512];
+            char buf[512] = { 0 };
             
             if (*args == '\0') {
-                print("test: ", 0x0f);
+                print("disk: ", 0x0f);
                 print("No arguments given\n", 0x0c);
-                print("Usage: test <sector>\n", 0x0f);
+                print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
                 continue;
             }
 
-            // TODO: We only support reading right now
-            //char mode = *args++;
-            //if (mode != 'r' || mode != 'w') {
-            //    print("test: ", 0x0f);
-            //    print("Invalid access mode. Use r(ead) or w(rite)\n", 0x0c);
-            //    print("Usage: test <r/w> <sector> [data]\n", 0x0f);
-            //    continue;
-            //}
-
-            uint32_t sector = atoi(args);
-            print("Reading...\n", 0x0f);
-            diskRead(sector, 1, buf);
+            while (isSpace(*args)) { args++; } // Skip whitespace
+            char mode = *args++;
+            while (isSpace(*args)) { args++; }
             
-            print("Contents:\n", 0x0f);
-            for (size_t i = 0; i < 512; i++) {
-                if (buf[i] != '\0') {
-                    putc(buf[i], 0x0f);
+            if (mode == 'r') {
+                if (*args == '\0') {
+                    print("disk: ", 0x0f);
+                    print("Sector not specified\n", 0x0c);
+                    print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                    continue;
                 }
-            }
 
-            putc('\n', 0x0f);
+                uint32_t sector = atoi(args);
+                print("Reading...\n", 0x0f);
+                diskRead(sector, 1, buf);
+                
+                print("Contents:\n", 0x0f);
+                for (size_t i = 0; i < 512; i++) {
+                    if (buf[i] != '\0') {
+                        putc(buf[i], 0x0f);
+                    }
+                }
+
+                putc('\n', 0x0f);
+            } else if (mode == 'w') {
+                char* data;
+                if ((data = strchr(args, ' ')) == NULL) {
+                    print("disk: ", 0x0f);
+                    print("No data given\n", 0x0c);
+                    print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                    continue;
+                }
+
+                *data++ = '\0';
+                uint32_t sector = atoi(args);
+
+                while (isSpace(*args)) { args++; } // Skip whitespace
+
+                strcpy(buf, data);
+                print("Writing...\n", 0x0f);
+                diskWrite(sector, 1, buf);
+            } else { 
+                print("disk: ", 0x0f);
+                print("Invalid access mode. Use r(ead) or w(rite)\n", 0x0c);
+                print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                continue;
+            }
         } else if (strcmp(input, "echo") == 0) {
             print(args, 0x0f);
         } else if (strcmp(input, "exit") == 0) {
