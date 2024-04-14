@@ -11,7 +11,8 @@ Kern uses a shell (for now), so you'll have to type commands to do stuff.
 It is currently quite simple. It supports these commands:
 
 - clear: Clears the screen
-- echo <msg>: Prints msg to the screen
+- disk \<r/w> \<sector> [data]: Reads/Writes data from/to sector on disk
+- echo \<msg>: Prints msg to the screen
 - exit: Exits the shell
 - help: Prints all available commands
 - ls: Prints all files

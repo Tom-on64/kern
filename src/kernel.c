@@ -111,9 +111,50 @@ void main() {
             print(" echo       | Prints a message to stdout\n", 0x0f);
             print(" exit       | Exits shell\n", 0x0f);
             print(" help       | Prints this message\n", 0x0f);
-            // TODO: print(" ls         | Lists all available files\n", 0x0f);
+            print(" ls         | Lists all available files\n", 0x0f);
             // TODO: print(" reboot     | Reboots the system\n", 0x0f);
             print(" test       | Performs tests\n", 0x0f);
+        } else if (strcmp(input, "ls") == 0) {
+            char filetab[512];
+            char* ft = filetab;
+            diskRead(1, 1, filetab);
+            
+            while (*ft != '\0') {
+                char filename[15] = { 0 };
+                uint8_t offset = 0;
+                for (uint8_t i = 0; i < 14; i++) {
+                    if (i == 9) {
+                        filename[offset++] = '.';
+                        continue;
+                    }
+                    if (*ft != '\0') { filename[offset++] = *ft; }
+                    ft++;
+                }
+                ft++; // RESERVED
+
+                uint8_t sector = *ft++;
+                uint8_t size = *ft++;
+
+                if (sector < 10) putc('0', 0x0f);
+                if (sector == 0) putc('0', 0x0f);
+                else print(itoa(sector, 10), 0x0f);
+                print(": ", 0x0f);
+                print(filename, 0x0f);
+
+                for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
+                    putc(' ', 0x0f);
+                }
+
+                print(" | ", 0x0f);
+                if (size >> 1) {
+                    print(itoa(size >> 1, 10), 0x0f);
+                    if (size & 0x01) { print(".5", 0x0f); }
+                    print("kB\n", 0x0f);
+                } else {
+                    print(itoa(size*512, 10), 0x0f);
+                    print("B\n", 0x0f);
+                }
+            }
         } else if (strcmp(input, "test") == 0) {
             print("Running Tests...\n", 0x0f);
             uint8_t buf[512];
@@ -142,3 +183,4 @@ void main() {
         }
     }
 }
+

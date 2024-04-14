@@ -9,11 +9,19 @@ SRC = ./src
 BUILD = ./build
 # C_FILES = $(shell find $(SRC) -name "*.c" -exec basename -s ".c" {} \;)
 
+.PHONY: os clean run
+
 # Main compilation target
-os: bootloader kernel
-	@cat $(BUILD)/boot.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
+os: $(BUILD) bootloader kernel
+	@$(AS) -fbin  -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
+	@cat $(BUILD)/boot.bin $(BUILD)/filetable.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880
 	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc
+	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=22 conv=notrunc
+
+$(BUILD):
+	@[ -d $(BUILD) ] || mkdir $(BUILD)
+	@rm -rf $(BUILD)/*
 
 # Bootloader: This target is responsible for creating boot.bin
 bootloader:
@@ -31,6 +39,6 @@ run:
 
 # Clean all build files
 clean:
-	@rm -rf $(BUILD)/*
+	@rm -rf $(BUILD)
 	@rm -f kern.iso
 

@@ -36,7 +36,7 @@ start:
     mov al, KERNEL_SIZE
     mov ch, 0   ; Cylinder
     mov dh, 0   ; Head
-    mov cl, 2   ; Sector
+    mov cl, 3   ; Sector - 1 is this file, 2 is filetable
     mov dl, [driveNum]
 
     mov ah, 2   ; Read from disk
