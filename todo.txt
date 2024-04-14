@@ -1,0 +1,18 @@
+=== Todo ===
+
+- [ ] Multistage Bootloader
+- [ ] VESA BIOS Extensions
+- [ ] Filesystem
+    - [ ] Filetable
+    - [ ] Files
+        - [ ] Larger than one sector (512B)
+        - [ ] Any file size (Not multiples of 512B)
+        - [ ] Filetypes
+    - [ ] Directories
+        - [ ] File tree
+        - [ ] cd command
+    - [ ] Links??
+        - [ ] Symbolic
+        - [ ] Hard
+- [ ] Custom font
+
