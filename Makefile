@@ -1,0 +1,36 @@
+# Variables
+CC = i386-elf-gcc
+LD = i386-elf-ld
+AS = nasm
+
+CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra 
+
+SRC = ./src
+BUILD = ./build
+# C_FILES = $(shell find $(SRC) -name "*.c" -exec basename -s ".c" {} \;)
+
+# Main compilation target
+os: bootloader kernel
+	@cat $(BUILD)/boot.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
+	@dd if=/dev/zero of=kern.iso bs=512 count=2880
+	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc
+
+# Bootloader: This target is responsible for creating boot.bin
+bootloader:
+	@$(AS) -fbin -o $(BUILD)/boot.bin $(SRC)/boot.asm
+
+# Kernel: This target is responsible for creating kernel.bin
+kernel: $(C_FILES) $(SRC)/entry.asm
+	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
+	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
+	@$(LD) -Tkernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
+
+# Run QEMU
+run:
+	qemu-system-x86_64 -drive format=raw,file="./kern.iso",index=0,media=disk -m 256M -accel tcg
+
+# Clean all build files
+clean:
+	@rm -rf $(BUILD)/*
+	@rm -f kern.iso
+
