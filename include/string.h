@@ -1,4 +1,6 @@
-#include "string.h"
+#ifndef STRING_H
+#define STRING_H
+
 #include "stdint.h"
 
 // Source: http://www.strudel.org.uk/itoa/
@@ -36,6 +38,13 @@ int isSpace(char c) {
 }
 
 // Some implementations taken from https://en.wikibooks.org/wiki/C_Programming/String_manipulation
+char* strcpy(char* str1, const char* str2) {
+    char* dst = str1;
+    const char* src = str2;
+    while ((*dst++ = *src++) != '\0');
+    return str1;
+}
+
 char* strcat(char* str1, const char* str2) {
     char* s = str1;
     while (*s != '\0') { s++; }
@@ -61,16 +70,25 @@ int strcmp(const char* str1, const char* str2) {
     return ((c1 < c2) ? -1 : (c1 > c2));
 }
 
-char* strcpy(char* str1, const char* str2) {
-    char* dst = str1;
-    const char* src = str2;
-    while ((*dst++ = *src++) != '\0');
-    return str1;
-}
-
 uint32_t strlen(const char* str) {
     const char* p = str;
     while (*++p != '\0');
     return (uint32_t)(p - str);
 }
 
+// Memory functions
+char* memcopy(char* src, char* dst, uint16_t length) {
+    for (int i = 0; i < length; i++) {
+        *(dst + i) = *(src + i);
+    }
+    return dst;
+}
+
+char* memset(char* dst, char value, uint16_t length) {
+    for (int i = 0; i < length; i++) {
+        *(dst + i) = value;
+    }
+    return dst;
+}
+
+#endif

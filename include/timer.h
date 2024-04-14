@@ -1,8 +1,12 @@
-#include "timer.h"
+#ifndef TIMER_H
+#define TIMER_H
+
 #include "stdint.h"
 #include "idt.h"
 #include "irq.h"
 #include "system.h"
+
+#define INPUT_CLK 1193180
 
 uint32_t timerTicks = 0;
 
@@ -20,7 +24,7 @@ void timerPhase(uint32_t hz) {
 
     outb(0x43, 0x36); // Tell PIT that we're setting channel 0
     outb(0x40, div & 0xff); // Low byte
-    outb(0X40, div >> 8); // High byte
+    outb(0x40, div >> 8); // High byte
 }
 
 void sleep(uint32_t ticks) {
@@ -29,3 +33,5 @@ void sleep(uint32_t ticks) {
     while (timerTicks != eticks); // Should avoid overflows unlike '<'
 }
 
+
+#endif

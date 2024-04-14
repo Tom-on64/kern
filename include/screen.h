@@ -1,6 +1,21 @@
+#ifndef SCREEN_H
+#define SCREEN_H
+
 #include "screen.h"
 #include "stdint.h"
 #include "system.h"
+#include "string.h"
+
+#define VIDMEM 0xb8000
+#define CURSOR_HIGH 14
+#define CURSOR_LOW 15
+#define CTRLREG 0x3d4
+#define DATAREG 0x3d5
+
+// 80x25 VGA Text mode
+#define ROWS 25
+#define COLS 80
+#define CHARS (ROWS*COLS)
 
 uint32_t cursor = 0;
 
@@ -10,6 +25,19 @@ void updateCursor() {
     outb(0x3d5, cursor & 0xff);
     outb(0x3d4, 0x0e); // High byte
     outb(0x3d5, cursor >> 8);
+}
+
+void setCursorPos(uint32_t offset) {
+    cursor = offset;
+    updateCursor();
+}
+
+uint32_t getCursorPos() {
+    return cursor;
+}
+
+uint32_t calcOffset(uint8_t col, uint8_t row) {
+    return row * COLS + col;
 }
 
 void scroll() {
@@ -93,19 +121,6 @@ void clear(uint8_t attr) {
     updateCursor();
 }
 
-void setCursorPos(uint32_t offset) {
-    cursor = offset;
-    updateCursor();
-}
-
-uint32_t getCursorPos() {
-    return cursor;
-}
-
-uint32_t calcOffset(uint8_t col, uint8_t row) {
-    return row * COLS + col;
-}
-
 void enableCursor(uint8_t start, uint8_t end) {
     outb(0x3d4, 0x0a); // Sending cursor start
     outb(0x3d5, (inb(0x3d5) & 0xc0) | start);
@@ -119,3 +134,5 @@ void disableCursor() {
     outb(0x3d4, 0x0b);
 }
 
+
+#endif

@@ -1,8 +1,27 @@
-#include "irq.h"
+#ifndef IRQ_H
+#define IRQ_H
+
 #include "stdint.h"
-#include "system.h"
+#include "idt.h"
 
 void* irqRoutines[16] = { 0 };
+
+extern void irq0();
+extern void irq1();
+extern void irq2();
+extern void irq3();
+extern void irq4();
+extern void irq5();
+extern void irq6();
+extern void irq7();
+extern void irq8();
+extern void irq9();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
 
 void installIrqHandler(uint32_t irq, void (*handler)(struct regs* r)) {
     irqRoutines[irq] = handler;
@@ -10,20 +29,6 @@ void installIrqHandler(uint32_t irq, void (*handler)(struct regs* r)) {
 
 void uninstallIrqHandler(uint32_t irq) {
     irqRoutines[irq] = 0;
-}
-
-// I have no clue how or what this does, but it makes everything work
-void irqRemap(void) {
-    outb(0xa0, 0x11);
-    outb(0x20, 0x11);
-    outb(0x21, 0x20);
-    outb(0xa1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xa1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xa1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xa1, 0x0);
 }
 
 void irqHandler(struct regs* r) {
@@ -35,6 +40,19 @@ void irqHandler(struct regs* r) {
     // Something about master and slave handlers
     if (r->intNo >= 40) outb(0xa0, 0x20);
     outb(0x20, 0x20);
+}
+
+void irqRemap(void) {
+    outb(0xa0, 0x11);
+    outb(0x20, 0x11);
+    outb(0x21, 0x20);
+    outb(0xa1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xa1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xa1, 0x01);
+    outb(0x21, 0x0);
+    outb(0xa1, 0x0);
 }
 
 void setupIrqs() {
@@ -59,3 +77,4 @@ void setupIrqs() {
     idtSetGate(47, (unsigned)irq15, 0x08, 0x8e);
 }
 
+#endif

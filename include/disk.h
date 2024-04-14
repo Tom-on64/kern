@@ -1,4 +1,6 @@
-#include "disk.h"
+#ifndef DRIVE_H
+#define DRIVE_H
+
 #include "stdint.h"
 #include "system.h"
 
@@ -6,6 +8,8 @@
 #define READ_COMMAND 0x20
 #define WRITE_COMMAND 0x30
 #define CACHE_FLUSH 0xE7
+
+extern uint8_t driveNum;
 
 void diskRead(uint32_t lbaAddress, uint8_t sectorCount, char* dst) {
     outb(PIO_PORT + 6, ((lbaAddress >> 24) & 0x0f) | 0xe0); // 6 - Use LBA; 4 - Drive number; 3-0 - Highest lba address nibble
@@ -56,3 +60,4 @@ void diskWrite(uint32_t lbaAddress, uint8_t sectorCount, char* src) {
     while (inb(PIO_PORT + 7) & (1 << 7)); // Poll status register untill BSY bit is clear
 }
 
+#endif

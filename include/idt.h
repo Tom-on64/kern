@@ -1,4 +1,6 @@
-#include "idt.h"
+#ifndef IDT_H
+#define IDT_H
+
 #include "stdint.h"
 #include "system.h"
 
@@ -18,6 +20,8 @@ struct idtPointer {
 struct idtEntry idt[256] = { 0 };
 struct idtPointer idtp;
 
+extern void idtLoad();
+
 void idtSetGate(uint8_t i, uint32_t offset, uint16_t selector, uint8_t typeAttr) {
     idt[i].offsetLow = (uint16_t)offset;
     idt[i].selector = selector;
@@ -32,4 +36,14 @@ void setupIdt() {
 
     idtLoad();
 }
+
+// Contains values of registers and exception info from isrs
+struct regs {
+    unsigned int gs, fs, es, ds;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int intNo, errCode;
+    unsigned int eip, cs, eflags, useresp, ss;
+};
+
+#endif
 
