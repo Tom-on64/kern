@@ -10,6 +10,8 @@
 
 #define PROMPT "#> "
 
+char filetable[512];
+
 void main() {
     // Interrupts
     setupIdt();
@@ -25,9 +27,10 @@ void main() {
     clear(0x0f);
     print("kern.\n\n", 0x0f);
 
+    diskRead(1, 1, filetable); // Read the filetable and store it in memory
+
     // Run Interactive Shell Program
     // TODO: Make it in another file
-
     while (1) {
         print(PROMPT, 0x0a);
         char* input = read('\n', 0x0f);
@@ -115,9 +118,7 @@ void main() {
             // TODO: print(" reboot     | Reboots the system\n", 0x0f);
             print(" test       | Performs tests\n", 0x0f);
         } else if (strcmp(input, "ls") == 0) {
-            char filetab[512];
-            char* ft = filetab;
-            diskRead(1, 1, filetab);
+            char* ft = filetable;
             
             while (*ft != '\0') {
                 char filename[15] = { 0 };
@@ -177,9 +178,48 @@ void main() {
             }
             print("Tests Finished!\n", 0x0f);
         } else {
-            print("Command not found: ", 0x0c);
-            print(input, 0x0c);
-            putc('\n', 0x0f);
+            char* ft = filetable;
+            uint8_t found = 0;
+
+            while (*ft != '\0') {
+                char filename[15] = { 0 };
+                uint8_t offset = 0;
+                for (uint8_t i = 0; i < 14; i++) {
+                    if (i == 9) {
+                        filename[offset++] = '.';
+                        continue;
+                    }
+                    if (*ft != '\0') { filename[offset++] = *ft; }
+                    ft++;
+                }
+
+                if (strcmp(input, filename) == 0) {
+                    ft++; // RESERVED
+                    uint8_t sector = *ft++;
+                    uint8_t size = *ft++;
+
+                    char buf[size * 512];
+                    diskRead(sector, size, buf);
+
+                    for (size_t i = 0; i < size * 512; i++) {
+                        if (buf[i] != '\0') {
+                            putc(buf[i], 0x0f);
+                        }
+                    }
+                    putc('\n', 0x0f);
+                    
+                    found++; // Set found to 1
+                    break;
+                }
+
+                ft += 3;
+            }
+
+            if (!found) {
+                print("Command not found: ", 0x0c);
+                print(input, 0x0c);
+                putc('\n', 0x0f);
+            }
         }
     }
 }
