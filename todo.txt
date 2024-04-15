@@ -2,6 +2,7 @@
 
 - [ ] Multistage Bootloader
 - [ ] VESA BIOS Extensions
+- [ ] Custom font
 - [ ] Filesystem
     - [ ] Filetable
     - [ ] Files
@@ -14,5 +15,18 @@
     - [ ] Links??
         - [ ] Symbolic
         - [ ] Hard
-- [ ] Custom font
+- [ ] System Calls
+    - [ ] Write()
+    - [ ] Read()
+    - [ ] Open()
+    - [ ] Close()
+    - [ ] Malloc()
+    - [ ] Free()
+- [ ] Virtual Memory
+- [ ] Paging
+- [ ] User (or system) programs
+    - [ ] Loading them
+    - [ ] Running them
+    - [ ] Exit back to kernel/shell
+- [ ] Standalone shell program
 
