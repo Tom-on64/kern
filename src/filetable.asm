@@ -10,10 +10,10 @@
 ;;
 
 filetable:
-    db "boot",0,0,0,0,0,0, "bin",0,0,1
-    db "filetable",0,      "tab",0,1,1
-    db "kernel",0,0,0,0,   "bin",0,2,20
-    db "test",0,0,0,0,0,0, "txt",0,22,1
+    db "boot",0,0,0,0,0,0, "bin",0,0,4
+    db "filetable",0,      "tab",0,4,1
+    db "kernel",0,0,0,0,   "bin",0,5,20
+    db "test",0,0,0,0,0,0, "txt",0,25,1
 
 times 512-($-$$) db 0
 

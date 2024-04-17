@@ -17,7 +17,7 @@ os: $(BUILD) bootloader kernel
 	@cat $(BUILD)/boot.bin $(BUILD)/filetable.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880
 	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc
-	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=22 conv=notrunc
+	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=25 conv=notrunc
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
@@ -25,7 +25,9 @@ $(BUILD):
 
 # Bootloader: This target is responsible for creating boot.bin
 bootloader:
-	@$(AS) -fbin -o $(BUILD)/boot.bin $(SRC)/boot.asm
+	@$(AS) -fbin -o $(BUILD)/stage1.bin $(SRC)/stage1.asm
+	@$(AS) -fbin -o $(BUILD)/stage2.bin $(SRC)/stage2.asm
+	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
 kernel: $(C_FILES) $(SRC)/entry.asm

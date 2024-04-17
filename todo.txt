@@ -1,12 +1,16 @@
 === Todo ===
 
-- [ ] Multistage Bootloader
-- [ ] VESA BIOS Extensions
-- [ ] Custom font
+- [*] Multistage Bootloader
+- [ ] Screen
+    - [*] Scrolling
+    - [ ] Scroll-back
+    - [ ] VESA BIOS Extensions
+    - [ ] Custom font
 - [ ] Filesystem
-    - [ ] Filetable
+    - [ ] Utility for filesystem building (not just an assembly file)
+    - [*] Filetable
     - [ ] Files
-        - [ ] Larger than one sector (512B)
+        - [*] Larger than one sector (512B)
         - [ ] Any file size (Not multiples of 512B)
         - [ ] Filetypes
     - [ ] Directories
@@ -22,11 +26,43 @@
     - [ ] Close()
     - [ ] Malloc()
     - [ ] Free()
+- [ ] Shell
+    - [ ] ';' separated commands
+    - [ ] I/O Redirection with '<' '>'
+    - [ ] Commands
+        - [*] echo
+        - [*] clear
+        - [*] help
+        - [*] ls
+        - [*] exit
+        - [ ] touch (make file)
+        - [ ] rm
+        - [ ] mkdir (add dirs first)
+        - [ ] reboot
+        - [ ] cd
+- [ ] Standard I/O stuff
+    - [ ] stdin
+    - [ ] stdout
+    - [ ] stderr
+    - [ ] printf
+    - [ ] color codes
 - [ ] Virtual Memory
 - [ ] Paging
 - [ ] User (or system) programs
     - [ ] Loading them
     - [ ] Running them
     - [ ] Exit back to kernel/shell
+    - [ ] argc, argv[]
 - [ ] Standalone shell program
+- [ ] Code Editor
+    - [ ] Text editor
+    - [ ] Syntax highlighting
+    - [ ] Saving/Loading
+    - [ ] Hex editor
+- [ ] Assembler/Compiler
+    - [ ] Assembler
+    - [ ] Compiler (probably C)
+    - [ ] Standard libs
+- [ ] Finish all todos
+- [ ] Refactoring!!!
 

@@ -27,7 +27,7 @@ void main() {
     clear(0x0f);
     print("kern.\n\n", 0x0f);
 
-    diskRead(1, 1, filetable); // Read the filetable and store it in memory
+    diskRead(4, 1, filetable); // Read the filetable and store it in memory
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
