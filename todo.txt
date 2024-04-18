@@ -4,7 +4,9 @@
 - [ ] Screen
     - [*] Scrolling
     - [ ] Scroll-back
-    - [ ] VESA BIOS Extensions
+    - [*] VESA BIOS Extensions
+    - [*] Better resolution
+    - [*] Graphics mode
     - [ ] Custom font
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)

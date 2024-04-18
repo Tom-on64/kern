@@ -2,9 +2,118 @@
 [org 0x7e00]
 
 %define KERNEL_LOC 0x1000
+%define VIDMEM 0xb800
 
 start:
     mov [driveNum], dl
+
+    ; Setup VBE info
+    xor ax, ax
+    mov es, ax
+    mov ah, 0x4f
+    mov di, vbeInfoBlock
+    int 0x10
+
+    cmp ax, 0x4f
+    jne error
+
+    mov ax, word [vbeInfoBlock.videoModePtr]
+    mov [offset], ax
+    mov ax, word [vbeInfoBlock.videoModePtr+2]
+    mov [_segment], ax
+
+    mov fs, ax
+    mov si, [offset]
+
+;; Get next VBE mode
+.findMode:
+    mov dx, [fs:si]
+    inc si
+    inc si
+    mov [offset], si
+    mov [mode], dx
+
+    cmp dx, 0xffff ; Indicates end of modes
+    je .endOfModes
+
+    mov ax, 0x4f01 ; Get VBE mode info
+    mov cx, [mode]
+    mov di, modeInfoBlock
+    int 0x10
+
+    cmp ax, 0x4f
+    jne error
+
+    ; Print values
+    ; mov ax, [modeInfoBlock.xRes]
+    ; ror ax, 8
+    ; call printHex
+    ; ror ax, 8
+    ; call printHex
+    ; mov ax, 0x0e20
+    ; int 0x10
+
+    ; mov ax, [modeInfoBlock.yRes]
+    ; ror ax, 8
+    ; call printHex
+    ; ror ax, 8
+    ; call printHex
+    ; mov ax, 0x0e20
+    ; int 0x10
+
+    ; xor ax, ax
+    ; mov al, [modeInfoBlock.bpp]
+    ; call printHex
+    ; mov ax, 0x0e20
+    ; int 0x10
+    
+    ; mov al, 0x0a
+    ; int 0x10
+    ; mov al, 0x0d
+    ; int 0x10
+
+    ; Check if it is the right mode
+    mov ax, [width]
+    cmp ax, [modeInfoBlock.xRes]
+    jne .nextMode
+
+    mov ax, [height]
+    cmp ax, [modeInfoBlock.yRes]
+    jne .nextMode
+    
+    mov al, [bpp]
+    cmp al, [modeInfoBlock.bpp]
+    jne .nextMode
+
+    ; Set VBE mode
+    mov ax, 0x4f02
+    mov bx, [mode]
+    or bx, 0x4000 ; Set 14th bit to 1
+    xor di, di
+    int 0x10
+
+    cmp ax, 0x4f
+    jne error
+
+    jmp loadGDT
+
+.nextMode:
+    mov ax, [_segment]
+    mov fs, ax
+    mov si, [offset]
+    jmp .findMode
+    
+.endOfModes:
+    mov ax, 0x0e4e ; Print 'N'
+    int 0x10
+    cli
+    hlt
+
+error:
+    mov ax, 0x0e46 ; Print 'F'
+    int 0x10
+    cli
+    hlt
 
 ;; Load the global descriptor table (GDT)
 loadGDT:
@@ -17,6 +126,36 @@ loadGDT:
 
     ; Far jump to 32 bit mode!!
     jmp CODE_SEG:protected_start
+
+;;
+;; Prints a hex byte
+;; al - value to print
+;;
+printHex:
+    push ax
+    push bx
+    
+    mov bh, 2
+    mov bl, al
+    and al, 0xf0
+    ror al, 4
+    mov ah, 0x0e ; For printing
+.printNibble:
+    cmp al, 10
+    jl .print
+    add al, 39
+.print:
+    add al, 48 ; ASCII Char
+    int 0x10
+    dec bh
+    jz .done
+    mov al, bl
+    and al, 0x0f
+    jmp .printNibble
+.done:
+    pop bx
+    pop ax
+    ret
 
 ;; 32 Bit entry code
 [bits 32]
@@ -111,7 +250,7 @@ modeInfoBlock:
 
 ;; Required by VBE 1.2+
     .xRes: dw 0
-    .yRex: dw 0
+    .yRes: dw 0
     .xCharSize: db 0
     .yCharSize: db 0
     .planeCount: db 0
