@@ -6,8 +6,8 @@
 #define MODE_INFO_BLOCK 0x5000
 #define WIDTH 1920
 #define HEIGHT 1080
-#define BG_COLOR 0xff1f2937
-#define FG_COLOR 0xffd1d5db
+#define BG_COLOR 0xff010b17
+#define FG_COLOR 0xffebddf4
 
 struct cursor_s {
     uint32_t x;
@@ -39,13 +39,22 @@ void putcAt(char c, uint32_t x, uint32_t y) {
     }
 }
 
-void putc(char c) {
-    putcAt(c, cursor.x, cursor.y);
+void printAt(const char* str, uint32_t x, uint32_t y) {
+    while (*str != '\0') {
+        putcAt(*str++, x, y);
+        x++;
+    }
+}
 
+void putc(char c) {
     if (c == '\n') {
         cursor.y++;
         cursor.x = 0;
+    } else if (c == '\b') {
+        cursor.x--;
+        putcAt(' ', cursor.x, cursor.y);
     } else {
+        putcAt(c, cursor.x, cursor.y);
         cursor.x++;
     }
 }

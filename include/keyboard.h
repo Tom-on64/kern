@@ -51,6 +51,7 @@ char buffer[MAX_BUFFER_SIZE + 1] = { 0 };
 bool echo = false;
 bool canBackspace = false;
 
+// TODO: Refactor this
 void keyboardHandler() {
     uint8_t scancode;
     scancode = inb(0x60);
@@ -75,6 +76,8 @@ void keyboardHandler() {
     }
 }
 
+// TODO: Add a 'char readc();' function that returns a single read character and use it for read()
+// Also this should be refactored to not use so many flag variables
 char* read(char terminator) {
     bufferLen = 0;
     echo = true;

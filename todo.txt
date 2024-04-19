@@ -1,7 +1,7 @@
 === Todo ===
 
 - [*] Multistage Bootloader
-- [ ] Write down where stuff is in memory (0x1000 - kernel, 0x2000 - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
+- [ ] Write down where stuff is in memory (0x1000 - kernel, 0x4000? - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
 - [ ] Screen
     - [ ] Scrolling
     - [ ] Scroll-back
