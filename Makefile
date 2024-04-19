@@ -3,7 +3,7 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 AS = nasm
 
-CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra 
+CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra
 
 SRC = ./src
 BUILD = ./build
@@ -32,10 +32,10 @@ bootloader:
 	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
-kernel: $(C_FILES) $(SRC)/entry.asm
+kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
 	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
-	@$(LD) -Tkernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
+	@$(LD) -T $(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
 
 # Run QEMU
 run:
