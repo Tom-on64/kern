@@ -6,12 +6,18 @@
 #include "irq.h"
 #include "system.h"
 
+#include "screen.h"
+
 #define INPUT_CLK 1193180
 
 uint32_t timerTicks = 0;
 
 void timerHandler() {
     timerTicks++;
+
+    // TODO: Improve the cursor rendering
+    if (timerTicks % 500 == 0) putcAt(127, cursor.x, cursor.y);
+    else if (timerTicks % 250 == 0) putcAt(' ', cursor.x, cursor.y);
 }
 
 void setupTimer() {
@@ -30,7 +36,7 @@ void timerPhase(uint32_t hz) {
 void sleep(uint32_t ticks) {
     uint32_t eticks = ticks + timerTicks;
     
-    while (timerTicks != eticks); // Should avoid overflows unlike '<'
+    while (timerTicks != eticks); // Should ignore overflows unlike '<'
 }
 
 

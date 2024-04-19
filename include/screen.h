@@ -48,9 +48,11 @@ void printAt(const char* str, uint32_t x, uint32_t y) {
 
 void putc(char c) {
     if (c == '\n') {
+        putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor
         cursor.y++;
         cursor.x = 0;
     } else if (c == '\b') {
+        putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor TODO: make this better
         cursor.x--;
         putcAt(' ', cursor.x, cursor.y);
     } else {

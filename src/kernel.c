@@ -22,7 +22,7 @@ void main() {
 
     setupKeyboard();
     setupTimer();
-    timerPhase(100); // 1 tick per 10ms
+    timerPhase(1000); // 1 tick per ~1ms
 
     // Screen setup
     diskRead(25, 4, (char*)0x6000); // Read font from disk
