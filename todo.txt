@@ -2,7 +2,7 @@
 
 - [*] Multistage Bootloader
 - [ ] Write down where stuff is in memory (0x1000 - kernel, 0x4000? - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
-- [ ] Screen
+- [ ] "Text" mode (not actually)
     - [ ] Scrolling
     - [ ] Scroll-back
     - [ ] Color codes (and just multicolor text in general)
@@ -12,6 +12,31 @@
     - [*] Custom font
     - [*] Larger text size
     - [ ] Variable text size :)
+- [ ] Graphics
+    - [ ] Enter/exit a "graphics" mode
+    - [ ] Pixel drawing
+    - [ ] Line drawing (Raycaster Alert??)
+    - [ ] Triangles (3D?!!???)
+- [ ] Math
+    - [ ] Trigonometry
+        - [ ] Sine
+        - [ ] Cosine
+        - [ ] Tangent
+        - [ ] Cotangent
+        - [ ] Arc (inverse) versions
+        - [ ] Hyperbolic versions
+    - [ ] Absolute value
+    - [ ] isOdd() 🗿
+    - [ ] Exponential fn (e^x)
+    - [ ] Logarithm
+    - [ ] Power
+    - [ ] Square Root
+    - [ ] Nth Root
+    - [ ] Floor
+    - [ ] Round
+    - [ ] Ceiling
+    - [ ] INFINITY
+    - [ ] NAN
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)
     - [*] Filetable

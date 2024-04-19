@@ -208,6 +208,9 @@ void main() {
                     char buf[size * 512];
                     diskRead(sector, size, buf);
 
+                    // TODO: Print .txt files, launch .bin files
+                    // For calling .bin files, use '((void (*)(void))buf)()' to jump to it
+
                     for (size_t i = 0; i < size * 512; i++) {
                         if (buf[i] != '\0') {
                             putc(buf[i]);
