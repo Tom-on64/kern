@@ -49,7 +49,6 @@ uint8_t shift = 0;
 uint16_t bufferLen = 0;
 char buffer[MAX_BUFFER_SIZE + 1] = { 0 };
 bool echo = false;
-uint8_t echoAttr = 0x0f;
 bool canBackspace = false;
 
 void keyboardHandler() {
@@ -64,7 +63,7 @@ void keyboardHandler() {
     if (scancode & 0x80) { // Keyup
     } else if (c != 0) {
         if (!canBackspace && c == '\b') return;
-        if (echo) putc(c, echoAttr);
+        if (echo) putc(c);
 
         buffer[bufferLen] = c;
 
@@ -76,10 +75,9 @@ void keyboardHandler() {
     }
 }
 
-char* read(char terminator, uint8_t attr) {
+char* read(char terminator) {
     bufferLen = 0;
-    echo = attr ? true : false;
-    echoAttr = attr;
+    echo = true;
 
     while (buffer[bufferLen-1] != terminator && bufferLen < MAX_BUFFER_SIZE);
 

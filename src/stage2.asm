@@ -85,6 +85,17 @@ start:
     cmp al, [modeInfoBlock.bpp]
     jne .nextMode
 
+    mov ax, [vbeInfoBlock.videoModePtr]
+    ror ax, 8
+    call printHex
+    ror ax, 8
+    call printHex
+    mov ax, [vbeInfoBlock.videoModePtr+2]
+    ror ax, 8
+    call printHex
+    ror ax, 8
+    call printHex
+
     ; Set VBE mode
     mov ax, 0x4f02
     mov bx, [mode]
@@ -104,14 +115,14 @@ start:
     jmp .findMode
     
 .endOfModes:
-    mov ax, 0x0e4e ; Print 'N'
-    int 0x10
+    mov si, modeNotFoundErr
+    call print
     cli
     hlt
 
 error:
-    mov ax, 0x0e46 ; Print 'F'
-    int 0x10
+    mov si, vbeErr
+    call print
     cli
     hlt
 
@@ -157,6 +168,23 @@ printHex:
     pop ax
     ret
 
+;;
+;; Prints a null terminated string
+;; si - pointer to string
+;;
+print:
+    push ax
+    mov ah, 0x0e
+.loop:
+    lodsb ; mov al, [si]   inc si
+    cmp al, 0
+    je .done
+    int 0x10
+    jmp .loop
+.done:
+    pop ax
+    ret
+
 ;; 32 Bit entry code
 [bits 32]
 protected_start:
@@ -172,6 +200,13 @@ protected_start:
     mov ebp, 0x90000
     mov esp, ebp
 
+    ; Store VBE Mode Info Block in memory
+    mov esi, modeInfoBlock
+    mov edi, 0x5000 ; Destination
+    mov ecx, 64 ; 64 * 4 = 256B (size of modeInfoBlock)
+
+    rep movsd
+
     ; Perform The far jump
     mov al, [driveNum]
     push ax
@@ -180,6 +215,9 @@ protected_start:
 
 ;; Data
 driveNum: db 0
+
+vbeErr: db "VBE Error!", 0
+modeNotFoundErr: db "VBE Mode not found!", 0
 
 ;; GDT
 GDT:

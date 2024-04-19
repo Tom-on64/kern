@@ -10,7 +10,8 @@
 
 #define PROMPT "#> "
 
-char filetable[512];
+// TODO: Put this at a set address
+char filetable[512] = { 0 };
 
 void main() {
     // Interrupts
@@ -22,21 +23,25 @@ void main() {
     setupKeyboard();
     setupTimer();
     timerPhase(100); // 1 tick per 10ms
-    enableCursor(14, 15);
 
-    clear(0x0f);
-    print("kern.\n\n", 0x0f);
+    // Screen setup
+    diskRead(25, 4, (char*)0x6000); // Read font from disk
+    setupScreen();
+    loadFont((char*)0x6000);
+
+    clear();
+    print("kern.\n\n");
 
     diskRead(4, 1, filetable); // Read the filetable and store it in memory
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        print(PROMPT, 0x0a);
-        char* input = read('\n', 0x0f);
+        print(PROMPT);
+        char* input = read('\n');
         
         if (input[0] == '\n') continue;
-        
+
         char* args;
         if ((args = strchr(input, ' ')) == NULL) {
             args = strchr(input, '\n');
@@ -45,14 +50,14 @@ void main() {
         *args++ = '\0'; // Separate command from args
 
         if (strcmp(input, "clear") == 0) {
-            clear(0x0f);
+            clear();
         } else if (strcmp(input, "disk") == 0) {
             char buf[512] = { 0 };
             
             if (*args == '\0') {
-                print("disk: ", 0x0f);
-                print("No arguments given\n", 0x0c);
-                print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                print("disk: ");
+                print("No arguments given\n");
+                print("Usage: disk <r/w> <sector> [data]\n");
                 continue;
             }
 
@@ -62,30 +67,30 @@ void main() {
             
             if (mode == 'r') {
                 if (*args == '\0') {
-                    print("disk: ", 0x0f);
-                    print("Sector not specified\n", 0x0c);
-                    print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                    print("disk: ");
+                    print("Sector not specified\n");
+                    print("Usage: disk <r/w> <sector> [data]\n");
                     continue;
                 }
 
                 uint32_t sector = atoi(args);
-                print("Reading...\n", 0x0f);
+                print("Reading...\n");
                 diskRead(sector, 1, buf);
                 
-                print("Contents:\n", 0x0f);
+                print("Contents:\n");
                 for (size_t i = 0; i < 512; i++) {
                     if (buf[i] != '\0') {
-                        putc(buf[i], 0x0f);
+                        putc(buf[i]);
                     }
                 }
 
-                putc('\n', 0x0f);
+                putc('\n');
             } else if (mode == 'w') {
                 char* data;
                 if ((data = strchr(args, ' ')) == NULL) {
-                    print("disk: ", 0x0f);
-                    print("No data given\n", 0x0c);
-                    print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                    print("disk: ");
+                    print("No data given\n");
+                    print("Usage: disk <r/w> <sector> [data]\n");
                     continue;
                 }
 
@@ -95,28 +100,28 @@ void main() {
                 while (isSpace(*args)) { args++; } // Skip whitespace
 
                 strcpy(buf, data);
-                print("Writing...\n", 0x0f);
+                print("Writing...\n");
                 diskWrite(sector, 1, buf);
             } else { 
-                print("disk: ", 0x0f);
-                print("Invalid access mode. Use r(ead) or w(rite)\n", 0x0c);
-                print("Usage: disk <r/w> <sector> [data]\n", 0x0f);
+                print("disk: ");
+                print("Invalid access mode. Use r(ead) or w(rite)\n");
+                print("Usage: disk <r/w> <sector> [data]\n");
                 continue;
             }
         } else if (strcmp(input, "echo") == 0) {
-            print(args, 0x0f);
+            print(args);
         } else if (strcmp(input, "exit") == 0) {
             break;
         } else if (strcmp(input, "help") == 0) {
-            print("Available Commands:\n", 0x0f);
-            print(" clear      | Clears the screen\n", 0x0f);
-            print(" disk       | Reads/Writes data from/to the disk\n", 0x0f);
-            print(" echo       | Prints a message to stdout\n", 0x0f);
-            print(" exit       | Exits shell\n", 0x0f);
-            print(" help       | Prints this message\n", 0x0f);
-            print(" ls         | Lists all available files\n", 0x0f);
-            // TODO: print(" reboot     | Reboots the system\n", 0x0f);
-            print(" test       | Performs tests\n", 0x0f);
+            print("Available Commands:\n");
+            print(" clear      | Clears the screen\n");
+            print(" disk       | Reads/Writes data from/to the disk\n");
+            print(" echo       | Prints a message to stdout\n");
+            print(" exit       | Exits shell\n");
+            print(" help       | Prints this message\n");
+            print(" ls         | Lists all available files\n");
+            print(" reboot     | Reboots the system\n");
+            print(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
             char* ft = filetable;
             
@@ -136,47 +141,49 @@ void main() {
                 uint8_t sector = *ft++;
                 uint8_t size = *ft++;
 
-                if (sector < 10) putc('0', 0x0f);
-                if (sector == 0) putc('0', 0x0f);
-                else print(itoa(sector, 10), 0x0f);
-                print(": ", 0x0f);
-                print(filename, 0x0f);
+                if (sector < 10) putc('0');
+                if (sector == 0) putc('0');
+                else print(itoa(sector, 10));
+                print(": ");
+                print(filename);
 
                 for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-                    putc(' ', 0x0f);
+                    putc(' ');
                 }
 
-                print(" | ", 0x0f);
+                print(" | ");
                 if (size >> 1) {
-                    print(itoa(size >> 1, 10), 0x0f);
-                    if (size & 0x01) { print(".5", 0x0f); }
-                    print("kB\n", 0x0f);
+                    print(itoa(size >> 1, 10));
+                    if (size & 0x01) { print(".5"); }
+                    print("kB\n");
                 } else {
-                    print(itoa(size*512, 10), 0x0f);
-                    print("B\n", 0x0f);
+                    print(itoa(size*512, 10));
+                    print("B\n");
                 }
             }
+        } else if (strcmp(input, "reboot") == 0) {
+            outb(0x64, 0xFE);
         } else if (strcmp(input, "test") == 0) {
-            print("Running Tests...\n", 0x0f);
+            print("Running Tests...\n");
             uint8_t buf[512];
             
-            print("Read Test .......... ", 0x0f);
+            print("Read Test .......... ");
             diskRead(0, 1, (char*)buf);
             if (buf[510] == 0x55 && buf[511] == 0xaa) {
-                print("[ DONE ]\n", 0x0a);
+                print("[ DONE ]\n");
             } else {
-                print("[ FAIL ]\n", 0x0c);
+                print("[ FAIL ]\n");
             }
-            print("Write Test ......... ", 0x0f);
+            print("Write Test ......... ");
             buf[510] = 0x55; buf[511] = 0xaa;
             diskWrite(0, 1, (char*)buf);
             diskRead(0, 1, (char*)buf); // Idk how else to test if the right data was written (also could break the bootloader if it fails)
             if (buf[510] == 0x55 && buf[511] == 0xaa) {
-                print("[ DONE ]\n", 0x0a);
+                print("[ DONE ]\n");
             } else {
-                print("[ FAIL ]\n", 0x0c);
+                print("[ FAIL ]\n");
             }
-            print("Tests Finished!\n", 0x0f);
+            print("Tests Finished!\n");
         } else {
             char* ft = filetable;
             uint8_t found = 0;
@@ -203,10 +210,10 @@ void main() {
 
                     for (size_t i = 0; i < size * 512; i++) {
                         if (buf[i] != '\0') {
-                            putc(buf[i], 0x0f);
+                            putc(buf[i]);
                         }
                     }
-                    putc('\n', 0x0f);
+                    putc('\n');
                     
                     found++; // Set found to 1
                     break;
@@ -216,9 +223,9 @@ void main() {
             }
 
             if (!found) {
-                print("Command not found: ", 0x0c);
-                print(input, 0x0c);
-                putc('\n', 0x0f);
+                print("Command not found: ");
+                print(input);
+                putc('\n');
             }
         }
     }

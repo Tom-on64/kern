@@ -1,13 +1,17 @@
 === Todo ===
 
 - [*] Multistage Bootloader
+- [ ] Write down where stuff is in memory (0x1000 - kernel, 0x2000 - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
 - [ ] Screen
-    - [*] Scrolling
+    - [ ] Scrolling
     - [ ] Scroll-back
+    - [ ] Color codes (and just multicolor text in general)
     - [*] VESA BIOS Extensions
     - [*] Better resolution
     - [*] Graphics mode
-    - [ ] Custom font
+    - [*] Custom font
+    - [ ] Larger text size
+    - [ ] color codes
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)
     - [*] Filetable
@@ -40,14 +44,13 @@
         - [ ] touch (make file)
         - [ ] rm
         - [ ] mkdir (add dirs first)
-        - [ ] reboot
+        - [*] reboot
         - [ ] cd
 - [ ] Standard I/O stuff
     - [ ] stdin
     - [ ] stdout
     - [ ] stderr
     - [ ] printf
-    - [ ] color codes
 - [ ] Virtual Memory
 - [ ] Paging
 - [ ] User (or system) programs

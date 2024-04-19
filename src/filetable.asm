@@ -13,7 +13,8 @@ filetable:
     db "boot",0,0,0,0,0,0, "bin",0,0,4
     db "filetable",0,      "tab",0,4,1
     db "kernel",0,0,0,0,   "bin",0,5,20
-    db "test",0,0,0,0,0,0, "txt",0,25,1
+    db "testfont",0,0,     "fnt",0,25,4
+    db "test",0,0,0,0,0,0, "txt",0,29,1
 
 times 512-($-$$) db 0
 

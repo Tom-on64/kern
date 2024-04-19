@@ -14,6 +14,8 @@ Since there's always more to do, here are the [todos](todo.txt).
 - Filesystem (filetable)
 - Interactive Shell
 - Disk I/O
+- Font support (funky format)
+- 1920x1080 Resolution, 32bpp
 
 ## Building & Running
 If you want to try kern for some reason, you can.

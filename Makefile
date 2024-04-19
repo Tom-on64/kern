@@ -13,11 +13,13 @@ BUILD = ./build
 
 # Main compilation target
 os: $(BUILD) bootloader kernel
-	@$(AS) -fbin  -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
+	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
+	@$(AS) -fbin -o $(BUILD)/testfont.bin $(SRC)/testfont.asm
 	@cat $(BUILD)/boot.bin $(BUILD)/filetable.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880
 	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc
-	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=25 conv=notrunc
+	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=25 conv=notrunc
+	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=29 conv=notrunc
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)

@@ -113,11 +113,11 @@ void setupIsrs() {
 
 void faultHandler(struct regs* r) {
     if (r->intNo < 32) {
-        print(exceptionMessages[r->intNo], 0x04);
+        print(exceptionMessages[r->intNo]);
 
         if (r->errCode) { 
-            print(": 0x", 0x04);
-            print(itoa(r->errCode, 16), 0x04);
+            print(": 0x");
+            print(itoa(r->errCode, 16));
         }
 
         cli();
