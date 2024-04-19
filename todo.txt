@@ -10,8 +10,8 @@
     - [*] Better resolution
     - [*] Graphics mode
     - [*] Custom font
-    - [ ] Larger text size
-    - [ ] color codes
+    - [*] Larger text size
+    - [ ] Variable text size :)
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)
     - [*] Filetable

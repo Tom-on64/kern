@@ -25,16 +25,21 @@ void setupScreen() {
     bytesPerScanline = *(uint16_t*)(MODE_INFO_BLOCK + 16); // Bytes per scanline location
 }
 
+// TODO: Probably make the font bigger in a better way, but this works for now
 void putcAt(char c, uint32_t x, uint32_t y) {
-    uint32_t offset = WIDTH * y * 16 + x * 8;
+    uint32_t offset = (WIDTH * y * 16 + x * 8) * 2;
 
     char* bitmap = &font[(c-1) * 16];
-    for (uint8_t i = 0; i < 16; i++) { // Rows
-        char bitmapRow = bitmap[i];
-        for (uint8_t j = 0; j < 8; j++) { // Cols
+    for (uint8_t i = 0; i < 32; i++) { // Rows (16*2 since we draw font 2x larger)
+        char bitmapRow = bitmap[i/2]; // Idk if this should work, because i'm scared of division
+        
+        for (uint8_t j = 0; j < 16; j++) { // Cols (8*2 same as rows)
             vidmem[offset + j] = (bitmapRow & 0x80) ? FG_COLOR : BG_COLOR;
-            bitmapRow = bitmapRow << 1;
-        }
+            if (j % 2) {
+                bitmapRow = bitmapRow << 1;
+            }
+        } 
+
         offset += WIDTH;
     }
 }

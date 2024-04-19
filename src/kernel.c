@@ -11,7 +11,7 @@
 #define PROMPT "#> "
 
 // TODO: Put this at a set address
-char filetable[512] = { 0 };
+char filetable[512];
 
 void main() {
     // Interrupts
