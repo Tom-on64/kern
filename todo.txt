@@ -2,6 +2,7 @@
 
 - [*] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
+- [ ] Makefile refactorin'
 - [ ] Write down where stuff is in memory (0x1000 - kernel, 0x4000? - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
 - [ ] "Text" mode (not actually)
     - [ ] Scrolling
