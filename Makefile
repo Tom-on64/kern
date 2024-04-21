@@ -7,12 +7,13 @@ CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra
 
 SRC = ./src
 BUILD = ./build
+C_FILES = calc
 # C_FILES = $(shell find $(SRC) -name "*.c" -exec basename -s ".c" {} \;)
 
 .PHONY: os clean run
 
 # Main compilation target
-os: $(BUILD) bootloader kernel
+os: $(BUILD) bootloader kernel $(C_FILES)
 	@echo "Assembling $(SRC)/testfont.asm..."
 	@$(AS) -fbin -o $(BUILD)/testfont.bin $(SRC)/testfont.asm
 	@echo "Building filesystem..."
@@ -23,6 +24,7 @@ os: $(BUILD) bootloader kernel
 	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc status=none
 	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=35 conv=notrunc status=none
 	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=39 conv=notrunc status=none
+	@dd if=$(BUILD)/calc.bin of=kern.iso bs=512 seek=40 conv=notrunc status=none
 	@echo "\nDone!\n"
 
 $(BUILD):
@@ -44,6 +46,13 @@ kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 	@echo "Compiling $(SRC)/kernel.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
 	@$(LD) -T $(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
+	@rm $(BUILD)/*.o
+
+$(C_FILES):
+	@echo "Compiling $(SRC)/$@.c..."
+	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c
+	@$(LD) -T $(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
+	@rm $(BUILD)/$@.o
 
 # Run QEMU
 run:

@@ -15,6 +15,7 @@ filetable:
     db "kernel",0,0,0,0,   "bin",0,5,30
     db "testfont",0,0,     "fnt",0,35,4
     db "test",0,0,0,0,0,0, "txt",0,39,1
+    db "calc",0,0,0,0,0,0, "bin",0,40,2
 
 times 512-($-$$) db 0
 

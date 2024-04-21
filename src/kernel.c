@@ -14,6 +14,9 @@
 // TODO: Put this at a set address
 char filetable[512];
 
+// Function declarations
+void printFiletable(char* ft);
+
 void main() {
     // Interrupts
     setupIdt();
@@ -159,44 +162,7 @@ void main() {
             print(" reboot     | Reboots the system\n");
             print(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
-            char* ft = filetable;
-            
-            while (*ft != '\0') {
-                char filename[15] = { 0 };
-                uint8_t offset = 0;
-                for (uint8_t i = 0; i < 14; i++) {
-                    if (i == 9) {
-                        filename[offset++] = '.';
-                        continue;
-                    }
-                    if (*ft != '\0') { filename[offset++] = *ft; }
-                    ft++;
-                }
-                ft++; // RESERVED
-
-                uint8_t sector = *ft++;
-                uint8_t size = *ft++;
-
-                if (sector < 10) putc('0');
-                if (sector == 0) putc('0');
-                else print(itoa(sector, 10));
-                print(": ");
-                print(filename);
-
-                for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-                    putc(' ');
-                }
-
-                print(" | ");
-                if (size >> 1) {
-                    print(itoa(size >> 1, 10));
-                    if (size & 0x01) { print(".5"); }
-                    print("kB\n");
-                } else {
-                    print(itoa(size*512, 10));
-                    print("B\n");
-                }
-            }
+            printFiletable(filetable);
         } else if (strcmp(input, "reboot") == 0) {
             outb(0x64, 0xFE);
         } else if (strcmp(input, "test") == 0) {
@@ -240,21 +206,29 @@ void main() {
                     ft++; // RESERVED
                     uint8_t sector = *ft++;
                     uint8_t size = *ft++;
+                    found++; // Set found to 1
 
                     char buf[size * 512];
                     diskRead(sector, size, buf);
 
-                    // TODO: Print .txt files, launch .bin files
-                    // For calling .bin files, use '((void (*)(void))buf)()' to jump to it
+                    char* fileType = strchr(filename, '.') + 1;
 
-                    for (size_t i = 0; i < size * 512; i++) {
-                        if (buf[i] != '\0') {
-                            putc(buf[i]);
+                    if (strcmp(fileType, "bin") == 0) {
+                        memcopy(buf, (char*)0x10000, size * 512);
+                        clear(); 
+                        ((void(*)(void))0x10000)(); // Call program
+                        clear();
+                    } else if (strcmp(fileType, "tab") == 0) {
+                        printFiletable(buf);
+                    } else {
+                        for (size_t i = 0; i < size * 512; i++) {
+                            if (buf[i] != '\0') {
+                                putc(buf[i]);
+                            }
                         }
+                        putc('\n');    
                     }
-                    putc('\n');
                     
-                    found++; // Set found to 1
                     break;
                 }
 
@@ -266,6 +240,45 @@ void main() {
                 print(input);
                 putc('\n');
             }
+        }
+    }
+}
+
+void printFiletable(char* ft) {
+    while (*ft != '\0') {
+        char filename[15] = { 0 };
+        uint8_t offset = 0;
+        for (uint8_t i = 0; i < 14; i++) {
+            if (i == 9) {
+                filename[offset++] = '.';
+                continue;
+            }
+            if (*ft != '\0') { filename[offset++] = *ft; }
+            ft++;
+        }
+        ft++; // RESERVED
+
+        uint8_t sector = *ft++;
+        uint8_t size = *ft++;
+
+        if (sector < 10) putc('0');
+        if (sector == 0) putc('0');
+        else print(itoa(sector, 10));
+        print(": ");
+        print(filename);
+
+        for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
+            putc(' ');
+        }
+
+        print(" | ");
+        if (size >> 1) {
+            print(itoa(size >> 1, 10));
+            if (size & 0x01) { print(".5"); }
+            print("kB\n");
+        } else {
+            print(itoa(size*512, 10));
+            print("B\n");
         }
     }
 }
