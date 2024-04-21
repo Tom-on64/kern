@@ -83,12 +83,15 @@
     - [ ] stdout
     - [ ] stderr
     - [ ] printf
-- [ ] Virtual Memory
-- [ ] Paging
+- [ ] Memory manager
+    - [ ] Physical
+    - [ ] Virtual
+    - [ ] Paging
 - [ ] User (or system) programs
-    - [ ] Loading them
-    - [ ] Running them
-    - [ ] Exit back to kernel/shell
+    - [x] Loading them
+    - [x] Running them
+    - [x] Exit back to kernel/shell
+    - [ ] Let them use libs
     - [ ] argc, argv[]
 - [ ] Standalone shell program
 - [ ] Code Editor
