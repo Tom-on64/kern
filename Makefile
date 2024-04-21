@@ -13,13 +13,17 @@ BUILD = ./build
 
 # Main compilation target
 os: $(BUILD) bootloader kernel
-	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
+	@echo "Assembling $(SRC)/testfont.asm..."
 	@$(AS) -fbin -o $(BUILD)/testfont.bin $(SRC)/testfont.asm
+	@echo "Building filesystem..."
+	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
 	@cat $(BUILD)/boot.bin $(BUILD)/filetable.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
-	@dd if=/dev/zero of=kern.iso bs=512 count=2880
-	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc
-	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=25 conv=notrunc
-	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=29 conv=notrunc
+	@echo "Building kern.iso..."
+	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
+	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=35 conv=notrunc status=none
+	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=39 conv=notrunc status=none
+	@echo "\nDone!\n"
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
@@ -27,13 +31,17 @@ $(BUILD):
 
 # Bootloader: This target is responsible for creating boot.bin
 bootloader:
+	@echo "Assembling $(SRC)/stage1.asm..."
 	@$(AS) -fbin -o $(BUILD)/stage1.bin $(SRC)/stage1.asm
+	@echo "Assembling $(SRC)/stage2.asm..."
 	@$(AS) -fbin -o $(BUILD)/stage2.bin $(SRC)/stage2.asm
 	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
 kernel: $(SRC)/kernel.c $(SRC)/entry.asm
+	@echo "Assembling $(SRC)/entry.asm..."
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
+	@echo "Compiling $(SRC)/kernel.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
 	@$(LD) -T $(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
 

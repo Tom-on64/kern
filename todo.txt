@@ -1,6 +1,7 @@
 === Todo ===
 
 - [*] Multistage Bootloader
+- [ ] Bootloader reads filetable to find files
 - [ ] Write down where stuff is in memory (0x1000 - kernel, 0x4000? - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
 - [ ] "Text" mode (not actually)
     - [ ] Scrolling
@@ -12,11 +13,15 @@
     - [*] Custom font
     - [*] Larger text size
     - [ ] Variable text size :)
+    - [ ] Make output overflow go to next line
 - [ ] Graphics
-    - [ ] Enter/exit a "graphics" mode
-    - [ ] Pixel drawing
-    - [ ] Line drawing (Raycaster Alert??)
-    - [ ] Triangles (3D?!!???)
+    - [ ] Enter/exit a "graphics" mode (idk if we need this)
+    - [x] Pixel drawing
+    - [x] Line drawing (Raycaster Alert??)
+    - [x] Triangles (3D?!!???)
+    - [x] Rectange :)
+    - [x] Circle!
+    - [x] Filled verisons
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine
@@ -25,7 +30,7 @@
         - [ ] Cotangent
         - [ ] Arc (inverse) versions
         - [ ] Hyperbolic versions
-    - [ ] Absolute value
+    - [x] Absolute value
     - [ ] isOdd() 🗿
     - [ ] Exponential fn (e^x)
     - [ ] Logarithm
@@ -33,8 +38,9 @@
     - [ ] Square Root
     - [ ] Nth Root
     - [ ] Floor
-    - [ ] Round
+    - [x] Round
     - [ ] Ceiling
+    - [x] Sign
     - [ ] INFINITY
     - [ ] NAN
 - [ ] Filesystem

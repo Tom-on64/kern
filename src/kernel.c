@@ -7,6 +7,7 @@
 #include "system.h"
 #include "disk.h"
 #include "string.h"
+#include "graphics.h"
 
 #define PROMPT "#> "
 
@@ -25,7 +26,8 @@ void main() {
     timerPhase(1000); // 1 tick per ~1ms
 
     // Screen setup
-    diskRead(25, 4, (char*)0x6000); // Read font from disk
+    // TODO: Find font in filetable
+    diskRead(35, 4, (char*)0x6000); // Read font from disk
     setupScreen();
     loadFont((char*)0x6000);
 
@@ -112,12 +114,46 @@ void main() {
             print(args);
         } else if (strcmp(input, "exit") == 0) {
             break;
+        } else if (strcmp(input, "gfx") == 0) {
+            clear();
+
+            // Draw some stuff :)
+            for (size_t i = 0; i < 120; i++) {
+                for (size_t j = 0; j < 120; j++) {
+                    drawPixel(200 + i, 200 + j, GREEN);
+                } 
+            }
+
+            fillRect(200, 200, 320, 320, GREEN);
+
+            drawLine(200, 200, 320, 320, RED);
+            drawLine(320, 200, 200, 320, RED);
+
+            drawLine(800, 300, 900, 400, BLUE);
+            drawLine(900, 400, 1000, 300, BLUE);
+            drawLine(1000, 300, 900, 200, BLUE);
+            drawLine(900, 200, 800, 300, BLUE);
+
+            drawLine(400, 350, 420, 100, rgb(0xee, 0x9f, 0x00));
+
+            drawTriangle(200, 400, 400, 600, 200, 600, MAGENTA);
+            fillTriangle(750, 400, 800, 450, 700, 450, CYAN);
+            drawTriangle(960, 400, 1000, 500, 990, 580, YELLOW);
+
+            drawRect(100, 650, 800, 900, rgb(0xe0, 0x0a, 0x3a));
+
+            drawCircle(1500, 600, 300, WHITE);
+            fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
+
+            read('q'); // Wait until we get a 'q'
+            clear();
         } else if (strcmp(input, "help") == 0) {
             print("Available Commands:\n");
             print(" clear      | Clears the screen\n");
             print(" disk       | Reads/Writes data from/to the disk\n");
             print(" echo       | Prints a message to stdout\n");
             print(" exit       | Exits shell\n");
+            print(" gfx        | Does a graphics test\n");
             print(" help       | Prints this message\n");
             print(" ls         | Lists all available files\n");
             print(" reboot     | Reboots the system\n");

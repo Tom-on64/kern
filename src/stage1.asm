@@ -4,7 +4,7 @@
 
 %define VIDMEM 0xb800
 %define KERNEL_LOC 0x1000
-%define KERNEL_SIZE 20 ; 10kB
+%define KERNEL_SIZE 30 ; 15kB
 
 start:
     mov [driveNum], dl   ; Store the drive number
