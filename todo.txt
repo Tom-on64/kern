@@ -1,6 +1,6 @@
 === Todo ===
 
-- [*] Multistage Bootloader
+- [x] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
 - [ ] Makefile refactorin'
 - [ ] Write down where stuff is in memory (0x1000 - kernel, 0x4000? - filetable, 0x5000 - VBE Mode Info, 0x6000 - Font)
@@ -8,15 +8,15 @@
     - [ ] Scrolling
     - [ ] Scroll-back
     - [ ] Color codes (and just multicolor text in general)
-    - [*] VESA BIOS Extensions
-    - [*] Better resolution
-    - [*] Graphics mode
-    - [*] Custom font
-    - [*] Larger text size
+    - [x] VESA BIOS Extensions
+    - [x] Better resolution
+    - [x] Graphics mode
+    - [x] Custom font
+    - [x] Larger text size
     - [ ] Variable text size :)
     - [ ] Make output overflow go to next line
-- [ ] Graphics
-    - [ ] Enter/exit a "graphics" mode (idk if we need this)
+- [x] Graphics
+    - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
     - [x] Line drawing (Raycaster Alert??)
     - [x] Triangles (3D?!!???)
@@ -38,17 +38,19 @@
     - [ ] Power
     - [ ] Square Root
     - [ ] Nth Root
-    - [ ] Floor
+    - [x] Floor
     - [x] Round
-    - [ ] Ceiling
+    - [x] Ceiling
     - [x] Sign
     - [ ] INFINITY
     - [ ] NAN
+    - [x] E (eulers number)
+    - [x] PI
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)
-    - [*] Filetable
+    - [x] Filetable
     - [ ] Files
-        - [*] Larger than one sector (512B)
+        - [x] Larger than one sector (512B)
         - [ ] Any file size (Not multiples of 512B)
         - [ ] Filetypes
     - [ ] Directories
@@ -68,15 +70,15 @@
     - [ ] ';' separated commands
     - [ ] I/O Redirection with '<' '>'
     - [ ] Commands
-        - [*] echo
-        - [*] clear
-        - [*] help
-        - [*] ls
-        - [*] exit
+        - [x] echo
+        - [x] clear
+        - [x] help
+        - [x] ls
+        - [x] exit
         - [ ] touch (make file)
         - [ ] rm
         - [ ] mkdir (add dirs first)
-        - [*] reboot
+        - [x] reboot
         - [ ] cd
 - [ ] Standard I/O stuff
     - [ ] stdin
@@ -92,6 +94,7 @@
     - [x] Running them
     - [x] Exit back to kernel/shell
     - [ ] Let them use libs
+    - [ ] Proper include files (LibC?)
     - [ ] argc, argv[]
 - [ ] Standalone shell program
 - [ ] Code Editor
