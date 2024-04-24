@@ -11,8 +11,7 @@
 
 #define PROMPT "#> "
 
-// TODO: Put this at a set address
-char filetable[512];
+char* filetable = (char*)0x7000; // Pretty sure we don't have to care about the bootloader at 0x7c00
 
 // Function declarations
 void printFiletable(char* ft);
@@ -30,14 +29,14 @@ void main() {
 
     // Screen setup
     // TODO: Find font in filetable
-    diskRead(35, 4, (char*)0x6000); // Read font from disk
+    diskRead(36, 4, (char*)0x6000); // Read font from disk
     setupScreen();
     loadFont((char*)0x6000);
 
     clear();
     print("kern.\n\n");
 
-    diskRead(4, 1, filetable); // Read the filetable and store it in memory
+    diskRead(5, 1, filetable); // Read the filetable and store it in memory
 
     // Run Interactive Shell Program
     // TODO: Make it in another file

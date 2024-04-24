@@ -22,9 +22,9 @@ os: $(BUILD) bootloader kernel $(C_FILES)
 	@echo "Building kern.iso..."
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
 	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=35 conv=notrunc status=none
-	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=39 conv=notrunc status=none
-	@dd if=$(BUILD)/calc.bin of=kern.iso bs=512 seek=40 conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=36 conv=notrunc status=none
+	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=40 conv=notrunc status=none
+	@dd if=$(BUILD)/calc.bin of=kern.iso bs=512 seek=41 conv=notrunc status=none
 	@echo "\nDone!\n"
 
 $(BUILD):

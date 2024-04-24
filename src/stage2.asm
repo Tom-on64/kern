@@ -7,6 +7,58 @@
 start:
     mov [driveNum], dl
 
+    ; Physical memory map setup
+    xor ax, ax
+    mov es, ax
+
+memMapEntries equ 0x8500
+getMemoryMap:
+    mov di, memMapEntries + 4 ; 4 bytes after memMapEntries
+    xor ebx, ebx
+    xor bp, bp
+    mov edx, "PAMS" ; SMAP in little endian
+    mov eax, 0xe820
+    mov dword [es:di+20], 1 ; Force valid ACPI 3.X entry
+    mov ecx, 24
+    int 0x15
+    jc .error
+
+    cmp eax, "PAMS"
+    jne .error
+    test ebx, ebx
+    jz .error
+
+.nextEntry:
+    mov edx, "PAMS" ; In case BIOS messes with edx
+    mov ecx, 24
+    mov eax, 0xe820
+    int 0x15
+    
+    jcxz .skipEntry
+    mov ecx, [es:di+8] ; Low 32 bits of length
+    or ecx, [es:di+12] ; High 32 bits of length
+    jz .skipEntry
+
+    ; Valid entry
+    inc bp
+    add di, 24 ; Next entry
+
+.skipEntry:
+    test ebx, ebx
+    jz .done
+    jmp .nextEntry
+
+.error:
+    mov si, acpiFuncErr
+    call print
+    cli
+    hlt
+
+.done:
+    mov [memMapEntries], bp
+    clc
+
+vbeSetup:
     ; Setup VBE info
     xor ax, ax
     mov es, ax
@@ -44,7 +96,7 @@ start:
     cmp ax, 0x4f
     jne error
 
-    ; Print values
+    ; Print values (Debug)
     ; mov ax, [modeInfoBlock.xRes]
     ; ror ax, 8
     ; call printHex
@@ -52,7 +104,6 @@ start:
     ; call printHex
     ; mov ax, 0x0e20
     ; int 0x10
-
     ; mov ax, [modeInfoBlock.yRes]
     ; ror ax, 8
     ; call printHex
@@ -60,13 +111,11 @@ start:
     ; call printHex
     ; mov ax, 0x0e20
     ; int 0x10
-
     ; xor ax, ax
     ; mov al, [modeInfoBlock.bpp]
     ; call printHex
     ; mov ax, 0x0e20
-    ; int 0x10
-    
+    ; int 0x10 
     ; mov al, 0x0a
     ; int 0x10
     ; mov al, 0x0d
@@ -218,6 +267,7 @@ driveNum: db 0
 
 vbeErr: db "VBE Error!", 0
 modeNotFoundErr: db "VBE Mode not found!", 0
+acpiFuncErr: db "ACPI Function not supported!", 0
 
 ;; GDT
 GDT:
@@ -256,7 +306,7 @@ offset: dw 0
 _segment: dw 0 ; segment is a keyword
 mode: dw 0
 
-times 512-($-$$) db 0 ; End Sector 1
+times (512*2)-($-$$) db 0 ; End Sector 2
 
 ;; Sector 2
 vbeInfoBlock:
@@ -331,5 +381,5 @@ modeInfoBlock:
 
     .reserved4: times 190 db 0 
 
-times (512*3)-($-$$) db 0 ; 2 Pad out to 3 sectors
+times (512*4)-($-$$) db 0
 

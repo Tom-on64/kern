@@ -4,6 +4,7 @@
 
 %define VIDMEM 0xb800
 %define KERNEL_LOC 0x1000
+%define FILETAB_LOC 0x7000 ; TODO: Read kernel size and location from ft
 %define KERNEL_SIZE 30 ; 15kB
 
 start:
@@ -25,7 +26,7 @@ start:
     mov bx, 0x7e00 ; 2nd stage bootloader location
     
     ; CHS Location
-    mov al, 3   ; Number of sectors to read (2 = 1kB)
+    mov al, 4   ; Number of sectors to read (4 = 2kB)
     mov ch, 0   ; Cylinder
     mov dh, 0   ; Head
     mov cl, 2   ; Sector
@@ -68,7 +69,7 @@ loadKernel:
     mov al, KERNEL_SIZE
     mov ch, 0   ; Cylinder
     mov dh, 0   ; Head
-    mov cl, 6   ; Sector
+    mov cl, 7   ; Sector
     mov dl, [driveNum]
 
     mov ah, 2   ; Read from disk
