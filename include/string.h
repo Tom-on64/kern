@@ -9,6 +9,11 @@ char* itoa(uint32_t val, uint8_t base) {
 
     if (base == 0 || base > 16) {
         // TODO: Add errors!!
+        return NULL;
+    }
+
+    if (val == 0) {
+        buf[0] = '0';
         return buf;
     }
  

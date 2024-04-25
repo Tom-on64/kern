@@ -13,7 +13,7 @@ start:
 
 memMapEntries equ 0x8500
 getMemoryMap:
-    mov di, memMapEntries + 4 ; 4 bytes after memMapEntries
+    mov di, 0x8504 ; 4 bytes after memMapEntries
     xor ebx, ebx
     xor bp, bp
     mov edx, "PAMS" ; SMAP in little endian
@@ -26,14 +26,21 @@ getMemoryMap:
     cmp eax, "PAMS"
     jne .error
     test ebx, ebx
-    jz .error
+    jnz .start
+
+.error:
+    mov si, acpiFuncErr
+    call print
+    cli
+    hlt
 
 .nextEntry:
     mov edx, "PAMS" ; In case BIOS messes with edx
     mov ecx, 24
     mov eax, 0xe820
     int 0x15
-    
+
+.start:
     jcxz .skipEntry
     mov ecx, [es:di+8] ; Low 32 bits of length
     or ecx, [es:di+12] ; High 32 bits of length
@@ -48,21 +55,13 @@ getMemoryMap:
     jz .done
     jmp .nextEntry
 
-.error:
-    mov si, acpiFuncErr
-    call print
-    cli
-    hlt
-
 .done:
     mov [memMapEntries], bp
     clc
 
 vbeSetup:
     ; Setup VBE info
-    xor ax, ax
-    mov es, ax
-    mov ah, 0x4f
+    mov ax, 0x4f00
     mov di, vbeInfoBlock
     int 0x10
 

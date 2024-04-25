@@ -11,10 +11,18 @@
 
 #define PROMPT "#> "
 
+typedef struct smapEntry_s {
+    uint64_t baseAddress;
+    uint64_t length;
+    uint32_t type;
+    uint32_t acpiAttr;
+} __attribute__ ((packed)) smapEntry_t;
+
 char* filetable = (char*)0x7000; // Pretty sure we don't have to care about the bootloader at 0x7c00
 
 // Function declarations
 void printFiletable(char* ft);
+void printPhysicalMemmap();
 
 void main() {
     // Interrupts
@@ -37,6 +45,8 @@ void main() {
     print("kern.\n\n");
 
     diskRead(5, 1, filetable); // Read the filetable and store it in memory
+    
+    printPhysicalMemmap();
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -279,6 +289,34 @@ void printFiletable(char* ft) {
             print(itoa(size*512, 10));
             print("B\n");
         }
+    }
+}
+
+void printPhysicalMemmap() {
+    uint32_t entryCount = *(uint32_t*)0x8500;
+    smapEntry_t* smapEntry = (smapEntry_t*)0x8504;
+
+    for (uint32_t i = 0; i < entryCount; i++) {
+        print("Region ");
+        if (i) print(itoa(i, 10));
+        else print("0");
+        print(": base: 0x");
+        print(itoa(smapEntry->baseAddress, 16));
+        print(" length: 0x");
+        print(itoa(smapEntry->length, 16));
+        print(" type: 0x");
+        print(itoa(smapEntry->type, 16));
+
+        switch (smapEntry->type) {
+            case 1: print(" (Available)"); break;
+            case 2: print(" (Reserved)"); break;
+            case 3: print(" (ACPI Reclaim)"); break;
+            case 4: print(" (ACPI NVS)"); break;
+            default: print(" (Reserved)"); break;
+        }
+
+        putc('\n');
+        smapEntry++;
     }
 }
 
