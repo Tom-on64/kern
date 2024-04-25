@@ -86,6 +86,8 @@
     - [ ] stderr
     - [ ] printf
 - [ ] Memory manager
+    - [x] Memory map
+    - [x] Print mem map
     - [ ] Physical
     - [ ] Virtual
     - [ ] Paging
