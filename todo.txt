@@ -88,7 +88,7 @@
 - [ ] Memory manager
     - [x] Memory map
     - [x] Print mem map
-    - [ ] Physical
+    - [x] Physical
     - [ ] Virtual
     - [ ] Paging
 - [ ] User (or system) programs

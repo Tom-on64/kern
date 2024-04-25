@@ -1,6 +1,12 @@
 #ifndef PHYSICAL_MEM_MANAGER_H
 #define PHYSICAL_MEM_MANAGER_H
 
+#include "string.h"
+
+#define BLOCK_SIZE 4096 // 4kB
+#define BLOCKS_PER_BYTE 8
+#define SMAP_ADDRESS 0x8500
+
 typedef struct smapEntry_s {
     uint64_t baseAddress;
     uint64_t length;
@@ -8,38 +14,115 @@ typedef struct smapEntry_s {
     uint32_t acpiAttr;
 } __attribute__ ((packed)) smapEntry_t;
 
-void printPhysicalMemmap() {
-    uint32_t entryCount = *(uint32_t*)0x8500;
-    smapEntry_t* smapEntry = (smapEntry_t*)0x8504;
+static uint32_t* memoryMap = 0;
+static uint32_t maxBlocks;
+static uint32_t usedBlocks = 0;
 
-    for (uint32_t i = 0; i < entryCount; i++) {
-        print("Region ");
-        print(itoa(i, 10));
-        print(" - base: 0x");
-        print(itoa(smapEntry->baseAddress, 16));
-        print(" length: 0x");
-        print(itoa(smapEntry->length, 16));
-        print(" type: ");
-        print(itoa(smapEntry->type, 10));
-
-        switch (smapEntry->type) {
-            case 1: print(" (Available)"); break;
-            case 2: print(" (Reserved)"); break;
-            case 3: print(" (ACPI Reclaim)"); break;
-            case 4: print(" (ACPI NVS)"); break;
-            default: print(" (Reserved)"); break;
-        }
-
-        putc('\n');
-        smapEntry++;
-    }
-
-    smapEntry--; // We incremented it after the last entry
-
-    print("\nTotal memory: 0x");
-    print(itoa(smapEntry->baseAddress + smapEntry->length - 1, 16));
-    print(" Bytes\n");
+void setBlock(uint32_t block) {
+    // Set the right bit to 1
+    memoryMap[block/32] |= (1 << (block % 32));
 }
 
+void unsetBlock(uint32_t block) {
+    // Set the right bit to 0
+    memoryMap[block/32] &= ~(1 << (block % 32));
+}
+
+uint8_t testBlock(uint32_t block) {
+    // Check the bit
+    return memoryMap[block/32] & (1 << (block % 32)) ? 1 : 0;
+}
+
+// TODO: Refactor whatever the fuck this is
+int32_t findFreeBlocks(uint32_t blockCount) {
+    if (blockCount == 0) { // Error
+        return -1;
+    }
+
+    uint32_t maxBlockEntries = maxBlocks / 32;
+    for (uint32_t i = 0; i < maxBlockEntries; i++) {
+        if (memoryMap[i] != 0xffffffff) {
+            for (uint8_t j = 0; j < 32; j++) {
+                uint32_t block = 1 << j;
+
+                if (!(memoryMap[i] & block)) {
+                    uint32_t startBlock = i * 32 + block;
+                    uint32_t freeBlocks = 0;
+
+                    for (uint32_t count = 0; count <= blockCount; count++) {
+                        if (!testBlock(startBlock + count)) {
+                            freeBlocks++;
+                        }
+                        
+                        if (freeBlocks == blockCount) {
+                            return i * 32 + j;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return -1; // No free memory found :/
+}
+
+void setupMemoryManager(uint32_t startAddress, uint32_t size) {
+    memoryMap = (uint32_t*)startAddress;
+    maxBlocks = size / BLOCK_SIZE;
+    usedBlocks = maxBlocks;
+
+    memset((char*)memoryMap, 0xff, maxBlocks / BLOCKS_PER_BYTE);
+}
+
+void initMemoryRegion(uint32_t baseAddress, uint32_t size) {
+    uint32_t align = baseAddress / BLOCK_SIZE;
+    uint32_t blockCount = size / BLOCK_SIZE;
+    
+    while (blockCount-- > 0) {
+        unsetBlock(align++);
+        usedBlocks--;
+    }
+
+    setBlock(0); // Make sure we don't override the first block that contains IDT, BIOS stuff etc.
+}
+
+void deinitMemoryRegion(uint32_t baseAddress, uint32_t size) {
+    uint32_t align = baseAddress / BLOCK_SIZE;
+    uint32_t blockCount = size / BLOCK_SIZE;
+    
+    while (blockCount-- > 0) {
+        setBlock(align++);
+        usedBlocks++;
+    }
+}
+
+void* allocBlocks(uint32_t blockCount) {
+    if ((maxBlocks - usedBlocks) < blockCount) {
+        return NULL;
+    }
+
+    int32_t startBlock = findFreeBlocks(blockCount);
+    if (startBlock == -1) {
+        return NULL;
+    }
+
+    for (uint32_t i = 0; i < blockCount; i++) {
+        setBlock(startBlock + i);
+        usedBlocks++;
+    }
+
+    return (void*)(startBlock * BLOCK_SIZE);
+}
+
+void freeBlocks(void* address, uint32_t blockCount) {
+    uint32_t startBlock = (uint32_t)(address) / BLOCK_SIZE;
+    
+    for (uint32_t i = 0; i < blockCount; i++) {
+        unsetBlock(startBlock + i);
+        usedBlocks--;
+    }
+
+    setBlock(0); // Make sure that block 0 is always set
+}
 
 #endif

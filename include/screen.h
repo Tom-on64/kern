@@ -14,11 +14,11 @@ struct cursor_s {
     uint32_t y;
 };
 
-char* font;
+static char* font;
 uint32_t* vidmem;
 uint16_t bytesPerScanline;
 
-struct cursor_s cursor = { 0, 0 };
+static struct cursor_s cursor = { 0, 0 };
 
 void setupScreen() {
     vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40); // Vidmem pointer location
