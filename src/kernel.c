@@ -19,7 +19,6 @@ uint32_t memmapAddr = 0x30000;
 void printFiletable(char* ft);
 void printPhysicalMemmap();
 
-__attribute__ ((section ("entry"))) // Make sure that main() is at the start of kernel.bin
 void main() {
     // Interrupts
     setupIdt();
@@ -50,7 +49,6 @@ void main() {
     // Screen setup
     // TODO: Find font in filetable
     diskRead(36, 4, (char*)0x6000); // Read font from disk
-    // loadFont((char*)0x6000);
 
     clear();
     print("kern.\n\n");

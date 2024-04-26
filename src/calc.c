@@ -3,9 +3,9 @@
 
 __attribute__ ((section ("entry")))
 void main() {
-    uint32_t wait = 0xffffffff;
+    uint32_t wait = 0x1fffffff;
 
-    putc('a');
+    print("kern.\n\n");
     
     while (wait--);
 
