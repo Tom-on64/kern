@@ -57,8 +57,6 @@ void main() {
 
     diskRead(5, 1, filetable); // Read the filetable and store it in memory
     
-    printPhysicalMemmap();
-
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
@@ -179,10 +177,13 @@ void main() {
             print(" gfx        | Does a graphics test\n");
             print(" help       | Prints this message\n");
             print(" ls         | Lists all available files\n");
+            print(" memmap     | Prints the memory map and info\n");
             print(" reboot     | Reboots the system\n");
             print(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
             printFiletable(filetable);
+        } else if (strcmp(input, "memmap") == 0) {
+            printPhysicalMemmap();
         } else if (strcmp(input, "reboot") == 0) {
             outb(0x64, 0xFE);
         } else if (strcmp(input, "test") == 0) {
