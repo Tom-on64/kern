@@ -11,6 +11,7 @@
 _start:
     pop ax
     mov [driveNum], al
+
     call main
     
     ; Exit QEMU

@@ -18,6 +18,8 @@
 #define rgb(r,g,b) ( ((r) << 16 | (g) << 8 | (b)) & 0x00ffffff )
 
 void drawPixel(int32_t x, int32_t y, uint32_t color) {
+    uint32_t* vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40);
+    
     uint32_t offset = (y * WIDTH) + x;
     vidmem[offset] = color;
 }
@@ -94,6 +96,8 @@ void drawCircle(int32_t x, int32_t y, uint16_t radius, uint32_t color) {
 
 // Recursive (may need large stack)
 void boundaryFill(int32_t x, int32_t y, uint32_t fillColor, uint32_t boundaryColor) {
+    uint32_t* vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40);
+
     uint32_t offset = y * WIDTH + x;
 
     if (vidmem[offset] != fillColor && vidmem[offset] != boundaryColor) {

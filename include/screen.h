@@ -14,19 +14,13 @@ struct cursor_s {
     uint32_t y;
 };
 
-static char* font;
-uint32_t* vidmem;
-uint16_t bytesPerScanline;
+static char* font = (char*)0x6000;
 
 static struct cursor_s cursor = { 0, 0 };
 
-void setupScreen() {
-    vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40); // Vidmem pointer location
-    bytesPerScanline = *(uint16_t*)(MODE_INFO_BLOCK + 16); // Bytes per scanline location
-}
-
 // TODO: Probably make the font bigger in a better way, but this works for now
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
+    uint32_t* vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40);
     uint32_t offset = (WIDTH * y * 16 + x * 8) * 2;
 
     char* bitmap = &font[((c % 128) - 1) * 16];
@@ -73,6 +67,8 @@ void print(const char* str) {
 }
 
 void clear() {
+    uint32_t* vidmem = *(uint32_t**)(MODE_INFO_BLOCK + 40);
+
     size_t i = 0;
     while (i < WIDTH*HEIGHT) {
         vidmem[i] = BG_COLOR; // #1f2937
@@ -81,10 +77,6 @@ void clear() {
 
     cursor.x = 0;
     cursor.y = 0;
-}
-
-void loadFont(char* address) {
-    font = address;
 }
 
 #endif

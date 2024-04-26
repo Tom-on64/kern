@@ -1,5 +1,6 @@
 SECTIONS {
-    .text 0x10000 : {
+    .text : {
+        *(entry); 
         *(.text*);
     }
     .data : {

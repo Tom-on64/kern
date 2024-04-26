@@ -8,7 +8,6 @@ CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra
 SRC = ./src
 BUILD = ./build
 C_FILES = calc
-# C_FILES = $(shell find $(SRC) -name "*.c" -exec basename -s ".c" {} \;)
 
 .PHONY: os clean run
 
@@ -45,13 +44,13 @@ kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
 	@echo "Compiling $(SRC)/kernel.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
-	@$(LD) -T $(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
+	@$(LD) -T$(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
 	@rm $(BUILD)/*.o
 
 $(C_FILES):
 	@echo "Compiling $(SRC)/$@.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c
-	@$(LD) -T $(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
+	@$(LD) -T$(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
 
 # Run QEMU

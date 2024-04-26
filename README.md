@@ -16,6 +16,7 @@ Since there's always more to do, here are the [todos](todo.txt).
 - Disk I/O
 - Font support (funky format)
 - 1920x1080 Resolution, 32bpp
+- Physical memory manager
 
 ## Building & Running
 If you want to try kern for some reason, you can.
@@ -52,7 +53,7 @@ Disk R/W: \
 _These images may be outdated, Idk_
 
 ## Known issues
-- Idk, they're probably just unknown ;)
+- If you run kernel.bin from shell, it will clear the memory map so when you load anything it will override the kernel code
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)
 

@@ -19,6 +19,7 @@ uint32_t memmapAddr = 0x30000;
 void printFiletable(char* ft);
 void printPhysicalMemmap();
 
+__attribute__ ((section ("entry"))) // Make sure that main() is at the start of kernel.bin
 void main() {
     // Interrupts
     setupIdt();
@@ -49,8 +50,7 @@ void main() {
     // Screen setup
     // TODO: Find font in filetable
     diskRead(36, 4, (char*)0x6000); // Read font from disk
-    setupScreen();
-    loadFont((char*)0x6000);
+    // loadFont((char*)0x6000);
 
     clear();
     print("kern.\n\n");
@@ -229,27 +229,52 @@ void main() {
                     uint8_t size = *ft++;
                     found++; // Set found to 1
 
-                    char buf[size * 512];
-                    diskRead(sector, size, buf);
-
                     char* fileType = strchr(filename, '.') + 1;
 
+                    uint32_t neededBlocks = (size * 512) / BLOCK_SIZE + 1;
+
+                    /* Debug printing
+                    print("Allocating ");
+                    print(itoa(neededBlocks, 10));
+                    print(" Block");
+                    if (neededBlocks > 1) putc('s');
+                    */
+
+                    char* address = allocBlocks(neededBlocks);
+
+                    if (address == NULL) {
+                        print("\nNot enough memory to allocate!\n");
+                        break;
+                    }
+
+                    /* Debug printing
+                    print("\nAllocated to address 0x");
+                    print(itoa((uint32_t)address, 16));
+                    print("!\n");
+                    */
+
+                    diskRead(sector, size, address);
+
                     if (strcmp(fileType, "bin") == 0) {
-                        memcopy(buf, (char*)0x10000, size * 512);
                         clear(); 
-                        ((void(*)(void))0x10000)(); // Call program
+                        ((void(*)(void))address)(); // Call program
                         clear();
                     } else if (strcmp(fileType, "tab") == 0) {
-                        printFiletable(buf);
+                        printFiletable(address);
                     } else {
                         for (size_t i = 0; i < size * 512; i++) {
-                            if (buf[i] != '\0') {
-                                putc(buf[i]);
+                            if (address[i] != '\0') {
+                                putc(address[i]);
                             }
                         }
                         putc('\n');    
                     }
                     
+                    // Debug printing
+                    // print("Freeing allocated memory...\n");
+                    freeBlocks(address, neededBlocks);
+                    // print("Done!\n");
+
                     break;
                 }
 
