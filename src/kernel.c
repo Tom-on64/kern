@@ -13,6 +13,7 @@
 #define PROMPT "#> "
 
 char* filetable = (char*)0x7000; // Pretty sure we don't have to care about the bootloader at 0x7c00
+uint32_t memmapAddr = 0x30000;
 
 // Function declarations
 void printFiletable(char* ft);
@@ -28,6 +29,22 @@ void main() {
     setupKeyboard();
     setupTimer();
     timerPhase(1000); // 1 tick per ~1ms
+
+    // Memory manager setup
+    uint32_t smapEntryCount = *(uint32_t*)0x8500;
+    smapEntry_t* smapEntries = (smapEntry_t*)0x8504;
+    uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
+
+    setupMemoryManager(memmapAddr, totalMemory);
+
+    for (uint32_t i = 0; i < smapEntryCount; i++) {
+        if (smapEntries[i].type == 1) {
+            initMemoryRegion(smapEntries[i].baseAddress, smapEntries[i].length);
+        }
+    }
+
+    deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
+    deinitMemoryRegion(memmapAddr, maxBlocks / BLOCKS_PER_BYTE);
 
     // Screen setup
     // TODO: Find font in filetable
@@ -317,5 +334,13 @@ void printPhysicalMemmap() {
     print("\nTotal memory: 0x");
     print(itoa(smapEntry->baseAddress + smapEntry->length - 1, 16));
     print(" Bytes\n");
+
+    print("Total 4kB Blocks: ");
+    print(itoa(maxBlocks, 10));
+    print("\nUsed or reserved blocks: ");
+    print(itoa(usedBlocks, 10));
+    print("\nFree blocks: ");
+    print(itoa(maxBlocks - usedBlocks, 10));
+    print("\n\n");
 }
 
