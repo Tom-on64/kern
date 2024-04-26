@@ -252,7 +252,6 @@ protected_start:
     mov esi, modeInfoBlock
     mov edi, 0x5000 ; Destination
     mov ecx, 64 ; 64 * 4 = 256B (size of modeInfoBlock)
-
     rep movsd
 
     ; Perform The far jump
@@ -360,9 +359,9 @@ modeInfoBlock:
     .directColorModeInfo: db 0
 
 ;; Required by VBE 2.0+
-    .physicalAddressPtr: dd 0
-    .reserved2: db 0
-    .reserved3: db 0
+    .physicalBasePtr: dd 0
+    .reserved2: dd 0
+    .reserved3: dw 0
 
 ;; Required by VBE 3.0+
     .linearBytesPerScanline: dw 0

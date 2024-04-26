@@ -3,7 +3,7 @@
 - [x] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
 - [ ] Makefile refactorin'
-- [x] Write down where stuff is in memory 
+- [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
     - [ ] Scrolling
     - [ ] Scroll-back
@@ -15,6 +15,7 @@
     - [x] Larger text size
     - [ ] Variable text size :)
     - [ ] Make output overflow go to next line
+    - [ ] More fonts
 - [x] Graphics
     - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
