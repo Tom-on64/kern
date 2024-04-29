@@ -54,7 +54,7 @@ void main() {
     print("kern.\n\n");
 
     diskRead(5, 1, filetable); // Read the filetable and store it in memory
-    
+
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {

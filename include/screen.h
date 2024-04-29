@@ -6,6 +6,8 @@
 #define MODE_INFO_BLOCK 0x5000
 #define BG_COLOR 0xff010b17
 #define FG_COLOR 0xffebddf4
+#define CHAR_WIDTH 8
+#define CHAR_HEIGHT 16
 
 typedef struct modeInfoBlock_s {
     // Required by all VBE revisions
@@ -74,23 +76,29 @@ static char* font = (char*)0x6000;
 static struct cursor_s cursor = { 0, 0 };
 static modeInfoBlock_t* gfxMode = (modeInfoBlock_t*)MODE_INFO_BLOCK;
 
-// TODO: Probably make the font bigger in a better way, but this works for now
+uint32_t bgColor = BG_COLOR;
+uint32_t fgColor = FG_COLOR;
+
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
-    uint32_t* vidmem = (uint32_t*)gfxMode->physicalBasePtr;
-    uint32_t offset = (gfxMode->xRes * y * 16 + x * 8) * 2;
+    uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
+    uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
+    uint32_t offset = (gfxMode->xRes * y * CHAR_HEIGHT + x * CHAR_WIDTH) * bytesPerPx;
 
     char* bitmap = &font[((c % 128) - 1) * 16];
-    for (uint8_t i = 0; i < 32; i++) { // Rows (16*2 since we draw font 2x larger)
-        char bitmapRow = bitmap[i/2]; // Idk if this should work, because i'm scared of division
+    for (uint8_t i = 0; i < CHAR_HEIGHT; i++) { // Rows
+        char bitmapRow = bitmap[i]; 
         
-        for (uint8_t j = 0; j < 16; j++) { // Cols (8*2 same as rows)
-            vidmem[offset + j] = (bitmapRow & 0x80) ? FG_COLOR : BG_COLOR;
-            if (j % 2) {
+        for (uint8_t j = 0; j < CHAR_WIDTH * bytesPerPx; ++j) { // Cols 
+            uint32_t color = (bitmapRow & 0x80) ? fgColor : bgColor;
+            uint8_t byte = j % bytesPerPx;
+            vidmem[offset + j] = (uint8_t)(color >> (8 * byte));
+
+            if (byte == bytesPerPx - 1) {
                 bitmapRow = bitmapRow << 1;
             }
-        } 
+        }
 
-        offset += gfxMode->xRes;
+        offset += gfxMode->linearBytesPerScanline; // gfxMode->xRes * bytesPerPx
     }
 }
 
@@ -122,13 +130,18 @@ void print(const char* str) {
     }
 }
 
+// TODO: Optimize this, it is VERY slow
 void clear() {
-    uint32_t* vidmem = (uint32_t*)gfxMode->physicalBasePtr;
+    uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
+    uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
 
     size_t i = 0;
-    while (i < gfxMode->xRes * gfxMode->yRes) {
-        vidmem[i] = BG_COLOR; // #1f2937
-        i++;
+    uint8_t j = 0;
+    while (i < gfxMode->xRes * gfxMode->yRes) { // Loop through all pixels
+        vidmem[i * bytesPerPx + j] = (uint8_t)(bgColor >> (j*8));
+
+        j = (j + 1) % bytesPerPx;
+        if (!j) { i++; }
     }
 
     cursor.x = 0;

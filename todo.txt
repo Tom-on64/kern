@@ -16,6 +16,8 @@
     - [ ] Variable text size :)
     - [ ] Make output overflow go to next line
     - [ ] More fonts
+    - [x] Generic screen.h stuff (don't assume 1920x1080 32bpp)
+    - [ ] 
 - [x] Graphics
     - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
@@ -68,6 +70,7 @@
     - [ ] Malloc()
     - [ ] Free()
 - [ ] Shell
+    - [ ] Separate file/program
     - [ ] ';' separated commands
     - [ ] I/O Redirection with '<' '>'
     - [ ] Commands
@@ -111,4 +114,8 @@
     - [ ] Standard libs
 - [ ] Finish all todos
 - [ ] Refactoring!!!
+- [ ] Can it run DOOM?
+- [ ] Games
+    - [ ] Minesweeper
+    - [ ] Solitaire
 
