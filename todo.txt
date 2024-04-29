@@ -1,8 +1,15 @@
 === Todo ===
 
+Legend:
+- [ ] Not done
+- [x] Done
+- [_] Was done at some point, but isn't now
+- [!] Important todo
+- [?] Optional
+
 - [x] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
-- [ ] Makefile refactorin'
+- [!] Makefile refactorin'
 - [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
     - [ ] Scrolling
@@ -12,12 +19,12 @@
     - [x] Better resolution
     - [x] Graphics mode
     - [x] Custom font
-    - [x] Larger text size
+    - [_] Larger text size
     - [ ] Variable text size :)
     - [ ] Make output overflow go to next line
     - [ ] More fonts
     - [x] Generic screen.h stuff (don't assume 1920x1080 32bpp)
-    - [ ] 
+    - [ ] Multi vbe mode support
 - [x] Graphics
     - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
@@ -25,7 +32,7 @@
     - [x] Triangles (3D?!!???)
     - [x] Rectange :)
     - [x] Circle!
-    - [x] Filled verisons
+    - [_] Filled verisons
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine
@@ -69,6 +76,7 @@
     - [ ] Close()
     - [ ] Malloc()
     - [ ] Free()
+    - [ ] Seek()
 - [ ] Shell
     - [ ] Separate file/program
     - [ ] ';' separated commands

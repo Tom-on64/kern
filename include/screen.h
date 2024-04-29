@@ -4,8 +4,8 @@
 #include "stdint.h"
 
 #define MODE_INFO_BLOCK 0x5000
-#define BG_COLOR 0xff010b17
-#define FG_COLOR 0xffebddf4
+#define BG_COLOR 0x00010b17
+#define FG_COLOR 0x00ebddf4
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 16
 
@@ -79,6 +79,20 @@ static modeInfoBlock_t* gfxMode = (modeInfoBlock_t*)MODE_INFO_BLOCK;
 uint32_t bgColor = BG_COLOR;
 uint32_t fgColor = FG_COLOR;
 
+uint32_t convertColor(uint32_t color) {
+    if (gfxMode->bpp == 8) { // Uses VGA Color pallete, idk how to support that
+        return color & 0xff; 
+    }
+
+    uint8_t red   = ((color >> 16) & 0xff) * (((1 << gfxMode->linearRedMaskSize)   - 1) / 255.0);
+    uint8_t green = ((color >> 8 ) & 0xff) * (((1 << gfxMode->linearGreenMaskSize) - 1) / 255.0);
+    uint8_t blue  = ((color      ) & 0xff) * (((1 << gfxMode->linearBlueMaskSize)  - 1) / 255.0);
+
+    return (red << gfxMode->redFieldPos) | (green << gfxMode->greenFieldPos) | (blue << gfxMode->blueFieldPos);
+}
+
+// TODO: Reimplement larger text
+// TODO: Support different bpps (and still keep the colors the same)
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
@@ -89,7 +103,7 @@ void putcAt(unsigned char c, uint32_t x, uint32_t y) {
         char bitmapRow = bitmap[i]; 
         
         for (uint8_t j = 0; j < CHAR_WIDTH * bytesPerPx; ++j) { // Cols 
-            uint32_t color = (bitmapRow & 0x80) ? fgColor : bgColor;
+            uint32_t color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);
             uint8_t byte = j % bytesPerPx;
             vidmem[offset + j] = (uint8_t)(color >> (8 * byte));
 
@@ -130,22 +144,22 @@ void print(const char* str) {
     }
 }
 
-// TODO: Optimize this, it is VERY slow
+// TODO: Optimize this, it is slow (i made it slightly better)
 void clear() {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
 
-    size_t i = 0;
-    uint8_t j = 0;
-    while (i < gfxMode->xRes * gfxMode->yRes) { // Loop through all pixels
-        vidmem[i * bytesPerPx + j] = (uint8_t)(bgColor >> (j*8));
-
-        j = (j + 1) % bytesPerPx;
-        if (!j) { i++; }
-    }
-
     cursor.x = 0;
     cursor.y = 0;
+
+    uint32_t color = convertColor(bgColor);
+   
+    for (uint32_t i = 0; i < gfxMode->xRes * gfxMode->yRes; i++) {
+        for (uint8_t j = 0; j < bytesPerPx; j++) {
+            vidmem[j] = (uint8_t)(color >> (j * 8));
+        }
+        vidmem += bytesPerPx;
+    }
 }
 
 #endif

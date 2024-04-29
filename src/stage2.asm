@@ -297,9 +297,9 @@ CODE_SEG equ GDT.codeDescriptor - GDT.start
 DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
-width: dw 1920
-height: dw 1080
-bpp: db 32
+width: dw 800
+height: dw 600
+bpp: db 8
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
 mode: dw 0
