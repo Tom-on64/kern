@@ -259,6 +259,8 @@ void main() {
                         clear();
                     } else if (strcmp(fileType, "tab") == 0) {
                         printFiletable(address);
+                    } else if (strcmp(fileType, "fnt") == 0) {
+                        print("Loading...\n");
                     } else {
                         for (size_t i = 0; i < size * 512; i++) {
                             if (address[i] != '\0') {

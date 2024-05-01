@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define MODE_INFO_BLOCK 0x5000
+#define MODE_INFO_BLOCK 0x9000
 #define BG_COLOR 0x00010b17
 #define FG_COLOR 0x00ebddf4
 #define CHAR_WIDTH 8

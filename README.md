@@ -54,6 +54,7 @@ _These images may be outdated, Idk_
 
 ## Known issues
 - If you run kernel.bin from shell, it will clear the memory map so when you load anything it will override the kernel code
+- fillCircle() in graphics.h is broken. No idea why, so no filled circles for you (i commented out the boundaryFill call in the function)
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)
 

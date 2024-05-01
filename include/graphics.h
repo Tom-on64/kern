@@ -105,18 +105,27 @@ void drawCircle(int32_t x, int32_t y, uint16_t radius, uint32_t color) {
 void boundaryFill(int32_t x, int32_t y, uint32_t fillColor, uint32_t boundaryColor) {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
-    uint32_t convColor = convertColor(fillColor);
+    uint32_t convColorF = convertColor(fillColor);
+    uint32_t convColorB = convertColor(boundaryColor);
 
     uint32_t offset = (y * gfxMode->xRes + x) * bytesPerPx;
 
-    if (vidmem[offset] != fillColor && vidmem[offset] != boundaryColor) {
+    uint8_t draw = 0;
+    for (uint8_t i = 0; i < bytesPerPx; i++) {
+        if (vidmem[offset + i] != (uint8_t)(convColorF >> (i*8)) && vidmem[offset + i] != (uint8_t)(convColorB >> (i*8))) {
+            draw = 1;
+            break;
+        }
+    }
+
+    if (draw) {
         for (uint8_t i = 0; i < bytesPerPx; i++) {
-            vidmem[offset + i] = (uint8_t)(convColor >> (i*8));
+            vidmem[offset + i] = (uint8_t)(convColorF >> (i*8));
         }
 
         boundaryFill(x + 1, y, fillColor, boundaryColor);
-        boundaryFill(x - 1, y, fillColor, boundaryColor);
         boundaryFill(x, y + 1, fillColor, boundaryColor);
+        boundaryFill(x - 1, y, fillColor, boundaryColor);
         boundaryFill(x, y - 1, fillColor, boundaryColor);
     }
 }
@@ -127,7 +136,7 @@ void fillRect(int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color) {
     int32_t cy = (y1 + y2) / 2;
 
     drawRect(x1, y1, x2, y2, color - 1);
-    // boundaryFill(cx, cy, color, color - 1);
+    boundaryFill(cx, cy, color, color - 1);
     drawRect(x1, y1, x2, y2, color);
 }
 
@@ -136,13 +145,13 @@ void fillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, in
     int32_t cy = (y1 + y2 + y3) / 3;
 
     drawTriangle(x1, y1, x2, y2, x3, y3, color - 1);
-    // boundaryFill(cx, cy, color, color - 1);
+    boundaryFill(cx, cy, color, color - 1);
     drawTriangle(x1, y1, x2, y2, x3, y3, color);
 }
 
 void fillCircle(int32_t x, int32_t y, uint16_t radius, uint32_t color) {
     drawCircle(x, y, radius, color - 1);
-    // boundaryFill(x, y, color, color - 1);
+    // boundaryFill(x, y, color, color - 1); TODO: It just doesn't feel like working here and hangs
     drawCircle(x, y, radius, color);
 }
 

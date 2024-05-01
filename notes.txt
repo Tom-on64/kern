@@ -1,8 +1,8 @@
 --- Memory Map ---
 0x1000  - Kernel
-0x5000  - VBE Mode Info Block
 0x6000  - Font
 0x7000  - Filetable (0x7c00 - Bootloader)
 0x8500  - ACPI Memory map
+0x9000  - VBE Mode Info Block
 0x30000 - Memory manager memmap
 

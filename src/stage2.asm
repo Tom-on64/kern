@@ -250,7 +250,7 @@ protected_start:
 
     ; Store VBE Mode Info Block in memory
     mov esi, modeInfoBlock
-    mov edi, 0x5000 ; Destination
+    mov edi, 0x9000 ; Destination
     mov ecx, 64 ; 64 * 4 = 256B (size of modeInfoBlock)
     rep movsd
 

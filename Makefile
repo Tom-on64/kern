@@ -12,19 +12,23 @@ C_FILES = calc
 .PHONY: os clean run
 
 # Main compilation target
-os: $(BUILD) bootloader kernel $(C_FILES)
+os: $(BUILD) bootloader kernel $(C_FILES) filesystem
+	@echo "\nDone!\n"
+
+# Filesystem
+filesystem:
 	@echo "Assembling $(SRC)/testfont.asm..."
 	@$(AS) -fbin -o $(BUILD)/testfont.bin $(SRC)/testfont.asm
 	@echo "Building filesystem..."
 	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
-	@cat $(BUILD)/boot.bin $(BUILD)/filetable.bin $(BUILD)/kernel.bin > $(BUILD)/os.bin
-	@echo "Building kern.iso..."
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
-	@dd if=$(BUILD)/os.bin of=kern.iso conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.bin of=kern.iso bs=512 seek=36 conv=notrunc status=none
-	@dd if=$(SRC)/fs/test.txt of=kern.iso bs=512 seek=40 conv=notrunc status=none
-	@dd if=$(BUILD)/calc.bin of=kern.iso bs=512 seek=41 conv=notrunc status=none
-	@echo "\nDone!\n"
+# TODO: Make this not so manual
+	@dd if=$(BUILD)/boot.bin      of=kern.iso bs=512 seek=0  conv=notrunc status=none
+	@dd if=$(BUILD)/filetable.bin of=kern.iso bs=512 seek=5  conv=notrunc status=none
+	@dd if=$(BUILD)/kernel.bin    of=kern.iso bs=512 seek=6  conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=36 conv=notrunc status=none
+	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=40 conv=notrunc status=none
+	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=41 conv=notrunc status=none
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
