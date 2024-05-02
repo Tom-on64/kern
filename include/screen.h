@@ -2,6 +2,7 @@
 #define SCREEN_H
 
 #include "stdint.h"
+#include "string.h"
 
 #define MODE_INFO_BLOCK 0x9000
 #define BG_COLOR 0x00010b17
@@ -123,6 +124,33 @@ void printAt(const char* str, uint32_t x, uint32_t y) {
     }
 }
 
+void scroll() { // TODO: Make this fast (same as everything else, it's extremely slow)
+    uint8_t charHeight = *(font + 1);
+    if ((cursor.y+1) * charHeight < gfxMode->yRes) { return; } // Check if we should scroll
+
+    uint32_t bytesPerLine = charHeight * gfxMode->bytesPerScanline;
+    uint32_t lines = gfxMode->yRes / charHeight;
+    uint32_t vidmem = gfxMode->physicalBasePtr;
+
+    for (uint32_t i = 1; i < lines; i++) {
+        uint32_t address = vidmem + i * bytesPerLine;
+        memcopy((char*)address, (char*)(address - bytesPerLine), bytesPerLine);
+    }
+    
+    uint32_t color = convertColor(bgColor);
+    uint8_t* lastLine = (uint8_t*)(vidmem + (lines-1) * bytesPerLine);
+    uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
+    
+    for (uint32_t i = 0; i < bytesPerLine; i++) {
+        for (uint8_t j = 0; j < bytesPerPx; j++) {
+            lastLine[j] = (uint8_t)(color >> (j * 8));
+        }
+        lastLine += bytesPerPx;
+    }
+
+    cursor.y--;
+}
+
 void putc(char c) {
     uint8_t charWidth = *(font);
 
@@ -150,6 +178,8 @@ void putc(char c) {
             cursor.x = 0;
         }
     }
+
+    scroll();
 }
 
 void print(const char* str) {

@@ -17,7 +17,7 @@ os: $(BUILD) filesystem
 	@echo "\nDone!\n"
 
 # Filesystem
-filesystem: $(BUILD)/boot.bin $(BUILD)/kernel.bin $(C_FILES) $(FONTS)
+filesystem: bootloader kernel $(C_FILES) $(FONTS)
 	@echo "Building filesystem..."
 	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
@@ -35,7 +35,7 @@ $(BUILD):
 	@rm -rf $(BUILD)/*
 
 # Bootloader: This target is responsible for creating boot.bin
-$(BUILD)/boot.bin: $(SRC)/stage1.asm $(SRC)/stage2.asm
+bootloader: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@echo "Assembling $(SRC)/stage1.asm..."
 	@$(AS) -fbin -o $(BUILD)/stage1.bin $(SRC)/stage1.asm
 	@echo "Assembling $(SRC)/stage2.asm..."
@@ -43,7 +43,7 @@ $(BUILD)/boot.bin: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
-$(BUILD)/kernel.bin: $(SRC)/kernel.c $(SRC)/entry.asm
+kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 	@echo "Assembling $(SRC)/entry.asm..."
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
 	@echo "Compiling $(SRC)/kernel.c..."
