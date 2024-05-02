@@ -4,6 +4,16 @@
 #include "stdint.h"
 #include "string.h"
 
+// Basic full saturation colors
+#define BLACK   0x00000000 // 0
+#define RED     0x00ff0000 // 1
+#define GREEN   0x0000ff00 // 2
+#define YELLOW  0x00ffff00 // 3
+#define BLUE    0x000000ff // 4
+#define MAGENTA 0x00ff00ff // 5
+#define CYAN    0x0000ffff // 6
+#define WHITE   0x00ffffff // 7
+
 #define MODE_INFO_BLOCK 0x9000
 #define BG_COLOR 0x00010b17
 #define FG_COLOR 0x00ebddf4
@@ -105,14 +115,15 @@ void putcAt(unsigned char c, uint32_t x, uint32_t y) {
     char* bitmap = &font[((c % 128) - 1) * charHeight];
     for (uint8_t i = 0; i < charHeight; i++) { // Rows
         char bitmapRow = bitmap[i];
+        uint32_t color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);
 
-        for (uint8_t j = 0; j < charHeight * bytesPerPx; ++j) { // Cols 
-            uint32_t color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);
+        for (uint8_t j = 0; j < charWidth * bytesPerPx; ++j) { // Cols 
             uint8_t byte = j % bytesPerPx;
             vidmem[offset + j] = (uint8_t)(color >> (8 * byte));
 
             if (byte == bytesPerPx - 1) {
                 bitmapRow = bitmapRow << 1;
+                color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);
             }
         }
 

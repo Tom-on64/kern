@@ -5,16 +5,6 @@
 #include "screen.h"
 #include "math.h"
 
-// Basic full saturation colors
-#define BLACK   0x00000000 // 0
-#define RED     0x00ff0000 // 1
-#define GREEN   0x0000ff00 // 2
-#define YELLOW  0x00ffff00 // 3
-#define BLUE    0x000000ff // 4
-#define MAGENTA 0x00ff00ff // 5
-#define CYAN    0x0000ffff // 6
-#define WHITE   0x00ffffff // 7
-
 #define rgb(r,g,b) ( ((r) << 16 | (g) << 8 | (b)) & 0x00ffffff )
 
 void drawPixel(int32_t x, int32_t y, uint32_t color) {
