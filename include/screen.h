@@ -93,10 +93,14 @@ uint32_t convertColor(uint32_t color) {
 // TODO: Reimplement larger text
 // TODO: Support different bpps (and still keep the colors the same)
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
-    uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
-    uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
+    // Font info
     uint8_t charWidth = *(font);
     uint8_t charHeight = *(font + 1);
+    // uint8_t bitmapRowLen = (charWidth - 1) / 8 + 1; // TODO: Larger font support
+    
+    // Video stuff
+    uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
+    uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint32_t offset = (gfxMode->xRes * y * charHeight + x * charWidth) * bytesPerPx;
 
     char* bitmap = &font[((c % 128) - 1) * charHeight];
@@ -124,7 +128,7 @@ void printAt(const char* str, uint32_t x, uint32_t y) {
     }
 }
 
-void scroll() { // TODO: Make this fast (same as everything else, it's extremely slow)
+void scroll() { // TODO: Make this faster (still kinda slow)
     uint8_t charHeight = *(font + 1);
     if ((cursor.y+1) * charHeight < gfxMode->yRes) { return; } // Check if we should scroll
 
@@ -134,7 +138,7 @@ void scroll() { // TODO: Make this fast (same as everything else, it's extremely
 
     for (uint32_t i = 1; i < lines; i++) {
         uint32_t address = vidmem + i * bytesPerLine;
-        memcopy((char*)address, (char*)(address - bytesPerLine), bytesPerLine);
+        memcpy32((char*)address, (char*)(address - bytesPerLine), bytesPerLine);
     }
     
     uint32_t color = convertColor(bgColor);

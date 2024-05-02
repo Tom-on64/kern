@@ -8,7 +8,7 @@ CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra
 SRC = ./src
 BUILD = ./build
 C_FILES = calc
-FONTS = testfont term16n
+FONTS = testfont term16n term18n
 
 .PHONY: os clean run
 

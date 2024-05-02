@@ -82,16 +82,23 @@ uint32_t strlen(const char* str) {
 }
 
 // Memory functions
-char* memcopy(char* src, char* dst, uint32_t length) {
+void* memcpy(void* src, void* dst, uint32_t length) {
     for (uint32_t i = 0; i < length; i++) {
-        *(dst + i) = *(src + i);
+        *((uint8_t*)dst + i) = *((uint8_t*)src + i);
     }
     return dst;
 }
 
-char* memset(char* dst, char value, uint32_t length) {
+void* memcpy32(void* src, void* dst, uint32_t length) {
+    for (uint32_t i = 0; i * 4 < length; i++) {
+        *((uint32_t*)dst + i) = *((uint32_t*)src + i);
+    }
+    return dst;
+}
+
+void* memset(void* dst, uint8_t value, uint32_t length) {
     for (uint32_t i = 0; i < length; i++) {
-        *(dst + i) = value;
+        *(uint8_t*)(dst + i) = value;
     }
     return dst;
 }

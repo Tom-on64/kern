@@ -263,7 +263,7 @@ void main() {
                         print("Loading ");
                         print(filename);
                         print("...\n");
-                        memcopy(address, font, size * 512);
+                        memcpy(address, font, size * 512);
                         print("Font loaded\n");
                     } else {
                         for (size_t i = 0; i < size * 512; i++) {
