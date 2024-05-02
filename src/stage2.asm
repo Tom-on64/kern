@@ -1,6 +1,8 @@
 [bits 16]
 [org 0x7e00]
 
+%include "src/config.asm"
+
 %define KERNEL_LOC 0x1000
 %define VIDMEM 0xb800
 
@@ -29,10 +31,8 @@ getMemoryMap:
     jnz .start
 
 .error:
-    mov si, acpiFuncErr
-    call print
-    cli
-    hlt
+    stc
+    jmp inputGfx
 
 .nextEntry:
     mov edx, "PAMS" ; In case BIOS messes with edx
@@ -59,8 +59,30 @@ getMemoryMap:
     mov [memMapEntries], bp
     clc
 
+;; Get graphics values from user (resolution etc.)
+inputGfx:
+    xor ecx, ecx
+    cmp word [width], 0 ; Values already set
+    jne vbeSetup
+    mov si, gfxChooseMsg
+    call print
+    call getNumber ; Stores input value in bx
+    mov [width], bx
+
+    mov si, gfxHeightMsg
+    call print
+    call getNumber
+    mov [height], bx
+
+    mov si, gfxBppMsg
+    call print
+    call getNumber
+    mov [bpp], bx
+
 vbeSetup:
     ; Setup VBE info
+    xor ax, ax
+    mov es, ax
     mov ax, 0x4f00
     mov di, vbeInfoBlock
     int 0x10
@@ -233,6 +255,64 @@ print:
     pop ax
     ret
 
+;;
+;; Reads a base 10 number as input from user
+;; Returns:
+;;  bx - number read
+;;
+getNumber: ; TODO: if user enters a number that overflows (n > 0xffff) shit breaks
+    push cx
+    push ax
+    push dx
+    xor bx, bx
+    mov cx, 10
+.nextDigit:
+    xor ah, ah
+    int 0x16
+    mov ah, 0x0e
+
+    cmp al, 0x08 ; Backspace
+    je .backspace
+    cmp al, 0x0d ; Enter
+    je .enter
+
+    cmp al, '0' ; Make sure user entered a number
+    jl .nextDigit
+    cmp al, '9' 
+    jg .nextDigit
+
+    int 0x10 ; Print the digit
+
+    sub al, '0' ; Convert to integer
+    mov ah, 0
+    imul bx, bx, 10 ; bx *= 10
+    add bx, ax ; bx += ax
+    jmp .nextDigit
+
+.backspace:
+    cmp bx, 0 ; Check if we can backspace
+    je .nextDigit 
+    int 0x10 ; go back one space
+
+    mov ax, bx
+    xor dx, dx
+    div cx      ; dx:ax / cx -> ax = result, dx = remainder
+    mov bx, ax
+
+    mov ah, 0x0e
+    mov al, ' ' 
+    int 0x10
+    mov al, 0x08
+    int 0x10
+
+    jmp .nextDigit
+
+.enter:
+    pop dx
+    pop ax
+    pop cx
+    ret
+
 ;; 32 Bit entry code
 [bits 32]
 protected_start:
@@ -267,6 +347,11 @@ vbeErr: db "VBE Error!", 0
 modeNotFoundErr: db "VBE Mode not found!", 0
 acpiFuncErr: db "ACPI Function not supported!", 0
 
+gfxChooseMsg: db "Please enter desired values" ; No NULL terminator, we want to print gfxWidthMsg right after anyway
+gfxWidthMsg: db 0x0a, 0x0d, "Width: ", 0
+gfxHeightMsg: db 0x0a, 0x0d, "Height: ", 0
+gfxBppMsg: db 0x0a, 0x0d, "Bits Per Pixel: ", 0
+
 ;; GDT
 GDT:
 .start:
@@ -297,9 +382,16 @@ CODE_SEG equ GDT.codeDescriptor - GDT.start
 DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
+%ifdef FORCE_RESOLUTION
 width: dw 1920
 height: dw 1080
 bpp: db 32
+%else
+width: dw 0
+height: dw 0
+bpp: db 0
+%endif
+
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
 mode: dw 0
