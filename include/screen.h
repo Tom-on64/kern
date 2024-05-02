@@ -129,12 +129,24 @@ void putc(char c) {
         cursor.y++;
         cursor.x = 0;
     } else if (c == '\b') {
-        putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor TODO: make this better
-        cursor.x--;
+        putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor
+
+        if (cursor.x == 0) {
+            cursor.x = gfxMode->xRes / CHAR_WIDTH - 1; // Subtract one so we don't overflow to the line start
+            cursor.y--; // y could be 0
+        } else {
+            cursor.x--;
+        }
+
         putcAt(' ', cursor.x, cursor.y);
     } else {
         putcAt(c, cursor.x, cursor.y);
         cursor.x++;
+
+        if (cursor.x >= gfxMode->xRes / CHAR_WIDTH) {
+            cursor.y++; // TODO: Scrolling
+            cursor.x = 0;
+        }
     }
 }
 
