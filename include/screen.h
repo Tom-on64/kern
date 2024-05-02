@@ -6,8 +6,6 @@
 #define MODE_INFO_BLOCK 0x9000
 #define BG_COLOR 0x00010b17
 #define FG_COLOR 0x00ebddf4
-#define CHAR_WIDTH 8
-#define CHAR_HEIGHT 16
 
 typedef struct modeInfoBlock_s {
     // Required by all VBE revisions
@@ -96,13 +94,15 @@ uint32_t convertColor(uint32_t color) {
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
-    uint32_t offset = (gfxMode->xRes * y * CHAR_HEIGHT + x * CHAR_WIDTH) * bytesPerPx;
+    uint8_t charWidth = *(font);
+    uint8_t charHeight = *(font + 1);
+    uint32_t offset = (gfxMode->xRes * y * charHeight + x * charWidth) * bytesPerPx;
 
-    char* bitmap = &font[((c % 128) - 1) * 16];
-    for (uint8_t i = 0; i < CHAR_HEIGHT; i++) { // Rows
-        char bitmapRow = bitmap[i]; 
-        
-        for (uint8_t j = 0; j < CHAR_WIDTH * bytesPerPx; ++j) { // Cols 
+    char* bitmap = &font[((c % 128) - 1) * charHeight];
+    for (uint8_t i = 0; i < charHeight; i++) { // Rows
+        char bitmapRow = bitmap[i];
+
+        for (uint8_t j = 0; j < charHeight * bytesPerPx; ++j) { // Cols 
             uint32_t color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);
             uint8_t byte = j % bytesPerPx;
             vidmem[offset + j] = (uint8_t)(color >> (8 * byte));
@@ -124,6 +124,8 @@ void printAt(const char* str, uint32_t x, uint32_t y) {
 }
 
 void putc(char c) {
+    uint8_t charWidth = *(font);
+
     if (c == '\n') {
         putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor
         cursor.y++;
@@ -132,7 +134,7 @@ void putc(char c) {
         putcAt(' ', cursor.x, cursor.y); // Make sure we don't leave an extra cursor
 
         if (cursor.x == 0) {
-            cursor.x = gfxMode->xRes / CHAR_WIDTH - 1; // Subtract one so we don't overflow to the line start
+            cursor.x = gfxMode->xRes / charWidth - 1; // Subtract one so we don't overflow to the line start
             cursor.y--; // y could be 0
         } else {
             cursor.x--;
@@ -143,7 +145,7 @@ void putc(char c) {
         putcAt(c, cursor.x, cursor.y);
         cursor.x++;
 
-        if (cursor.x >= gfxMode->xRes / CHAR_WIDTH) {
+        if (cursor.x >= gfxMode->xRes / charWidth) {
             cursor.y++; // TODO: Scrolling
             cursor.x = 0;
         }

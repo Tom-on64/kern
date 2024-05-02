@@ -8,17 +8,16 @@ CFLAGS = -ffreestanding -m32 -Iinclude -Wall -Wextra
 SRC = ./src
 BUILD = ./build
 C_FILES = calc
+FONTS = testfont term16n
 
 .PHONY: os clean run
 
 # Main compilation target
-os: $(BUILD) bootloader kernel $(C_FILES) filesystem
+os: $(BUILD) filesystem
 	@echo "\nDone!\n"
 
 # Filesystem
-filesystem:
-	@echo "Assembling $(SRC)/testfont.asm..."
-	@$(AS) -fbin -o $(BUILD)/testfont.bin $(SRC)/testfont.asm
+filesystem: $(BUILD)/boot.bin $(BUILD)/kernel.bin $(C_FILES) $(FONTS)
 	@echo "Building filesystem..."
 	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
 	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
@@ -26,16 +25,17 @@ filesystem:
 	@dd if=$(BUILD)/boot.bin      of=kern.iso bs=512 seek=0  conv=notrunc status=none
 	@dd if=$(BUILD)/filetable.bin of=kern.iso bs=512 seek=5  conv=notrunc status=none
 	@dd if=$(BUILD)/kernel.bin    of=kern.iso bs=512 seek=6  conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=36 conv=notrunc status=none
-	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=40 conv=notrunc status=none
-	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=41 conv=notrunc status=none
+	@dd if=$(BUILD)/term16n.bin   of=kern.iso bs=512 seek=36 conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=40 conv=notrunc status=none
+	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=44 conv=notrunc status=none
+	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=45 conv=notrunc status=none
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
 	@rm -rf $(BUILD)/*
 
 # Bootloader: This target is responsible for creating boot.bin
-bootloader:
+$(BUILD)/boot.bin: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@echo "Assembling $(SRC)/stage1.asm..."
 	@$(AS) -fbin -o $(BUILD)/stage1.bin $(SRC)/stage1.asm
 	@echo "Assembling $(SRC)/stage2.asm..."
@@ -43,7 +43,7 @@ bootloader:
 	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
-kernel: $(SRC)/kernel.c $(SRC)/entry.asm
+$(BUILD)/kernel.bin: $(SRC)/kernel.c $(SRC)/entry.asm
 	@echo "Assembling $(SRC)/entry.asm..."
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
 	@echo "Compiling $(SRC)/kernel.c..."
@@ -56,6 +56,10 @@ $(C_FILES):
 	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c
 	@$(LD) -T$(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
+
+$(FONTS):
+	@echo "Assembling $(SRC)/fonts/$@.asm..."
+	@$(AS) -fbin -o $(BUILD)/$@.bin $(SRC)/fonts/$@.asm
 
 # Run QEMU
 run:

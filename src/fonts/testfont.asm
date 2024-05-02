@@ -5,8 +5,15 @@
 ;;; 8*16*128 = 2048B (2kB)
 ;;; Takes up 4 sectors
 ;;;
-;; 0-31
-times 31*16 db 0
+
+;;; Font header - 16 Bytes
+charWidth:  db 8
+charHeight: db 16
+reserved:   times 14 db 0
+
+;;; Bitmap data
+;; 1-31 Non printable characters (0 - NULL is in the header, and we can't print it anyway)
+times 30*16 db 0
 ;; Space ' ' or '_' - starts at ascii 32/20h
 db 00000000b,\
    00000000b,\
