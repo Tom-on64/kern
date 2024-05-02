@@ -48,7 +48,7 @@ void main() {
 
     // Screen setup
     // TODO: Find font in filetable
-    diskRead(36, 4, (char*)0x6000); // Read font from disk
+    diskRead(36, 4, font); // Read font from disk
 
     clear();
     print("kern.\n\n");
@@ -260,7 +260,11 @@ void main() {
                     } else if (strcmp(fileType, "tab") == 0) {
                         printFiletable(address);
                     } else if (strcmp(fileType, "fnt") == 0) {
-                        print("Loading...\n");
+                        print("Loading ");
+                        print(filename);
+                        print("...\n");
+                        memcopy(address, font, size * 512);
+                        print("Font loaded\n");
                     } else {
                         for (size_t i = 0; i < size * 512; i++) {
                             if (address[i] != '\0') {
