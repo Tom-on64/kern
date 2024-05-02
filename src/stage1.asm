@@ -9,6 +9,9 @@
 
 start:
     mov [driveNum], dl   ; Store the drive number
+    xor ax, ax
+    mov es, ax
+    mov ds, ax
 
     ; Clear screen
     mov ax, 0x03

@@ -153,17 +153,6 @@ vbeSetup:
     cmp al, [modeInfoBlock.bpp]
     jne .nextMode
 
-    mov ax, [vbeInfoBlock.videoModePtr]
-    ror ax, 8
-    call printHex
-    ror ax, 8
-    call printHex
-    mov ax, [vbeInfoBlock.videoModePtr+2]
-    ror ax, 8
-    call printHex
-    ror ax, 8
-    call printHex
-
     ; Set VBE mode
     mov ax, 0x4f02
     mov bx, [mode]
@@ -382,6 +371,7 @@ CODE_SEG equ GDT.codeDescriptor - GDT.start
 DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
+;; !! IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO !!
 width: dw 0
 height: dw 0
 bpp: db 0
