@@ -91,7 +91,6 @@ uint32_t convertColor(uint32_t color) {
 }
 
 // TODO: Reimplement larger text
-// TODO: Support different bpps (and still keep the colors the same)
 void putcAt(unsigned char c, uint32_t x, uint32_t y) {
     // Font info
     uint8_t charWidth = *(font);
@@ -128,7 +127,7 @@ void printAt(const char* str, uint32_t x, uint32_t y) {
     }
 }
 
-void scroll() { // TODO: Make this faster (still kinda slow)
+void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() helped alot)
     uint8_t charHeight = *(font + 1);
     if ((cursor.y+1) * charHeight < gfxMode->yRes) { return; } // Check if we should scroll
 
@@ -178,7 +177,7 @@ void putc(char c) {
         cursor.x++;
 
         if (cursor.x >= gfxMode->xRes / charWidth) {
-            cursor.y++; // TODO: Scrolling
+            cursor.y++;
             cursor.x = 0;
         }
     }
@@ -192,7 +191,6 @@ void print(const char* str) {
     }
 }
 
-// TODO: Optimize this, it is slow (i made it slightly better)
 void clear() {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
@@ -202,11 +200,18 @@ void clear() {
 
     uint32_t color = convertColor(bgColor);
    
-    for (uint32_t i = 0; i < gfxMode->xRes * gfxMode->yRes; i++) {
+    for (uint32_t i = 0; i < gfxMode->xRes; i++) { // Clear one line of pixels
         for (uint8_t j = 0; j < bytesPerPx; j++) {
             vidmem[j] = (uint8_t)(color >> (j * 8));
         }
         vidmem += bytesPerPx;
+    }
+
+    vidmem -= gfxMode->bytesPerScanline;
+
+    for (uint32_t i = 0; i < gfxMode->yRes; i++) { // Copy that line to clear the entire screen (using memcpy32 is fast!)
+        memcpy32(vidmem, vidmem + gfxMode->bytesPerScanline, gfxMode->bytesPerScanline);
+        vidmem += gfxMode->bytesPerScanline;
     }
 }
 
