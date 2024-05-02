@@ -21,10 +21,12 @@ Legend:
     - [x] Custom font
     - [_] Larger text size
     - [ ] Variable text size :)
-    - [ ] Make output overflow go to next line
-    - [ ] More fonts
+    - [x] Make output overflow go to next line
+    - [x] More fonts
     - [x] Generic screen.h stuff (don't assume 1920x1080 32bpp)
-    - [ ] Multi vbe mode support
+    - [x] Multi vbe mode support
+    - [x] Setup on boot
+    - [ ] Different font size support
 - [x] Graphics
     - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
