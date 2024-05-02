@@ -1,8 +1,6 @@
 [bits 16]
 [org 0x7e00]
 
-%include "src/config.asm"
-
 %define KERNEL_LOC 0x1000
 %define VIDMEM 0xb800
 
@@ -185,10 +183,12 @@ vbeSetup:
     jmp .findMode
     
 .endOfModes:
-    mov si, modeNotFoundErr
+    mov ax, 0x03
+    int 0x10 ; Clear screen
+    mov si, gfxModeNotFoundErr
     call print
-    cli
-    hlt
+    mov word [width], 0 ; Unset values
+    jmp inputGfx
 
 error:
     mov si, vbeErr
@@ -344,13 +344,13 @@ protected_start:
 driveNum: db 0
 
 vbeErr: db "VBE Error!", 0
-modeNotFoundErr: db "VBE Mode not found!", 0
 acpiFuncErr: db "ACPI Function not supported!", 0
 
 gfxChooseMsg: db "Please enter desired values" ; No NULL terminator, we want to print gfxWidthMsg right after anyway
 gfxWidthMsg: db 0x0a, 0x0d, "Width: ", 0
 gfxHeightMsg: db 0x0a, 0x0d, "Height: ", 0
 gfxBppMsg: db 0x0a, 0x0d, "Bits Per Pixel: ", 0
+gfxModeNotFoundErr: db "Mode not found! ", 0
 
 ;; GDT
 GDT:
@@ -382,15 +382,9 @@ CODE_SEG equ GDT.codeDescriptor - GDT.start
 DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
-%ifdef FORCE_RESOLUTION
-width: dw 1920
-height: dw 1080
-bpp: db 32
-%else
 width: dw 0
 height: dw 0
 bpp: db 0
-%endif
 
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
