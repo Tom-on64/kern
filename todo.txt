@@ -35,6 +35,11 @@ Legend:
     - [x] Rectange :)
     - [x] Circle!
     - [_] Filled verisons
+- [ ] Interrupts
+    - [x] IDT Setup (idt.h)
+    - [x] Exception handling
+    - [ ] Hardware/software interrupts
+    - [ ] Syscalls! (int 0x80)
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine

@@ -1,8 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "irq.h"
 #include "idt.h"
+#include "pic.h"
 #include "system.h"
 #include "screen.h"
 #include "stdint.h"
@@ -92,7 +92,8 @@ char* read(char terminator) {
 }
 
 void setupKeyboard() {
-    installIrqHandler(1, keyboardHandler);
+    idtSetGate(33, keyboardHandler, INT_GATE_FLAGS);
+    setIrqMask(1);
 }
 
 #endif

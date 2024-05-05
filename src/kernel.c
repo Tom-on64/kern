@@ -1,14 +1,14 @@
+#include "physicalMemManager.h" // TODO: Name this better
+#include "disk.h"
 #include "screen.h"
 #include "idt.h"
-#include "isrs.h"
-#include "irq.h"
-#include "keyboard.h"
-#include "timer.h"
+#include "exceptions.h"
+#include "syscall.h"
+#include "pic.h"
 #include "system.h"
-#include "disk.h"
 #include "string.h"
 #include "graphics.h"
-#include "physicalMemManager.h" // TODO: Name this better
+#include "keyboard.h"
 
 #define PROMPT "#> "
 
@@ -20,16 +20,6 @@ void printFiletable(char* ft);
 void printPhysicalMemmap();
 
 void main() {
-    // Interrupts
-    setupIdt();
-    setupIsrs();
-    setupIrqs();
-    sti();
-
-    setupKeyboard();
-    setupTimer();
-    timerPhase(1000); // 1 tick per ~1ms
-
     // Memory manager setup
     uint32_t smapEntryCount = *(uint32_t*)0x8500;
     smapEntry_t* smapEntries = (smapEntry_t*)0x8504;
@@ -46,14 +36,27 @@ void main() {
     deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
     deinitMemoryRegion(memmapAddr, maxBlocks / BLOCKS_PER_BYTE);
 
-    // Screen setup
     // TODO: Find font in filetable
     diskRead(36, 4, font); // Read font from disk
-
+    
     clear();
     print("kern.\n\n");
 
     diskRead(5, 1, filetable); // Read the filetable and store it in memory
+   
+    // Interrupts
+    setupIdt();
+    setupExceptions();
+    idtSetGate(0x80, syscallHandler, USR_INT_GAME_FLAGS); // Setup Syscall handler in IDT for int 0x80
+    disableIrqs();
+    remapPic();
+    __asm__ volatile ("sti");
+
+    // Syscall Test!
+    __asm__ volatile ("movl $0, %eax; int $0x80"); // Syscall(0);
+    __asm__ volatile ("movl $1, %eax; int $0x80"); // Syscall(1);
+   
+    //setupKeyboard();
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -164,7 +167,7 @@ void main() {
             drawCircle(1500, 600, 300, WHITE);
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
-            read('q'); // Wait until we get a 'q'
+            //read('q'); // Wait until we get a 'q'
             clear();
         } else if (strcmp(input, "help") == 0) {
             print("Available Commands:\n");

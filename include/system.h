@@ -24,18 +24,9 @@ void outw(uint16_t port, uint16_t data) {
     asm volatile("outw %0, %1" :: "a"(data), "Nd"(port));
 }
 
-
-// Assembly stuff
-void cli() {
-    asm volatile("cli");
-}
-
-void sti() {
-    asm volatile("sti");
-}
-
-void hlt() {
-    asm volatile("hlt");
+void ioWait() {
+    // Waits ~1 I/O Cycle (Linux uses this so it should be good)
+    asm volatile("outb %%al, $0x80" : : "a"(0));
 }
 
 #endif
