@@ -1,12 +1,12 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "idt.h"
-#include "pic.h"
-#include "system.h"
-#include "screen.h"
-#include "stdint.h"
-#include "stdbool.h"
+#include <idt.h>
+#include <pic.h>
+#include <system.h>
+#include <screen.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 // Keycodes
 #define LEFT_SHIFT_PRESS 0x2a
@@ -52,7 +52,8 @@ bool echo = false;
 bool canBackspace = false;
 
 // TODO: Refactor this
-void keyboardHandler() {
+__attribute__ ((interrupt))
+void keyboardHandler(intFrame_t* iframe) {
     uint8_t scancode;
     scancode = inb(0x60);
 
@@ -74,6 +75,8 @@ void keyboardHandler() {
         if (bufferLen > 0) canBackspace = true;
         else canBackspace = false;
     }
+
+    sendPicEOI(1);
 }
 
 // TODO: Add a 'char readc();' function that returns a single read character and use it for read()
@@ -92,8 +95,8 @@ char* read(char terminator) {
 }
 
 void setupKeyboard() {
-    idtSetGate(33, keyboardHandler, INT_GATE_FLAGS);
-    setIrqMask(1);
+    idtSetGate(0x21, keyboardHandler, INT_GATE_FLAGS);
+    unsetIrqMask(1);
 }
 
 #endif

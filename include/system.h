@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 // Port functions
 uint8_t inb(uint16_t port) {

@@ -1,27 +1,30 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "stdint.h"
-#include "idt.h"
-#include "irq.h"
-#include "system.h"
-
-#include "screen.h"
+#include <stdint.h>
+#include <idt.h>
+#include <pic.h>
+#include <system.h>
+#include <screen.h>
 
 #define INPUT_CLK 1193180
 
 uint32_t timerTicks = 0;
 
-void timerHandler() {
+__attribute__ ((interrupt))
+void timerHandler(intFrame_t* iframe) {
     timerTicks++;
 
     // TODO: Improve the cursor rendering
     if (timerTicks % 500 == 0) putcAt(127, cursor.x, cursor.y);
     else if (timerTicks % 250 == 0) putcAt(' ', cursor.x, cursor.y);
+
+    sendPicEOI(0);
 }
 
 void setupTimer() {
-    installIrqHandler(0, timerHandler);
+    idtSetGate(32, timerHandler, INT_GATE_FLAGS);
+    unsetIrqMask(0);
 }
 
 // Source: https://en.wikibooks.org/wiki/X86_Assembly/Programmable_Interval_Timer

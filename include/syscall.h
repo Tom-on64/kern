@@ -1,7 +1,7 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
-#include "screen.h"
+#include <screen.h>
 
 // System call count
 #define MAX_SYSCALLS 2

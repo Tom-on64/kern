@@ -1,7 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 // Source: http://www.strudel.org.uk/itoa/
 char* itoa(uint32_t val, uint8_t base) {

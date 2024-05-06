@@ -1,8 +1,8 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "stdint.h"
-#include "string.h"
+#include <stdint.h>
+#include <string.h>
 
 // Basic full saturation colors
 #define BLACK   0x00000000 // 0

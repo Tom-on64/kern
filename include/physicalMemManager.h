@@ -1,8 +1,8 @@
 #ifndef PHYSICAL_MEM_MANAGER_H
 #define PHYSICAL_MEM_MANAGER_H
 
-#include "string.h"
-#include "stdint.h"
+#include <string.h>
+#include <stdint.h>
 
 #define BLOCK_SIZE 4096 // 4kB
 #define BLOCKS_PER_BYTE 8

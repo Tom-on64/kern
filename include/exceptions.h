@@ -1,26 +1,8 @@
 #ifndef ISRS_H
 #define ISRS_H
 
-#include "idt.h"
-#include "screen.h"
-
-/*
-    Alignment Check
-    Machine Check
-    Reserved
-    ...
-    Reserved
-*/
-
-// TODO: Make proper handlers
-__attribute__ ((naked)) // Temporary handler
-void excpHandler(void) {
-    __asm__ volatile (
-        ".intel_syntax\n"
-        "iretd\n"
-        ".att_syntax"
-    );
-}
+#include <idt.h>
+#include <screen.h>
 
 // Exception handlers
 __attribute__ ((interrupt))

@@ -1,8 +1,8 @@
 #ifndef DRIVE_H
 #define DRIVE_H
 
-#include "stdint.h"
-#include "system.h"
+#include <stdint.h>
+#include <system.h>
 
 #define PIO_PORT 0x1f0
 #define READ_COMMAND 0x20

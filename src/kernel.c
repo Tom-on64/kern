@@ -1,14 +1,15 @@
-#include "physicalMemManager.h" // TODO: Name this better
-#include "disk.h"
-#include "screen.h"
-#include "idt.h"
-#include "exceptions.h"
-#include "syscall.h"
-#include "pic.h"
-#include "system.h"
-#include "string.h"
-#include "graphics.h"
-#include "keyboard.h"
+#include <physicalMemManager.h> // TODO: Name this better
+#include <disk.h>
+#include <screen.h>
+#include <idt.h>
+#include <exceptions.h>
+#include <syscall.h>
+#include <pic.h>
+#include <system.h>
+#include <string.h>
+#include <graphics.h>
+#include <keyboard.h>
+#include <timer.h>
 
 #define PROMPT "#> "
 
@@ -52,18 +53,16 @@ void main() {
     remapPic();
     __asm__ volatile ("sti");
 
-    // Syscall Test!
-    __asm__ volatile ("movl $0, %eax; int $0x80"); // Syscall(0);
-    __asm__ volatile ("movl $1, %eax; int $0x80"); // Syscall(1);
-   
-    //setupKeyboard();
+    setupTimer();
+    timerPhase(1000); // 1 kHz
+    setupKeyboard();
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
         print(PROMPT);
         char* input = read('\n');
-        
+
         if (input[0] == '\n') continue;
 
         char* args;
@@ -207,7 +206,11 @@ void main() {
             } else {
                 print("[ FAIL ]\n");
             }
-            print("Tests Finished!\n");
+            print("Syscall Test:\n");
+            __asm__ volatile ("movl $0, %eax; int $0x80"); // Syscall(0);
+            __asm__ volatile ("movl $1, %eax; int $0x80"); // Syscall(1);
+            
+            print("\nTests Finished!\n");
         } else {
             char* ft = filetable;
             uint8_t found = 0;
