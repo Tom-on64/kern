@@ -1,7 +1,7 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
-#include <pit.h>
+#include <interrupt/pit.h>
 
 // System call count
 #define MAX_SYSCALLS 2

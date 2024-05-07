@@ -2,9 +2,9 @@
 #define TIMER_H
 
 #include <stdint.h>
-#include <idt.h>
-#include <pic.h>
-#include <screen.h>
+#include <interrupt/idt.h>
+#include <interrupt/pic.h>
+#include <screen/text.h>
 
 #define CHANNEL_0 0x40 // Offset it by 1 or 2 for ch1 and ch2
 #define COMMAND   0x43

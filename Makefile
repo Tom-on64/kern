@@ -3,7 +3,7 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 AS = nasm
 
-CFLAGS = -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -mgeneral-regs-only -m32 -march=i386 -Iinclude -Wall
+CFLAGS = -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -mgeneral-regs-only -m32 -march=i386 -Wall -Iinclude/c
 
 SRC = ./src
 BUILD = ./build
@@ -47,7 +47,7 @@ kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 	@echo "Assembling $(SRC)/entry.asm..."
 	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
 	@echo "Compiling $(SRC)/kernel.c..."
-	@$(CC) $(CFLAGS) -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
+	@$(CC) $(CFLAGS) -Iinclude -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
 	@$(LD) -T$(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
 	@rm $(BUILD)/*.o
 

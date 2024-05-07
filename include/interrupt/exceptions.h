@@ -1,8 +1,8 @@
 #ifndef ISRS_H
 #define ISRS_H
 
-#include <idt.h>
-#include <screen.h>
+#include <interrupt/idt.h>
+#include <screen/text.h>
 
 // Exception handlers
 __attribute__ ((interrupt))

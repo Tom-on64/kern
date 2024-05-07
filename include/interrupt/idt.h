@@ -2,7 +2,7 @@
 #define IDT_H
 
 #include <stdint.h>
-#include <screen.h>
+#include <screen/text.h>
 
 #define TRAP_GATE_FLAGS    0x8f // P = 1, DPL = 00, S = 0, Type = 1111 (32-bit Trap gate)
 #define INT_GATE_FLAGS     0x8e // P = 1, DPL = 00, S = 0, Type = 1110 (32-bit Int gate)

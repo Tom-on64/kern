@@ -1,7 +1,7 @@
 #ifndef PIC_H
 #define PIC_H
 
-#include <system.h>
+#include <ports/io.h>
 
 // PIC I/O Ports
 #define PIC_1_CMD  0x20

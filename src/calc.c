@@ -1,13 +1,8 @@
-#include "stdint.h"
-#include "screen.h"
+#include <time.h>
 
 __attribute__ ((section ("entry")))
 void main() {
-    uint32_t wait = 0x1fffffff;
-
-    print("kern.\n\n");
-    
-    while (wait--);
+    sleep(4500); // Wait 4.5 seconds
 
     return;
 }

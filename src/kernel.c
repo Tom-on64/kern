@@ -1,16 +1,16 @@
-#include <physicalMemManager.h> // TODO: Name this better
-#include <disk.h>
-#include <screen.h>
-#include <idt.h>
-#include <exceptions.h>
-#include <syscall.h>
-#include <pic.h>
-#include <system.h>
-#include <string.h>
-#include <graphics.h>
-#include <keyboard.h>
-#include <pit.h>
-#include <time.h>
+#include <memory/physical.h>
+#include <disk/disk.h>
+#include <screen/text.h>
+#include <interrupt/idt.h>
+#include <interrupt/exceptions.h>
+#include <interrupt/syscall.h>
+#include <interrupt/pic.h>
+#include <ports/io.h>
+#include <c/string.h>
+#include <screen/graphics.h>
+#include <keyboard/keyboard.h>
+#include <interrupt/pit.h>
+#include <c/time.h>
 
 #define PROMPT "#> "
 

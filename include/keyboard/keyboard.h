@@ -1,10 +1,10 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <idt.h>
-#include <pic.h>
-#include <system.h>
-#include <screen.h>
+#include <interrupt/idt.h>
+#include <interrupt/pic.h>
+#include <ports/io.h>
+#include <screen/text.h>
 #include <stdint.h>
 #include <stdbool.h>
 

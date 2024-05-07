@@ -2,7 +2,7 @@
 #define DRIVE_H
 
 #include <stdint.h>
-#include <system.h>
+#include <ports/io.h>
 
 #define PIO_PORT 0x1f0
 #define READ_COMMAND 0x20

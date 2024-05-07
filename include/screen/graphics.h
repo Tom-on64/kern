@@ -2,7 +2,7 @@
 #define GRAPHICS_H
 
 #include <stdint.h>
-#include <screen.h>
+#include <screen/text.h>
 #include <math.h>
 
 #define rgb(r,g,b) ( ((r) << 16 | (g) << 8 | (b)) & 0x00ffffff )
