@@ -3,7 +3,7 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 AS = nasm
 
-CFLAGS = -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -mgeneral-regs-only -m32 -march=i386 -Iinclude -Wall 
+CFLAGS = -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -mgeneral-regs-only -m32 -march=i386 -Iinclude -Wall
 
 SRC = ./src
 BUILD = ./build

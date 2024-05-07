@@ -1526,22 +1526,22 @@ db 00h,\
    00h,\
    00h,\
    00h
-db 00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   00h,\
-   0FEh
+db 0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF,\
+   0xFF
    
 ;; End of visible ascii characters
    times 2048-($-$$) db 0

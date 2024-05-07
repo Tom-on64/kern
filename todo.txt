@@ -9,10 +9,11 @@ Legend:
 
 - [x] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
+- [ ] The almighty 'printf()'
 - [!] Makefile refactorin'
 - [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
-    - [ ] Scrolling
+    - [x] Scrolling
     - [ ] Scroll-back
     - [ ] Color codes (and just multicolor text in general)
     - [x] VESA BIOS Extensions
@@ -34,12 +35,15 @@ Legend:
     - [x] Triangles (3D?!!???)
     - [x] Rectange :)
     - [x] Circle!
-    - [_] Filled verisons
-- [ ] Interrupts
+    - [x] Filled verisons
+- [ ] Interrupts
     - [x] IDT Setup (idt.h)
     - [x] Exception handling
-    - [ ] Hardware/software interrupts
-    - [ ] Syscalls! (int 0x80)
+    - [x] Hardware/software interrupts
+    - [x] Syscalls! (int 0x80)
+    - [ ] IRQ 0 - PIT
+    - [ ] IRQ 1 - Keyboard
+    - [ ] IRQ 8 - CMOS Real time clock
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine
@@ -63,6 +67,7 @@ Legend:
     - [ ] NAN
     - [x] E (eulers number)
     - [x] PI
+    - [ ] Floating point macros/functions
 - [ ] Filesystem
     - [ ] Utility for filesystem building (not just an assembly file)
     - [x] Filetable
@@ -77,6 +82,7 @@ Legend:
         - [ ] Symbolic
         - [ ] Hard
 - [ ] System Calls
+    - [ ] Sleep()
     - [ ] Write()
     - [ ] Read()
     - [ ] Open()
@@ -103,7 +109,6 @@ Legend:
     - [ ] stdin
     - [ ] stdout
     - [ ] stderr
-    - [ ] printf
 - [ ] Memory manager
     - [x] Memory map
     - [x] Print mem map

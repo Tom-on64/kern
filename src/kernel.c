@@ -9,7 +9,8 @@
 #include <string.h>
 #include <graphics.h>
 #include <keyboard.h>
-#include <timer.h>
+#include <pit.h>
+#include <time.h>
 
 #define PROMPT "#> "
 
@@ -54,7 +55,6 @@ void main() {
     __asm__ volatile ("sti");
 
     setupTimer();
-    timerPhase(1000); // 1 kHz
     setupKeyboard();
 
     // Run Interactive Shell Program
@@ -166,7 +166,7 @@ void main() {
             drawCircle(1500, 600, 300, WHITE);
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
-            //read('q'); // Wait until we get a 'q'
+            read('q'); // Wait until we get a 'q'
             clear();
         } else if (strcmp(input, "help") == 0) {
             print("Available Commands:\n");
@@ -179,6 +179,7 @@ void main() {
             print(" ls         | Lists all available files\n");
             print(" memmap     | Prints the memory map and info\n");
             print(" reboot     | Reboots the system\n");
+            print(" sleep      | Sleeps for input number of seconds\n");
             print(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
             printFiletable(filetable);
@@ -186,6 +187,13 @@ void main() {
             printPhysicalMemmap();
         } else if (strcmp(input, "reboot") == 0) {
             outb(0x64, 0xFE);
+        } else if (strcmp(input, "sleep") == 0) {
+            if (*args == '\0') continue;
+
+            uint32_t ms = atoi(args) * 1000; // Convert seconds to miliseconds
+            if (ms == 0) continue;
+
+            sleep(ms);
         } else if (strcmp(input, "test") == 0) {
             print("Running Tests...\n");
             uint8_t buf[512];
@@ -206,9 +214,6 @@ void main() {
             } else {
                 print("[ FAIL ]\n");
             }
-            print("Syscall Test:\n");
-            __asm__ volatile ("movl $0, %eax; int $0x80"); // Syscall(0);
-            __asm__ volatile ("movl $1, %eax; int $0x80"); // Syscall(1);
             
             print("\nTests Finished!\n");
         } else {

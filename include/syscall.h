@@ -1,27 +1,25 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
-#include <screen.h>
+#include <pit.h>
 
 // System call count
 #define MAX_SYSCALLS 2
 
-void sys_test0() {
-    fgColor = YELLOW;
-    print("Syscall 0 - Test\n");
-    fgColor = FG_COLOR;
-}
+// Args: ebx - number of miliseconds
+void sys_sleep() {
+    uint32_t ms;
+    __asm__ volatile ("movl %%ebx, %0" : "=r"(ms));
 
-void sys_test1() {
-    fgColor = CYAN;
-    print("Syscall 1 - Test\n");
-    fgColor = FG_COLOR;
+    uint32_t requiredTicks = *timerTicks + ms;
+    while (*timerTicks != requiredTicks) { // Wait...
+        __asm__ volatile ("sti;hlt;cli;");
+    }
 }
 
 // System call table
 void* syscalls[MAX_SYSCALLS] = {
-    sys_test0, 
-    sys_test1, 
+    sys_sleep, 
 };
 
 // int 0x80 - Syscall interrupt, handled by this function

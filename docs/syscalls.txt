@@ -1,0 +1,11 @@
+=== System Calls === 
+
+Syscall handlers are prefixed by 'sys_'
+Syscalls can be called using interrupt 0x80
+The EAX register should countain a syscall number
+
+Here's a list of syscalls: (and their numbers)
+
+syscall(0) : Sleep()
+    Args: EBX - Number of miliseconds to sleep for
+
