@@ -1,5 +1,5 @@
 SECTIONS {
-    .text 0x1000 : {
+    .text 0x50000 : {
         *(.text*);
     }
     .data : {

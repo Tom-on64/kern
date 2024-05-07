@@ -3,9 +3,8 @@
 [global start]
 
 %define VIDMEM 0xb800
-%define KERNEL_LOC 0x1000
 %define FILETAB_LOC 0x7000 ; TODO: Read kernel size and location from ft
-%define KERNEL_SIZE 30; 15kB
+%define KERNEL_SIZE 30 ; 15kB
 
 start:
     mov [driveNum], dl   ; Store the drive number
@@ -64,9 +63,9 @@ loadKernel:
 
 .read:
     ; Location
-    xor ax, ax 
+    mov ax, 0x5000 ; Making es 0x5000 will load the kernel at 0x50000
     mov es, ax
-    mov bx, KERNEL_LOC ; 2nd stage bootloader location
+    xor bx, bx
     
     ; CHS Location
     mov al, KERNEL_SIZE

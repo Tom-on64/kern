@@ -1,7 +1,7 @@
 [bits 16]
 [org 0x7e00]
 
-%define KERNEL_LOC 0x1000
+%define KERNEL_LOC 0x50000
 %define VIDMEM 0xb800
 
 start:
@@ -372,7 +372,7 @@ DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
 ;; !! IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO !!
-width: dw 0 ;1920
+width: dw 1920
 height: dw 1080
 bpp: db 32
 
