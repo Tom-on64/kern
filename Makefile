@@ -25,10 +25,10 @@ filesystem: bootloader kernel $(C_FILES) $(FONTS)
 	@dd if=$(BUILD)/boot.bin      of=kern.iso bs=512 seek=0  conv=notrunc status=none
 	@dd if=$(BUILD)/filetable.bin of=kern.iso bs=512 seek=5  conv=notrunc status=none
 	@dd if=$(BUILD)/kernel.bin    of=kern.iso bs=512 seek=6  conv=notrunc status=none
-	@dd if=$(BUILD)/term16n.bin   of=kern.iso bs=512 seek=36 conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=40 conv=notrunc status=none
-	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=44 conv=notrunc status=none
-	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=45 conv=notrunc status=none
+	@dd if=$(BUILD)/term16n.bin   of=kern.iso bs=512 seek=46 conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=50 conv=notrunc status=none
+	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=54 conv=notrunc status=none
+	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=55 conv=notrunc status=none
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
@@ -63,7 +63,11 @@ $(FONTS):
 
 # Run QEMU
 run:
-	qemu-system-x86_64 -drive format=raw,file="./kern.iso",index=0,media=disk -m 256M -accel tcg
+	qemu-system-x86_64\
+		-drive format=raw,file="./kern.iso",index=0,media=disk\
+		-m 256M\
+		-accel tcg\
+		-rtc base=localtime,clock=host,driftfix=slew
 
 # Clean all build files
 clean:

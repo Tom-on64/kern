@@ -10,6 +10,7 @@
 #include <screen/graphics.h>
 #include <keyboard/keyboard.h>
 #include <interrupt/pit.h>
+#include <interrupt/rtc.h>
 #include <time.h>
 
 #define PROMPT "#> "
@@ -39,7 +40,7 @@ void main() {
     deinitMemoryRegion(memmapAddr, maxBlocks / BLOCKS_PER_BYTE);
 
     // TODO: Find font in filetable
-    diskRead(36, 4, font); // Read font from disk
+    diskRead(46, 4, font); // Read font from disk
     
     clear();
     print("kern.\n\n");
@@ -52,9 +53,11 @@ void main() {
     idtSetGate(0x80, syscallHandler, USR_INT_GAME_FLAGS); // Setup Syscall handler in IDT for int 0x80
     disableIrqs();
     remapPic();
+    unsetIrqMask(2); // Enable PIC 2 line
     __asm__ volatile ("sti");
 
     setupTimer();
+    setupRtc();
     setupKeyboard();
 
     // Run Interactive Shell Program

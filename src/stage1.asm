@@ -4,7 +4,7 @@
 
 %define VIDMEM 0xb800
 %define FILETAB_LOC 0x7000 ; TODO: Read kernel size and location from ft
-%define KERNEL_SIZE 30 ; 15kB
+%define KERNEL_SIZE 40 ; 20kB
 
 start:
     mov [driveNum], dl   ; Store the drive number

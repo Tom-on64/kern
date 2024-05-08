@@ -12,11 +12,11 @@
 filetable:
     db "boot",0,0,0,0,0,0, "bin",0,0,5
     db "filetable",0,      "tab",0,5,1
-    db "kernel",0,0,0,0,   "bin",0,6,30
-    db "term16n",0,0,0,    "fnt",0,36,4
-    db "testfont",0,0,     "fnt",0,40,4
-    db "test",0,0,0,0,0,0, "txt",0,44,1
-    db "calc",0,0,0,0,0,0, "bin",0,45,2
+    db "kernel",0,0,0,0,   "bin",0,6,40
+    db "term16n",0,0,0,    "fnt",0,46,4
+    db "testfont",0,0,     "fnt",0,50,4
+    db "test",0,0,0,0,0,0, "txt",0,54,1
+    db "calc",0,0,0,0,0,0, "bin",0,55,2
 
 times 512-($-$$) db 0
 
