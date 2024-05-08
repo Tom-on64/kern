@@ -6,11 +6,11 @@
 #include <interrupt/syscall.h>
 #include <interrupt/pic.h>
 #include <ports/io.h>
-#include <c/string.h>
+#include <string.h>
 #include <screen/graphics.h>
 #include <keyboard/keyboard.h>
 #include <interrupt/pit.h>
-#include <c/time.h>
+#include <time.h>
 
 #define PROMPT "#> "
 

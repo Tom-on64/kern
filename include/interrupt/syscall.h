@@ -2,6 +2,7 @@
 #define SYSCALL_H
 
 #include <interrupt/pit.h>
+#include <screen/text.h>
 
 // System call count
 #define MAX_SYSCALLS 2
@@ -17,9 +18,19 @@ void sys_sleep() {
     }
 }
 
+// TODO: Use a Write() syscall and write to stdout
+// Args: ebx - string pointer
+void sys_puts() {
+    char* s;
+    __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
+
+    print(s);
+}
+
 // System call table
 void* syscalls[MAX_SYSCALLS] = {
     sys_sleep, 
+    sys_puts, 
 };
 
 // int 0x80 - Syscall interrupt, handled by this function
