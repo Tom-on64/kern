@@ -56,6 +56,8 @@ _These images may be outdated, Idk_
 - If you run kernel.bin from shell, it will clear the memory map so when you load anything it will override the kernel code
 - fillCircle() in graphics.h is broken. No idea why, so no filled circles for you (i commented out the boundaryFill call in the function)
 - convertColor() doesn't work right, because i should be using floating point, but -mgeneral-regs-only doesn't let me :(
+- Keyboard handler is kinda bad :/
+- Not really an issue, bit QEMU's PIT is really slow and inacurate
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)
 
