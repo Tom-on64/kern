@@ -36,13 +36,13 @@ Legend:
     - [x] Rectange :)
     - [x] Circle!
     - [x] Filled verisons
-- [ ] Interrupts
+- [x] Interrupts
     - [x] IDT Setup (idt.h)
     - [x] Exception handling
     - [x] Hardware/software interrupts
     - [x] Syscalls! (int 0x80)
     - [x] IRQ 0 - PIT
-    - [ ] IRQ 1 - Keyboard
+    - [x] IRQ 1 - Keyboard
     - [x] IRQ 8 - CMOS Real time clock
     - [?] Other IRQs (idk which ones)
 - [ ] Math

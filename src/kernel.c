@@ -64,7 +64,7 @@ void main() {
     // TODO: Make it in another file
     while (1) {
         print(PROMPT);
-        char* input = read('\n');
+        char* input = read();
 
         if (input[0] == '\n') continue;
 
@@ -169,7 +169,7 @@ void main() {
             drawCircle(1500, 600, 300, WHITE);
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
-            read('q'); // Wait until we get a 'q'
+            getc(); // Wait until we get a 'q'
             clear();
         } else if (strcmp(input, "help") == 0) {
             print("Available Commands:\n");
