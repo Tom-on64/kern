@@ -49,7 +49,8 @@ char* read() {
     uint8_t len = 0;
 
     while ((c = getc()) != '\n') {
-        if (c == '\b' && len > 0) {
+        if (c == '\b') {
+            if (len < 1) continue; // Can we backspace?
             len--;
             putc(c);
         } else if (len + 1 != MAX_INPUT_LENGTH) { // Check if we can add a new character
