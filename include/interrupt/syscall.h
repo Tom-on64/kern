@@ -3,9 +3,10 @@
 
 #include <interrupt/pit.h>
 #include <screen/text.h>
+#include <keyboard/keyboard.h>
 
 // System call count
-#define MAX_SYSCALLS 2
+#define MAX_SYSCALLS 3
 
 // Args: ebx - number of miliseconds
 void sys_sleep() {
@@ -19,7 +20,7 @@ void sys_sleep() {
 }
 
 // TODO: Use a Write() syscall and write to stdout
-// Args: ebx - string pointer
+// Args: ebx - char* string
 void sys_puts() {
     char* s;
     __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
@@ -27,10 +28,18 @@ void sys_puts() {
     print(s);
 }
 
+// TODO: Use a Read() sycall and read from stdin
+// Returns: ebx - char* string
+void sys_gets() {
+    char* s = read();
+    __asm__ volatile ("movl %0, %%ebx" :: "r"(s));
+}
+
 // System call table
 void* syscalls[MAX_SYSCALLS] = {
     sys_sleep, 
     sys_puts, 
+    sys_gets, 
 };
 
 // int 0x80 - Syscall interrupt, handled by this function

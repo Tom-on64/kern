@@ -68,6 +68,7 @@ run:
 		-m 256M\
 		-accel tcg\
 		-rtc base=localtime,clock=host,driftfix=slew
+#        -machine pcspk-audiodev=test
 
 # Clean all build files
 clean:

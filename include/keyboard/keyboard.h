@@ -18,7 +18,7 @@ typedef struct {
 keyboardState_t keyboard;
 
 __attribute__ ((interrupt))
-void keyboardHandler(intFrame_t* iframe) {
+void keyboardHandler(intFrame_t* iframe) { // TODO: Make this better and be able to read multi-byte scancode
     uint8_t scancode = inb(0x60);
     char c = US_Keyboard[keyboard.shift][scancode];
 
@@ -38,13 +38,13 @@ void keyboardHandler(intFrame_t* iframe) {
 
 char getc() {
     keyboard.character = '\0';
-    while (keyboard.character == '\0') __asm__ volatile ("hlt");
+    while (keyboard.character == '\0') { __asm__ volatile ("hlt"); }
     return keyboard.character;
 }
 
 // Reads until a newline
-char inputBuffer[MAX_INPUT_LENGTH];
 char* read() {
+    static char inputBuffer[MAX_INPUT_LENGTH];
     char c;
     uint8_t len = 0;
 
@@ -53,7 +53,7 @@ char* read() {
             if (len < 1) continue; // Can we backspace?
             len--;
             putc(c);
-        } else if (len + 1 != MAX_INPUT_LENGTH) { // Check if we can add a new character
+        } else if (len + 1 != MAX_INPUT_LENGTH) { // Check if we can add a new character (this method avoids overflow issues)
             inputBuffer[len++] = c;
             putc(c);
         }
