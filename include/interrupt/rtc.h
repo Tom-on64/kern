@@ -87,7 +87,7 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
         if (!(regB & 0x04)) {
             newDatetime.second = (newDatetime.second & 0x0f) + ((newDatetime.second >> 4) * 10);
             newDatetime.minute = (newDatetime.minute & 0x0f) + ((newDatetime.minute >> 4) * 10);
-            newDatetime.hour   = ((newDatetime.hour  & 0x0f) + (((newDatetime.hour & 0x70) >> 4) * 10)) | (newDatetime.hour * 0x80); // 12/24 Hour format bs
+            newDatetime.hour   = ((newDatetime.hour & 0x0F) + (((newDatetime.hour & 0x70) / 16) * 10)) | (newDatetime.hour & 0x80); // 12/24 Hour format bs
             newDatetime.day    = (newDatetime.day    & 0x0f) + ((newDatetime.day    >> 4) * 10);
             newDatetime.month  = (newDatetime.month  & 0x0f) + ((newDatetime.month  >> 4) * 10);
             newDatetime.year   = (newDatetime.year   & 0x0f) + ((newDatetime.year   >> 4) * 10);
@@ -111,25 +111,23 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
 
         if (true) { // TODO: Probably get rid of this idk
             char buf[20] = { 0 }; // "12/12 2012 12:12:12" - Max string 20 chars with null byte
-
+            
             strcat(buf, itoa(datetime->day, 10));
             strcat(buf, "/");
             strcat(buf, itoa(datetime->month, 10));
             strcat(buf, " ");
             strcat(buf, itoa(datetime->year, 10));
             strcat(buf, " ");
+            if (datetime->hour < 10) strcat(buf, "0");
             strcat(buf, itoa(datetime->hour, 10));
             strcat(buf, ":");
+            if (datetime->minute < 10) strcat(buf, "0");
             strcat(buf, itoa(datetime->minute, 10));
             strcat(buf, ":");
+            if (datetime->second < 10) strcat(buf, "0");
             strcat(buf, itoa(datetime->second, 10));
 
-            printAt("                    ", 30, 0);
-            bgColor = 0x0027323f;
-            fgColor = 0x00ededed;
             printAt(buf, 30, 0);
-            bgColor = BG_COLOR;
-            fgColor = FG_COLOR;
         }
     }
 
