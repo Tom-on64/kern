@@ -12,6 +12,8 @@
 #include <interrupt/pit.h>
 #include <interrupt/rtc.h>
 #include <time.h>
+#include <sound/pcspk.h>
+#include <sound/notes.h>
 
 #define PROMPT "#> "
 
@@ -183,6 +185,7 @@ void main() {
             print(" memmap     | Prints the memory map and info\n");
             print(" reboot     | Reboots the system\n");
             print(" sleep      | Sleeps for input number of seconds\n");
+            print(" soundtest  | Plays a tune :)\n");
             print(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
             printFiletable(filetable);
@@ -197,6 +200,30 @@ void main() {
             if (ms == 0) continue;
 
             sleep(ms);
+        } else if (strcmp(input, "soundtest") == 0) {
+            print("Playing...\n");
+            enableSpeaker();
+
+            /*
+             * Megalovania - Toby Fox
+             * |-D-D-d--A---Ab--G--F--D-F-G-| (Goofy ahh notation)
+             * (The timing may be off)
+             */
+            for (uint8_t i = 0; i < 4; i++) {
+                note_t first[4] = { D4, C4, H3, Hb3 };
+                playNote(first[i],  120);
+                playNote(first[i],  120);
+                playNote(D5,  240);
+                playNote(A4,  360);
+                playNote(Ab4, 240);
+                playNote(G4,  240);
+                playNote(F4,  240);
+                playNote(D4,  120);
+                playNote(F4,  120);
+                playNote(G4,  120);
+            }
+
+            disableSpeaker();
         } else if (strcmp(input, "test") == 0) {
             print("Running Tests...\n");
             uint8_t buf[512];
@@ -205,7 +232,7 @@ void main() {
             diskRead(0, 1, (char*)buf);
             if (buf[510] == 0x55 && buf[511] == 0xaa) {
                 print("[ DONE ]\n");
-            } else {
+        } else {
                 print("[ FAIL ]\n");
             }
             print("Write Test ......... ");

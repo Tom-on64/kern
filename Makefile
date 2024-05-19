@@ -67,8 +67,8 @@ run:
 		-drive format=raw,file="./kern.iso",index=0,media=disk\
 		-m 256M\
 		-accel tcg\
-		-rtc base=localtime,clock=host,driftfix=slew
-#        -machine pcspk-audiodev=test
+		-rtc base=localtime,clock=host,driftfix=slew\
+		-audiodev coreaudio,id=audio0 -machine pcspk-audiodev=audio0
 
 # Clean all build files
 clean:
