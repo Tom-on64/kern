@@ -45,6 +45,11 @@ Legend:
     - [x] IRQ 1 - Keyboard
     - [x] IRQ 8 - CMOS Real time clock
     - [?] Other IRQs (idk which ones)
+- [ ] Sound
+    - [x] Pc Speaker
+    - [x] Notes (in hertz)
+    - [ ] Sound Blaster 16
+    - [x] MEGALOVANIA
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine
