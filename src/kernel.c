@@ -15,42 +15,18 @@
 #include <sound/pcspk.h>
 #include <sound/notes.h>
 #include <memory/virtual.h>
+#include <memory/addresses.h>
 
 #define PROMPT "#> "
 
 char* filetable = (char*)0x7000; // Pretty sure we don't have to care about the bootloader at 0x7c00
-uint32_t memmapAddr = 0x30000;
 
 // Function declarations
 void printFiletable(char* ft);
 void printPhysicalMemmap();
 
 void main() {
-    // Memory manager setup
-    uint32_t smapEntryCount = *(uint32_t*)0x8500;
-    smapEntry_t* smapEntries = (smapEntry_t*)0x8504;
-    uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
-
-    setupMemoryManager(memmapAddr, totalMemory);
-
-    for (uint32_t i = 0; i < smapEntryCount; i++) {
-        if (smapEntries[i].type == 1) {
-            initMemoryRegion(smapEntries[i].baseAddress, smapEntries[i].length);
-        }
-    }
-
-    deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
-    deinitMemoryRegion(memmapAddr, maxBlocks / BLOCKS_PER_BYTE);
-
-    // TODO: Find font in filetable
-    diskRead(46, 4, font); // Read font from disk
-    
-    clear();
-    print("kern.\n\n");
-
-    diskRead(5, 1, filetable); // Read the filetable and store it in memory
-   
-    // Interrupts
+    // Interrupt setup
     setupIdt();
     setupExceptions();
     idtSetGate(0x80, syscallHandler, USR_INT_GAME_FLAGS); // Setup Syscall handler in IDT for int 0x80
@@ -63,6 +39,42 @@ void main() {
     setupRtc();
     setupKeyboard();
 
+    // Physical memory manager setup
+    uint32_t smapEntryCount = *(uint32_t*)0x8500;
+    smapEntry_t* smapEntries = (smapEntry_t*)0x8504;
+    uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
+
+    setupPhysicalMemoryManager(MEMMAP_AREA, totalMemory);
+
+    for (uint32_t i = 0; i < smapEntryCount; i++) {
+        if (smapEntries[i].type == 1) {
+            initMemoryRegion(smapEntries[i].baseAddress, smapEntries[i].length);
+        }
+    }
+
+    deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
+    deinitMemoryRegion(MEMMAP_AREA, maxBlocks / BLOCKS_PER_BYTE);
+
+    // Virtual memory manager setup
+    setupVirtualMemoryManager(); // TODO: Check if it succeeds
+
+    // Identity map VBE framebuffer
+    uint32_t fbSize = (gfxMode->yRes * gfxMode->linearBytesPerScanline) / PAGE_SIZE;
+    if (fbSize % PAGE_SIZE > 0) { fbSize++; }
+    fbSize *= 2; // Double for hardware
+    for (uint32_t i = 0, fbStart = gfxMode->physicalBasePtr; i < fbSize; i++, fbStart += PAGE_SIZE) {
+        mapPage((void*)fbStart, (void*)fbStart);
+    }
+    deinitMemoryRegion(gfxMode->physicalBasePtr, fbSize * BLOCK_SIZE);
+
+    // Screen setup
+    diskRead(46, 4, font); // TODO: Find font in filetable
+    
+    clear();
+    print("kern.\n\n");
+
+    diskRead(5, 1, filetable); // Read the filetable and store it in memory
+   
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {

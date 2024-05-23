@@ -111,12 +111,12 @@ Legend:
     - [ ] stdin
     - [ ] stdout
     - [ ] stderr
-- [ ] Memory manager
+- [x] Memory manager
     - [x] Memory map
     - [x] Print mem map
     - [x] Physical
-    - [ ] Virtual
-    - [ ] Paging
+    - [x] Virtual
+    - [x] Paging
 - [ ] User (or system) programs
     - [x] Loading them
     - [x] Running them

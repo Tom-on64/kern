@@ -47,14 +47,20 @@ int32_t findFreeBlocks(uint32_t blockCount) {
                 uint32_t block = 1 << j;
 
                 if (!(memoryMap[i] & block)) {
-                    uint32_t startBlock = i * 32 + block;
-                    uint32_t freeBlocks = 0;
+                    // uint32_t startBlock = i * 32 + block;
+                    // uint32_t freeBlocks = 0;
 
-                    for (uint32_t count = 0; count <= blockCount; count++) {
-                        if (!testBlock(startBlock + count)) {
-                            freeBlocks++;
+                    for (uint32_t count = i, freeBlocks = 0; count < blockCount; count++) {
+                        if (j + count > 31 && i + 1 <= maxBlocks / 32) {
+                            if (!(memoryMap[i+1] & (1 << (j + count)))) {
+                                freeBlocks++;
+                            }
+                        } else {
+                            if (!(memoryMap[i] & (1 << (j + count)))) {
+                                freeBlocks++;
+                            }
                         }
-                        
+
                         if (freeBlocks == blockCount) {
                             return i * 32 + j;
                         }
@@ -67,7 +73,7 @@ int32_t findFreeBlocks(uint32_t blockCount) {
     return -1; // No free memory found :/
 }
 
-void setupMemoryManager(uint32_t startAddress, uint32_t size) {
+void setupPhysicalMemoryManager(uint32_t startAddress, uint32_t size) {
     memoryMap = (uint32_t*)startAddress;
     maxBlocks = size / BLOCK_SIZE;
     usedBlocks = maxBlocks;
