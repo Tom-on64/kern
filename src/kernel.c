@@ -14,6 +14,7 @@
 #include <time.h>
 #include <sound/pcspk.h>
 #include <sound/notes.h>
+#include <memory/virtual.h>
 
 #define PROMPT "#> "
 
@@ -222,6 +223,7 @@ void main() {
                 playNote(F4,  120);
                 playNote(G4,  120);
             }
+            rest(120);
 
             disableSpeaker();
         } else if (strcmp(input, "test") == 0) {
