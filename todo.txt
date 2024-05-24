@@ -89,13 +89,12 @@ Legend:
         - [ ] Hard
 - [ ] System Calls
     - [x] Sleep()
-    - [x] Print() - Temporary for printing before we get Write(stdout) :)
-    - [ ] Write()
-    - [ ] Read()
+    - [ ] Write() (temporarly puts())
+    - [ ] Read() (temporarly gets())
     - [ ] Open()
     - [ ] Close()
-    - [ ] Malloc()
-    - [ ] Free()
+    - [x] Malloc()
+    - [x] Free()
     - [ ] Seek()
 - [ ] Shell
     - [ ] Separate file/program
@@ -126,10 +125,13 @@ Legend:
     - [x] Loading them
     - [x] Running them
     - [x] Exit back to kernel/shell
-    - [ ] Let them use libs
+    - [x] Let them use libs
     - [ ] Proper include files (LibC?)
     - [ ] argc, argv[]
 - [ ] Standalone shell program
+- [ ] Userspace programs
+    - [ ] Calculator
+    - [ ] Caledar
 - [ ] Code Editor
     - [ ] Text editor
     - [ ] Syntax highlighting
@@ -145,4 +147,5 @@ Legend:
 - [ ] Games
     - [ ] Minesweeper
     - [ ] Solitaire
+    - [ ] Tetris
 

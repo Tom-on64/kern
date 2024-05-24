@@ -1,12 +1,14 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
+#include <interrupt/idt.h>
 #include <interrupt/pit.h>
 #include <screen/text.h>
 #include <keyboard/keyboard.h>
+#include <memory/malloc.h>
 
 // System call count
-#define MAX_SYSCALLS 3
+#define MAX_SYSCALLS 5
 
 // Args: ebx - number of miliseconds
 void sys_sleep() {
@@ -35,22 +37,48 @@ void sys_gets() {
     read(s);
 }
 
+// Args: ebx - amount of bytes to malloc
+void sys_malloc() {
+    uint32_t size = 0;
+    __asm__ volatile ("movl %%ebx, %0" : "=b"(size));
+    
+    // First Malloc()
+    if (!mallocListHead) {
+        mallocInit(size); // Setup malloc linked list
+    }
+
+    void* ptr = mallocNextNode(size);
+    mallocMergeFree();
+
+    // Return allocated address in eax
+    __asm__ volatile ("movl %0, %%eax" : : "r"(ptr));
+}
+
+// Args: ebx - allocated pointer
+void sys_free() {
+    void* ptr = NULL;
+    __asm__ volatile ("movl %%ebx, %0" : "=b"(ptr));
+    mallocFree(ptr);
+}
+
 // System call table
 void* syscalls[MAX_SYSCALLS] = {
-    sys_sleep, // Syscall(0)
-    sys_puts,  // Syscall(1)
-    sys_gets,  // Syscall(2)
+    sys_sleep,  // Syscall(0)
+    sys_puts,   // Syscall(1)
+    sys_gets,   // Syscall(2)
+    sys_malloc, // Syscall(3)
+    sys_free,   // Syscall(4)
 };
 
 // int 0x80 - Syscall interrupt, handled by this function
 // eax : Syscall number
 __attribute__ ((naked)) // No prologue or epilogue, just assembly
-void syscallHandler(void) {
+void syscallHandler(intFrame_t* iframe) {
     // Interrupt - Stack should contain: ss, esp, eflags, cs, eip
     // We should also push these regs: ax, gs, fs, es, ds, bp, di, si, dx, cx, bx
     __asm__ volatile (
             ".intel_syntax noprefix\n" // We use intel syntax
-            ".equ MAX_SYSCALLS, 3\n" // Define MAX_SYSCALLS again TODO: I don't want to have to do this
+            ".equ MAX_SYSCALLS, 5\n" // Define MAX_SYSCALLS again TODO: I don't want to have to do this
 
             // Check if syscall exists
             "cmp eax, MAX_SYSCALLS - 1\n"
@@ -86,6 +114,7 @@ void syscallHandler(void) {
 
             // TODO: Send an error or something here
             "invalidSyscall:\n"
+            "mov eax, -1\n" // Current error thing
             "iretd\n"
 
             ".att_syntax" // Switch back to Att Syntax (Just in case)

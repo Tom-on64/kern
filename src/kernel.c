@@ -16,6 +16,7 @@
 #include <sound/notes.h>
 #include <memory/virtual.h>
 #include <memory/addresses.h>
+#include <memory/malloc.h>
 
 #define PROMPT "#> "
 
@@ -303,8 +304,29 @@ void main() {
 
                     diskRead(sector, size, entryPoint);
 
-                    if (strcmp(fileType, "bin") == 0) { // TODO: Improve this
+                    if (strcmp(fileType, "bin") == 0) {
+                        // Reset malloc
+                        mallocListHead = NULL;
+                        mallocVirtualAddr = (uint32_t)entryPoint + neededPages * PAGE_SIZE;
+                        mallocPhysicalAddr = 0;
+                        mallocPages = 0;
+
                         ((void(*)(void))entryPoint)(); // Call program
+
+                        for (uint32_t i = 0, virtualAddr = mallocVirtualAddr; i < mallocPages; i++, virtualAddr += PAGE_SIZE) {
+                            ptEntry_t* page = getPage(virtualAddr);
+
+                            if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) {
+                                freePage(page);
+                                unmapPage((void*)virtualAddr);
+                                flushTlbEntry(virtualAddr);
+                            }
+                        }
+
+                        mallocListHead = NULL;
+                        mallocVirtualAddr = 0;
+                        mallocPhysicalAddr = 0;
+                        mallocPages = 0;
                     } else if (strcmp(fileType, "tab") == 0) {
                         printFiletable(entryPoint);
                     } else if (strcmp(fileType, "fnt") == 0) {

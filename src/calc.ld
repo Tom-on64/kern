@@ -1,6 +1,6 @@
+ENTRY("main");
 SECTIONS {
     .text : {
-        *(entry); 
         *(.text*);
     }
     .data : {
@@ -13,3 +13,4 @@ SECTIONS {
         *(.bss*);
     }
 }
+
