@@ -1,12 +1,9 @@
-#include <time.h>
 #include <stdio.h>
 
 __attribute__ ((section ("entry")))
 void main() {
-    char* msg = read();
+    char msg[8] = { 'H','e','l','l','o','!','\n',0 };
     print(msg);
-    
-    sleep(4500);
 
     return;
 }

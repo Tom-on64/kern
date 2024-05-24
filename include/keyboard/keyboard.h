@@ -43,8 +43,7 @@ char getc() {
 }
 
 // Reads until a newline
-char* read() {
-    static char inputBuffer[MAX_INPUT_LENGTH];
+void read(char* buffer) {
     char c;
     uint8_t len = 0;
 
@@ -54,15 +53,14 @@ char* read() {
             len--;
             putc(c);
         } else if (len + 1 != MAX_INPUT_LENGTH) { // Check if we can add a new character (this method avoids overflow issues)
-            inputBuffer[len++] = c;
+            buffer[len++] = c;
             putc(c);
         }
     }
 
-    inputBuffer[len++] = c; // Add newline
+    buffer[len++] = c; // Add newline
     putc(c);
-    inputBuffer[len] = '\0'; // Null terminate
-    return inputBuffer;
+    buffer[len] = '\0'; // Null terminate
 }
 
 void setupKeyboard() {

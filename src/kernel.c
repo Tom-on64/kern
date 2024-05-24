@@ -19,7 +19,7 @@
 
 #define PROMPT "#> "
 
-char* filetable = (char*)0x7000; // Pretty sure we don't have to care about the bootloader at 0x7c00
+char* filetable = (char*)FILETABLE_LOC; // Pretty sure we don't have to care about the bootloader at 0x7c00
 
 // Function declarations
 void printFiletable(char* ft);
@@ -40,8 +40,8 @@ void main() {
     setupKeyboard();
 
     // Physical memory manager setup
-    uint32_t smapEntryCount = *(uint32_t*)0x8500;
-    smapEntry_t* smapEntries = (smapEntry_t*)0x8504;
+    uint32_t smapEntryCount = *(uint32_t*)SMAP_ENTRY_COUNT;
+    smapEntry_t* smapEntries = (smapEntry_t*)SMAP_ENTRIES; // After a unit32_t
     uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
 
     setupPhysicalMemoryManager(MEMMAP_AREA, totalMemory);
@@ -74,12 +74,13 @@ void main() {
     print("kern.\n\n");
 
     diskRead(5, 1, filetable); // Read the filetable and store it in memory
-   
+    
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
         print(PROMPT);
-        char* input = read();
+        char input[MAX_INPUT_LENGTH];
+        read(input);
 
         if (input[0] == '\n') continue;
 
@@ -284,56 +285,51 @@ void main() {
 
                     char* fileType = strchr(filename, '.') + 1;
 
-                    uint32_t neededBlocks = (size * 512) / BLOCK_SIZE + 1;
+                    uint32_t neededPages = (size * 512) / PAGE_SIZE;
+                    if ((size * 512) % PAGE_SIZE > 0) { neededPages++; }
 
-                    /* Debug printing
-                    print("Allocating ");
-                    print(itoa(neededBlocks, 10));
-                    print(" Block");
-                    if (neededBlocks > 1) putc('s');
-                    */
-
-                    char* address = allocBlocks(neededBlocks);
-
-                    if (address == NULL) {
-                        print("\nNot enough memory to allocate!\n");
-                        break;
+                    char* entryPoint = (char*)0x400000; // Right after first 4MB
+                    for (uint32_t i = 0; i < neededPages; i++) {
+                        ptEntry_t page = 0;
+                        uint32_t physicalAddress = (uint32_t)allocPage(&page);
+                        
+                        if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
+                            fgColor = RED;
+                            print("\nNot enough memory to allocate!\n");
+                            fgColor = FG_COLOR;
+                            break;
+                        }
                     }
 
-                    /* Debug printing
-                    print("\nAllocated to address 0x");
-                    print(itoa((uint32_t)address, 16));
-                    print("!\n");
-                    */
+                    diskRead(sector, size, entryPoint);
 
-                    diskRead(sector, size, address);
-
-                    if (strcmp(fileType, "bin") == 0) {
-                        clear(); 
-                        ((void(*)(void))address)(); // Call program
-                        clear();
+                    if (strcmp(fileType, "bin") == 0) { // TODO: Improve this
+                        ((void(*)(void))entryPoint)(); // Call program
                     } else if (strcmp(fileType, "tab") == 0) {
-                        printFiletable(address);
+                        printFiletable(entryPoint);
                     } else if (strcmp(fileType, "fnt") == 0) {
                         print("Loading ");
                         print(filename);
                         print("...\n");
-                        memcpy(address, font, size * 512);
+                        memcpy(entryPoint, font, size * 512);
                         print("Font loaded\n");
                     } else {
                         for (size_t i = 0; i < size * 512; i++) {
-                            if (address[i] != '\0') {
-                                putc(address[i]);
+                            if (entryPoint[i] != '\0') {
+                                putc(entryPoint[i]);
                             }
                         }
                         putc('\n');    
                     }
-                    
-                    // Debug printing
-                    // print("Freeing allocated memory...\n");
-                    freeBlocks(address, neededBlocks);
-                    // print("Done!\n");
 
+                    for (uint32_t i = 0, virtualAddr = (uint32_t)entryPoint; i < neededPages; i++, virtualAddr += PAGE_SIZE) {
+                        ptEntry_t* page = getPage(virtualAddr);
+                        if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) { // Check if the page is used
+                            freePage(page);
+                            unmapPage((void*)virtualAddr);
+                            flushTlbEntry(virtualAddr); // Invalidate unused page
+                        }
+                    }
                     break;
                 }
 

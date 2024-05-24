@@ -53,7 +53,7 @@ kernel: $(SRC)/kernel.c $(SRC)/entry.asm
 
 $(C_FILES):
 	@echo "Compiling $(SRC)/$@.c..."
-	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c
+	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c 
 	@$(LD) -T$(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
 

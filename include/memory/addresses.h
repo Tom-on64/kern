@@ -3,5 +3,8 @@
 
 #define MEMMAP_AREA 0x30000
 #define KERNEL_LOC 0x50000
+#define FILETABLE_LOC 0x7000
+#define SMAP_ENTRY_COUNT 0x8500
+#define SMAP_ENTRIES 0x8504
 
 #endif

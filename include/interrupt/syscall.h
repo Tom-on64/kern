@@ -24,22 +24,22 @@ void sys_sleep() {
 void sys_puts() {
     char* s;
     __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
-
     print(s);
 }
 
 // TODO: Use a Read() sycall and read from stdin
-// Returns: ebx - char* string
+// Args: ebx - char* buffer
 void sys_gets() {
-    char* s = read();
-    __asm__ volatile ("movl %0, %%ebx" :: "r"(s));
+    char* s;
+    __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
+    read(s);
 }
 
 // System call table
 void* syscalls[MAX_SYSCALLS] = {
-    sys_sleep, 
-    sys_puts, 
-    sys_gets, 
+    sys_sleep, // Syscall(0)
+    sys_puts,  // Syscall(1)
+    sys_gets,  // Syscall(2)
 };
 
 // int 0x80 - Syscall interrupt, handled by this function
@@ -50,7 +50,7 @@ void syscallHandler(void) {
     // We should also push these regs: ax, gs, fs, es, ds, bp, di, si, dx, cx, bx
     __asm__ volatile (
             ".intel_syntax noprefix\n" // We use intel syntax
-            ".equ MAX_SYSCALLS, 2\n" // Define MAX_SYSCALLS again
+            ".equ MAX_SYSCALLS, 3\n" // Define MAX_SYSCALLS again TODO: I don't want to have to do this
 
             // Check if syscall exists
             "cmp eax, MAX_SYSCALLS - 1\n"
@@ -82,7 +82,7 @@ void syscallHandler(void) {
             "pop fs\n"
             "pop gs\n"
             "add esp, 4\n" // Save eax value
-            "iretd\n" // Return from interrupt
+            "iretd\n" // Return from interrupt (32 bit)
 
             // TODO: Send an error or something here
             "invalidSyscall:\n"

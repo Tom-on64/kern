@@ -16,7 +16,7 @@
 #define SET_ATTR(_entry, _attr) (*(_entry) |= (_attr))
 #define CLEAR_ATTR(_entry, _attr) (*(_entry) &= ~(_attr))
 #define TEST_ATTR(_entry, _attr) (*(_entry) & (_attr))
-#define SET_FRAME(_entry, _address) (*(_entry) = (*(_entry) & ~0x7ffff000) | (_address))
+#define SET_FRAME(_entry, _address) (*(_entry) = (*(_entry) & ~0xfffff000) | (_address))
 
 typedef uint32_t ptEntry_t;
 typedef uint32_t pdEntry_t;
@@ -96,13 +96,13 @@ void freePage(ptEntry_t* page) {
 }
 
 uint8_t setPageDirectory(pageDirectory_t* pd) {
-    if (!pd) { return 0; } // Nuh uh
+    if (!pd) { return 1; } // Nuh uh
     currentPd = pd;
     
     // cr3 (Control register 3) - current page dir address
     __asm__ volatile("movl %%eax, %%cr3" : : "a"(currentPd));
 
-    return 1; // Success
+    return 0; // Success
 }
 
 void flushTlbEntry(uint32_t virtualAddress) {
@@ -116,7 +116,7 @@ uint8_t mapPage(void* physicalAddr, void* virtualAddr) {
     if (!TEST_ATTR(entry, PTE_PRESENT)) {
         // Assuming that the page is not allocated since it's not present
         pageTable_t* table = (pageTable_t*)allocBlocks(1);
-        if (!table) return 0; // Out of memory!!
+        if (!table) return 1; // Out of memory!!
 
         // Clear page table (may be slow?)
         memset(table, 0, sizeof(pageTable_t));
@@ -134,7 +134,7 @@ uint8_t mapPage(void* physicalAddr, void* virtualAddr) {
     SET_ATTR(page, PTE_PRESENT);
     SET_FRAME(page, (uint32_t)physicalAddr);
 
-    return 1; // Success
+    return 0; // Success
 }
 
 void unmapPage(void* virtualAddress) {
@@ -148,7 +148,7 @@ uint8_t setupVirtualMemoryManager() {
     // Create a default page dir
     pageDirectory_t* dir = (pageDirectory_t*)allocBlocks(3);
     
-    if (!dir) { return 0; } // Out of memory
+    if (!dir) { return 1; } // Out of memory
 
     memset(dir, 0, sizeof(pageDirectory_t));
     for (uint32_t i = 0; i < 1024; i++) {
@@ -157,11 +157,11 @@ uint8_t setupVirtualMemoryManager() {
 
     // Alloc default page table
     pageTable_t* table = (pageTable_t*)allocBlocks(1);
-    if (!table) { return 0; } // Out of memory
+    if (!table) { return 1; } // Out of memory
     
     // Alloc a 3GB page
     pageTable_t* table3gb = (pageTable_t*)allocBlocks(1);
-    if (!table) { return 0; } // Out of memory
+    if (!table) { return 1; } // Out of memory
 
     memset(table, 0, sizeof(pageTable_t));
     memset(table3gb, 0, sizeof(pageTable_t));
@@ -200,7 +200,7 @@ uint8_t setupVirtualMemoryManager() {
 
     // ENABLE PAGING!!! Set PG bit 31 and PE bit 0 in cr0
     __asm__ volatile("movl %cr0, %eax; orl $0x80000001, %eax; movl %eax, %cr0");
-    return 1;
+    return 0; // Success
 }
 
 #endif
