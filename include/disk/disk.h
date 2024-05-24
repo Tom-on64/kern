@@ -9,8 +9,6 @@
 #define WRITE_COMMAND 0x30
 #define CACHE_FLUSH 0xE7
 
-extern uint8_t driveNum;
-
 void diskRead(uint32_t lbaAddress, uint8_t sectorCount, char* dst) {
     outb(PIO_PORT + 6, ((lbaAddress >> 24) & 0x0f) | 0xe0); // 6 - Use LBA; 4 - Drive number; 3-0 - Highest lba address nibble
     outb(PIO_PORT + 2, sectorCount); // Sector count register

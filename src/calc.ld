@@ -1,6 +1,6 @@
-ENTRY("main");
 SECTIONS {
     .text : {
+        *(entry);
         *(.text*);
     }
     .data : {

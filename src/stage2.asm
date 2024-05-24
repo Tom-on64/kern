@@ -324,9 +324,6 @@ protected_start:
     rep movsd
 
     ; Perform The far jump
-    mov al, [driveNum]
-    push ax
-    
     jmp CODE_SEG:KERNEL_LOC
 
 ;; Data

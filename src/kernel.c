@@ -17,6 +17,7 @@
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <memory/malloc.h>
+#include <stdlib.h>
 
 #define PROMPT "#> "
 
@@ -26,6 +27,7 @@ char* filetable = (char*)FILETABLE_LOC; // Pretty sure we don't have to care abo
 void printFiletable(char* ft);
 void printPhysicalMemmap();
 
+__attribute__ ((section("entry")))
 void main() {
     // Interrupt setup
     setupIdt();
@@ -248,7 +250,7 @@ void main() {
             diskRead(0, 1, (char*)buf);
             if (buf[510] == 0x55 && buf[511] == 0xaa) {
                 print("[ DONE ]\n");
-        } else {
+            } else {
                 print("[ FAIL ]\n");
             }
             print("Write Test ......... ");
@@ -260,6 +262,10 @@ void main() {
             } else {
                 print("[ FAIL ]\n");
             }
+            print("Malloc Test ........ ");
+            void* buffer = malloc(100);
+            free(buffer);
+            print("[ DONE ]\n");
             
             print("\nTests Finished!\n");
         } else {

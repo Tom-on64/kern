@@ -3,7 +3,8 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 AS = nasm
 
-CFLAGS = -ffreestanding -fno-builtin -fno-stack-protector -nostdinc -mgeneral-regs-only -m32 -march=i386 -Wall -Iinclude/c
+CFLAGS = -std=c17 -ffreestanding -fno-builtin -fno-stack-protector -fno-pie \
+		 -Os -nostdinc -mgeneral-regs-only -m32 -march=i386 -Wall -Iinclude/c
 
 SRC = ./src
 BUILD = ./build
@@ -43,18 +44,16 @@ bootloader: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin > $(BUILD)/boot.bin
 
 # Kernel: This target is responsible for creating kernel.bin
-kernel: $(SRC)/kernel.c $(SRC)/entry.asm
-	@echo "Assembling $(SRC)/entry.asm..."
-	@$(AS) -felf32 -o $(BUILD)/entry.o $(SRC)/entry.asm
+kernel: $(SRC)/kernel.c
 	@echo "Compiling $(SRC)/kernel.c..."
 	@$(CC) $(CFLAGS) -Iinclude -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
-	@$(LD) -T$(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/*.o
+	@$(LD) -T$(SRC)/kernel.ld -z notext --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/kernel.o
 	@rm $(BUILD)/*.o
 
 $(C_FILES):
 	@echo "Compiling $(SRC)/$@.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c 
-	@$(LD) -T$(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
+	@$(LD) -T$(SRC)/$@.ld -z notext --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
 
 $(FONTS):
