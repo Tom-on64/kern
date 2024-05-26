@@ -16,13 +16,17 @@ typedef struct {
 
 char* filetable = (char*)FILETABLE_LOC; // Pretty sure we don't have to care about the bootloader at 0x7c00
 
-fileEntry_t* findFile(char* filename) { // TODO: Don't modify the filename string. (maybe make a copy??)
-    char* filetype = strchr(filename, '.');
+fileEntry_t* findFile(const char* filename) {
+    if (strlen(filename) > 14) { return NULL; } // Filename too long
+    static char filenameBuf[16];
+    strcpy(filenameBuf, filename);
+
+    char* filetype = strchr(filenameBuf, '.');
     *filetype++ = '\0'; // Split filename and filetype by a NULL
 
     char* ft = filetable;
     while (*ft != '\0') {
-        if (strcmp(filename, ft) != 0) { // Filename doesn't match
+        if (strcmp(filenameBuf, ft) != 0) { // Filename doesn't match
             ft += 16; // Goto next entry
             continue;
         }
@@ -58,7 +62,8 @@ void writeFile(char* filename, void* buffer) { // TODO: Add length so we don't w
         file = (fileEntry_t*)filetable;
         while (*(char*)file != '\0') { file++; } // Find end of the filetable
          
-        // strchr(filename, '.'); TODO: We don't have to do this, because findFile() modifies the string like this
+        *strchr(filename, '.') = '\0';
+
         char* filetype = filename + strlen(filename); // + 1?
         fileEntry_t* previous = file - 1;
 

@@ -1,34 +1,35 @@
-#include <memory/physical.h>
-#include <disk/disk.h>
-#include <screen/text.h>
 #include <interrupt/idt.h>
 #include <interrupt/exceptions.h>
 #include <interrupt/syscall.h>
 #include <interrupt/pic.h>
-#include <ports/io.h>
-#include <string.h>
-#include <screen/graphics.h>
-#include <keyboard/keyboard.h>
 #include <interrupt/pit.h>
 #include <interrupt/rtc.h>
-#include <time.h>
-#include <sound/pcspk.h>
-#include <sound/notes.h>
+#include <keyboard/keyboard.h>
+
+#include <memory/physical.h>
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <memory/malloc.h>
+#include <disk/filesys.h>
+#include <disk/disk.h>
+#include <screen/text.h>
+#include <screen/graphics.h>
+#include <sound/pcspk.h>
+#include <sound/notes.h>
+#include <ports/io.h>
+
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #define PROMPT "#> "
 
-char* filetable = (char*)FILETABLE_LOC; // Pretty sure we don't have to care about the bootloader at 0x7c00
-
 // Function declarations
-void printFiletable(char* ft);
 void printPhysicalMemmap();
 
 __attribute__ ((section("entry")))
 void main() {
+    diskRead(5, 1, filetable);
     // Interrupt setup
     setupIdt();
     setupExceptions();
@@ -71,12 +72,10 @@ void main() {
     deinitMemoryRegion(gfxMode->physicalBasePtr, fbSize * BLOCK_SIZE);
 
     // Screen setup
-    diskRead(46, 4, font); // TODO: Find font in filetable
-    
+    readFile("term16n.fnt", font);
     clear();
     print("kern.\n\n");
 
-    diskRead(5, 1, filetable); // Read the filetable and store it in memory
     
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -269,147 +268,86 @@ void main() {
             
             print("\nTests Finished!\n");
         } else {
-            char* ft = filetable;
-            uint8_t found = 0;
-
-            while (*ft != '\0') {
-                char filename[15] = { 0 };
-                uint8_t offset = 0;
-                for (uint8_t i = 0; i < 14; i++) {
-                    if (i == 9) {
-                        filename[offset++] = '.';
-                        continue;
-                    }
-                    if (*ft != '\0') { filename[offset++] = *ft; }
-                    ft++;
-                }
-
-                if (strcmp(input, filename) == 0) {
-                    ft++; // RESERVED
-                    uint8_t sector = *ft++;
-                    uint8_t size = *ft++;
-                    found++; // Set found to 1
-
-                    char* fileType = strchr(filename, '.') + 1;
-
-                    uint32_t neededPages = (size * 512) / PAGE_SIZE;
-                    if ((size * 512) % PAGE_SIZE > 0) { neededPages++; }
-
-                    char* entryPoint = (char*)0x400000; // Right after first 4MB
-                    for (uint32_t i = 0; i < neededPages; i++) {
-                        ptEntry_t page = 0;
-                        uint32_t physicalAddress = (uint32_t)allocPage(&page);
-                        
-                        if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
-                            fgColor = RED;
-                            print("\nNot enough memory to allocate!\n");
-                            fgColor = FG_COLOR;
-                            break;
-                        }
-                    }
-
-                    diskRead(sector, size, entryPoint);
-
-                    if (strcmp(fileType, "bin") == 0) {
-                        // Reset malloc
-                        mallocListHead = NULL;
-                        mallocVirtualAddr = (uint32_t)entryPoint + neededPages * PAGE_SIZE;
-                        mallocPhysicalAddr = 0;
-                        mallocPages = 0;
-
-                        ((void(*)(void))entryPoint)(); // Call program
-
-                        for (uint32_t i = 0, virtualAddr = mallocVirtualAddr; i < mallocPages; i++, virtualAddr += PAGE_SIZE) {
-                            ptEntry_t* page = getPage(virtualAddr);
-
-                            if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) {
-                                freePage(page);
-                                unmapPage((void*)virtualAddr);
-                                flushTlbEntry(virtualAddr);
-                            }
-                        }
-
-                        mallocListHead = NULL;
-                        mallocVirtualAddr = 0;
-                        mallocPhysicalAddr = 0;
-                        mallocPages = 0;
-                    } else if (strcmp(fileType, "tab") == 0) {
-                        printFiletable(entryPoint);
-                    } else if (strcmp(fileType, "fnt") == 0) {
-                        print("Loading ");
-                        print(filename);
-                        print("...\n");
-                        memcpy(entryPoint, font, size * 512);
-                        print("Font loaded\n");
-                    } else {
-                        for (size_t i = 0; i < size * 512; i++) {
-                            if (entryPoint[i] != '\0') {
-                                putc(entryPoint[i]);
-                            }
-                        }
-                        putc('\n');    
-                    }
-
-                    for (uint32_t i = 0, virtualAddr = (uint32_t)entryPoint; i < neededPages; i++, virtualAddr += PAGE_SIZE) {
-                        ptEntry_t* page = getPage(virtualAddr);
-                        if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) { // Check if the page is used
-                            freePage(page);
-                            unmapPage((void*)virtualAddr);
-                            flushTlbEntry(virtualAddr); // Invalidate unused page
-                        }
-                    }
-                    break;
-                }
-
-                ft += 3;
-            }
-
-            if (!found) {
+            fileEntry_t* file = findFile(input);
+            
+            if (file == NULL) {
                 print("Command not found: ");
                 print(input);
                 putc('\n');
-            }
-        }
-    }
-}
-
-void printFiletable(char* ft) {
-    while (*ft != '\0') {
-        char filename[15] = { 0 };
-        uint8_t offset = 0;
-        for (uint8_t i = 0; i < 14; i++) {
-            if (i == 9) {
-                filename[offset++] = '.';
                 continue;
             }
-            if (*ft != '\0') { filename[offset++] = *ft; }
-            ft++;
-        }
-        ft++; // RESERVED
 
-        uint8_t sector = *ft++;
-        uint8_t size = *ft++;
+            uint32_t neededPages = (file->length * 512) / PAGE_SIZE;
+            if ((file->length * 512) % PAGE_SIZE > 0) { neededPages++; }
 
-        if (sector < 10) putc('0');
-        if (sector == 0) putc('0');
-        else print(itoa(sector, 10));
-        print(": ");
-        print(filename);
+            char* entryPoint = (char*)0x400000; // Right after first 4MB
+            for (uint32_t i = 0; i < neededPages; i++) {
+                ptEntry_t page = 0;
+                uint32_t physicalAddress = (uint32_t)allocPage(&page);
+                
+                if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
+                    fgColor = RED;
+                    print("\nNot enough memory to allocate!\n");
+                    fgColor = FG_COLOR;
+                    break;
+                }
+            }
 
-        for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-            putc(' ');
-        }
+            readFile(input, entryPoint);
 
-        print(" | ");
-        if (size >> 1) {
-            print(itoa(size >> 1, 10));
-            if (size & 0x01) { print(".5"); }
-            print("kB\n");
-        } else {
-            print(itoa(size*512, 10));
-            print("B\n");
+            if (strcmp(file->filetype, "bin") == 0) {
+                // Reset malloc
+                mallocListHead = NULL;
+                mallocVirtualAddr = (uint32_t)entryPoint + neededPages * PAGE_SIZE;
+                mallocPhysicalAddr = 0;
+                mallocPages = 0;
+
+                ((void(*)(void))entryPoint)(); // Call program
+
+                for (uint32_t i = 0, virtualAddr = mallocVirtualAddr; i < mallocPages; i++, virtualAddr += PAGE_SIZE) {
+                    ptEntry_t* page = getPage(virtualAddr);
+
+                    if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) {
+                        freePage(page);
+                        unmapPage((void*)virtualAddr);
+                        flushTlbEntry(virtualAddr);
+                    }
+                }
+
+                mallocListHead = NULL;
+                mallocVirtualAddr = 0;
+                mallocPhysicalAddr = 0;
+                mallocPages = 0;
+            } else if (strcmp(file->filetype, "tab") == 0) {
+                printFiletable(entryPoint);
+            } else if (strcmp(file->filetype, "fnt") == 0) {
+                print("Loading ");
+                print(file->filename);
+                print("...\n");
+                memcpy(entryPoint, font, file->length * 512);
+                print("Font loaded\n");
+            } else {
+                for (size_t i = 0; i < file->length * 512; i++) {
+                    if (entryPoint[i] != '\0') {
+                        putc(entryPoint[i]);
+                    }
+                }
+                putc('\n');    
+            }
+
+            for (uint32_t i = 0, virtualAddr = (uint32_t)entryPoint; i < neededPages; i++, virtualAddr += PAGE_SIZE) {
+                ptEntry_t* page = getPage(virtualAddr);
+                if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) { // Check if the page is used
+                    freePage(page);
+                    unmapPage((void*)virtualAddr);
+                    flushTlbEntry(virtualAddr); // Invalidate unused page
+                }
+            }
         }
     }
+
+    outw(0x604, 0x2000); //  QEMU - Quit emulator
+    while (1); // Just hang
 }
 
 void printPhysicalMemmap() {
