@@ -127,7 +127,8 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
             if (datetime->second < 10) strcat(buf, "0");
             strcat(buf, itoa(datetime->second, 10));
 
-            printAt(buf, 30, 0);
+            // The clock is a little offset down (about 0.4 of a character) It does look nice though!
+            printAt(buf, gfxMode->xRes - strlen(buf) - 1, 0);
         }
     }
 
