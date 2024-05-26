@@ -48,14 +48,15 @@ void updateFiletable() {
     // TODO: Update the filetable by writing data from memory to disk!
 }
 
-void readFile(char* filename, void* buffer) { // Hopefully the buffer is large enought :/
+uint8_t readFile(char* filename, void* buffer) { // Hopefully the buffer is large enought :/
     fileEntry_t* file = findFile(filename);
-    if (file == NULL) { return; } // File doesn't exist!
+    if (file == NULL) { return 1; } // File doesn't exist!
 
     diskRead(file->startAddress, file->length, buffer);
+    return 0; // Success
 }
 
-void writeFile(char* filename, void* buffer) { // TODO: Add length so we don't write too much/too little
+uint8_t writeFile(char* filename, void* buffer) { // TODO: Add length so we don't write too much/too little
     fileEntry_t* file = findFile(filetable);
     if (file == NULL) { // File exists -> override
         // File doesn't exist -> create new file
@@ -74,6 +75,7 @@ void writeFile(char* filename, void* buffer) { // TODO: Add length so we don't w
     }
 
     diskWrite(file->startAddress, file->length, buffer); // Write the file
+    return 0; // Success
 }
 
 void printFiletable(char* ft) {

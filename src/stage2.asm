@@ -1,7 +1,7 @@
 [bits 16]
 [org 0x7e00]
 
-%define KERNEL_LOC 0x50000
+%define STAGE3_LOC 0x50000
 %define VIDMEM 0xb800
 
 start:
@@ -324,7 +324,7 @@ protected_start:
     rep movsd
 
     ; Perform The far jump
-    jmp CODE_SEG:KERNEL_LOC
+    jmp CODE_SEG:STAGE3_LOC
 
 ;; Data
 driveNum: db 0

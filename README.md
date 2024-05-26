@@ -53,9 +53,10 @@ Graphics test: \
 _These images may be outdated, Idk_
 
 ## Known issues
-- If you run kernel.bin from shell, it will clear the memory map so when you load anything it will override the kernel code
+- If you run any of the bootloader stages or kernel form the shell, it will most likely break. (Maybe add an executable flag?)
 - fillCircle() in graphics.h is broken. No idea why, so no filled circles for you (i commented out the boundaryFill call in the function)
 - convertColor() doesn't work right, because i should be using floating point, but -mgeneral-regs-only doesn't let me :(
+- The soundtest command is very likely to get stuck on a note and play it forever. (Maybe a Sleep() bug?)
 - Not really an issue, bit QEMU's PIT is really slow and inacurate
 
 ## [Old Version](https://github.com/Tom-on64/old-kern)

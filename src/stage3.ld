@@ -1,5 +1,6 @@
+/* Third stage "prekernel" */
 SECTIONS {
-    .text 0xC0000000 : {
+    .text 0x50000 : {
         *(entry);
         *(.text*);
     }

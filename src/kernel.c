@@ -29,7 +29,12 @@ void printPhysicalMemmap();
 
 __attribute__ ((section("entry")))
 void main() {
-    diskRead(5, 1, filetable);
+    // Retrieve global variables
+    currentPd = (pageDirectory_t*)*(uint32_t*)CURRENT_PAGE_DIR_ADDR; // Don't ask
+    memoryMap = (uint32_t*)MEMMAP_AREA;
+    maxBlocks = *(uint32_t*)PHYS_MEM_MAX_BLOCKS;
+    usedBlocks = *(uint32_t*)PHYS_MEM_USED_BLOCKS;
+
     // Interrupt setup
     setupIdt();
     setupExceptions();
@@ -42,40 +47,11 @@ void main() {
     setupTimer();
     setupRtc();
     setupKeyboard();
-
-    // Physical memory manager setup
-    uint32_t smapEntryCount = *(uint32_t*)SMAP_ENTRY_COUNT;
-    smapEntry_t* smapEntries = (smapEntry_t*)SMAP_ENTRIES; // After a unit32_t
-    uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
-
-    setupPhysicalMemoryManager(MEMMAP_AREA, totalMemory);
-
-    for (uint32_t i = 0; i < smapEntryCount; i++) {
-        if (smapEntries[i].type == 1) {
-            initMemoryRegion(smapEntries[i].baseAddress, smapEntries[i].length);
-        }
-    }
-
-    deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
-    deinitMemoryRegion(MEMMAP_AREA, maxBlocks / BLOCKS_PER_BYTE);
-
-    // Virtual memory manager setup
-    setupVirtualMemoryManager(); // TODO: Check if it succeeds
-
-    // Identity map VBE framebuffer
-    uint32_t fbSize = (gfxMode->yRes * gfxMode->linearBytesPerScanline) / PAGE_SIZE;
-    if (fbSize % PAGE_SIZE > 0) { fbSize++; }
-    fbSize *= 2; // Double for hardware
-    for (uint32_t i = 0, fbStart = gfxMode->physicalBasePtr; i < fbSize; i++, fbStart += PAGE_SIZE) {
-        mapPage((void*)fbStart, (void*)fbStart);
-    }
-    deinitMemoryRegion(gfxMode->physicalBasePtr, fbSize * BLOCK_SIZE);
-
+ 
     // Screen setup
     readFile("term16n.fnt", font);
     clear();
     print("kern.\n\n");
-
     
     // Run Interactive Shell Program
     // TODO: Make it in another file

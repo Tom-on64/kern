@@ -3,8 +3,7 @@
 [global start]
 
 %define VIDMEM 0xb800
-%define FILETAB_LOC 0x7000 ; TODO: Read kernel size and location from ft
-%define KERNEL_SIZE 40 ; 20kB
+%define FILETAB_LOC 0x7000
 
 start:
     mov [driveNum], dl   ; Store the drive number
@@ -37,7 +36,7 @@ start:
     mov ah, 2   ; Read from disk
     int 0x13    ; Read interrupt
 
-    jnc loadKernel
+    jnc loadPrekernel
 
     dec byte [counter]
     jnz .read
@@ -58,20 +57,20 @@ diskErr:
     cli
     hlt
 
-loadKernel:
+loadPrekernel:
     mov byte [counter], 3
 
 .read:
     ; Location
-    mov ax, 0x5000 ; Making es 0x5000 will load the kernel at 0x50000
+    mov ax, 0x5000 ; Making es 0x5000 will load the prekernel at 0x50000
     mov es, ax
     xor bx, bx
     
     ; CHS Location
-    mov al, KERNEL_SIZE
+    mov al, 10  ; Prekernel size
     mov ch, 0   ; Cylinder
     mov dh, 0   ; Head
-    mov cl, 7   ; Sector
+    mov cl, 6   ; Sector
     mov dl, [driveNum]
 
     mov ah, 2   ; Read from disk
