@@ -4,6 +4,5 @@
 __attribute__ ((section("entry")))
 void main() {
     print("Hello, World!\n");
-
     return;
 }

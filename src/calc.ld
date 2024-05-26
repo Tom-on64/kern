@@ -1,5 +1,5 @@
 SECTIONS {
-    .text : {
+    .text 0x400000 : {
         *(entry);
         *(.text*);
     }
