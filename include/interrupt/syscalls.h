@@ -3,13 +3,13 @@
 
 #include <interrupt/idt.h>
 #include <interrupt/pit.h>
-#include <screen/text.h>
+#include <terminal/terminal.h>
 #include <keyboard/keyboard.h>
 #include <memory/malloc.h>
+#include <syscall.h>
+#include <stdint.h>
 
-// System call count
-#define MAX_SYSCALLS 5
-
+// Syscall(0) - Sleep()
 // Args: ebx - number of miliseconds
 void sys_sleep() {
     uint32_t ms;
@@ -21,12 +21,24 @@ void sys_sleep() {
     }
 }
 
-// TODO: Use a Write() syscall and write to stdout
-// Args: ebx - char* string
-void sys_puts() {
-    char* s;
-    __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
-    print(s);
+// Syscall(1) - Write()
+// Args: ebx - int fd
+//       ecx - void* buf
+//       edx - uint32_t len
+void sys_write() {
+    int32_t fd = 0;
+    void* buf = NULL;
+    uint32_t len = 0;
+
+    __asm__ volatile ("nop" : "=b"(fd), "=c"(buf), "=d"(len));
+
+    // TODO: Open fd table?
+    if (fd == 1) { // "stdout"
+        int32_t result = terminalWrite(buf, len); // Call a terminal print function
+        __asm__ volatile ("movl %0, %%eax" : : "r"(result));
+    } else { // Not implemented
+        __asm__ volatile ("movl $1, %eax");
+    }
 }
 
 // TODO: Use a Read() sycall and read from stdin
@@ -37,7 +49,9 @@ void sys_gets() {
     read(s);
 }
 
+// Syscall(3) - Malloc()
 // Args: ebx - amount of bytes to malloc
+// Returns: eax - Pointer to allocated memory
 void sys_malloc() {
     uint32_t size = 0;
     __asm__ volatile ("movl %%ebx, %0" : "=b"(size));
@@ -54,6 +68,7 @@ void sys_malloc() {
     __asm__ volatile ("movl %0, %%eax" : : "r"(ptr));
 }
 
+// Syscall(4) - Free()
 // Args: ebx - allocated pointer
 void sys_free() {
     void* ptr = NULL;
@@ -62,12 +77,12 @@ void sys_free() {
 }
 
 // System call table
-void* syscalls[MAX_SYSCALLS] = {
-    sys_sleep,  // Syscall(0)
-    sys_puts,   // Syscall(1)
-    sys_gets,   // Syscall(2)
-    sys_malloc, // Syscall(3)
-    sys_free,   // Syscall(4)
+void (*syscalls[MAX_SYSCALLS])(void) = {
+    [SYS_SLEEP]     = sys_sleep,  
+    [SYS_WRITE]     = sys_write,  
+    [SYS_GETS]      = sys_gets,   
+    [SYS_MALLOC]    = sys_malloc, 
+    [SYS_FREE]      = sys_free,   
 };
 
 // int 0x80 - Syscall interrupt, handled by this function

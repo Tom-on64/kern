@@ -1,12 +1,18 @@
 #ifndef STDIO_H
 #define STDIO_H
 
-void print(const char* s) { // Use Syscall(1) - Puts()
-    __asm__ volatile ("int $0x80" : : "a"(1), "b"(s));
+#include <syscall.h>
+#include <string.h>
+
+// TODO: Make a proper file descriptor table
+#define STDOUT 1
+
+void print(const char* s) {
+    write(STDOUT, s, strlen(s));
 }
 
-void read(char* s) { // Use Syscall(2) - Gets()
-    __asm__ volatile ("int $0x80" : : "a"(2), "b"(s));
+void read(char* s) { 
+    print("\x1b[1M[ ERROR: Read() Syscall not found! ]\n");
 }
 
 #endif

@@ -75,7 +75,8 @@ Legend:
     - [x] PI
     - [ ] Floating point macros/functions
 - [ ] Filesystem
-    - [ ] Utility for filesystem building (not just an assembly file)
+    - [!] Utility for filesystem building (not just an assembly file)
+    - [x] Better header for file i/o (disk/filesys.h)
     - [x] Filetable
     - [ ] Files
         - [x] Larger than one sector (512B)
@@ -89,7 +90,7 @@ Legend:
         - [ ] Hard
 - [ ] System Calls
     - [x] Sleep()
-    - [ ] Write() (temporarly puts())
+    - [x] Write()
     - [ ] Read() (temporarly gets())
     - [ ] Open()
     - [ ] Close()
@@ -131,7 +132,7 @@ Legend:
 - [ ] Standalone shell program
 - [ ] Userspace programs
     - [ ] Calculator
-    - [ ] Caledar
+    - [ ] Calendar
 - [ ] Code Editor
     - [ ] Text editor
     - [ ] Syntax highlighting

@@ -1,0 +1,35 @@
+--- Terminal Escape Sequences ---
+
+Escape character:
+    char:   '\e'
+    hex:    0x1b
+    oct:    0o33
+    dec:    27
+
+Note: the escape character will be denoted by ESC here
+
+Syntax:
+    All escape sequenced start with the escape character followed by an opening square bracket '['
+    The sequence can take any number of arguments in a semicolon separated list
+    If a argument is skipped, it will be implicitly set to 0
+    The escape sequence must end with a uppercase or lowercase letter
+
+Available escape sequences:
+    - Cursor Controls -
+    `ESC[#A` - Moves cursor # rows up
+    `ESC[#B` - Moves cursor # rows down
+    `ESC[#C` - Moves cursor # columns left
+    `ESC[#D` - Moves cursor # columns right
+    `ESC[#E` - Moves cursor to #th row
+    `ESC[#F` - Moves cursor to #th column
+    `ESC[#G` - Show (# = 1) or hide (# = 0) cursor
+    `ESC[{row};{col}H`  - Moves cursor to specified position (if not arguments given, moves to [0,0])a
+    - Erase functions -
+    `ESC[I`  - Reserved
+    `ESC[J`  - Erase screen
+    `ESC[K`  - Erase line (not implemented)
+    `ESC[L`  - Erase column (not implemented)
+    - Text Style -
+    `ESC[#M` - Sets foreground color to #
+    `ESC[#N` - Sets backgorund color to #
+

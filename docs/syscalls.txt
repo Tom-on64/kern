@@ -2,10 +2,25 @@
 
 Syscall handlers are prefixed by 'sys_'
 Syscalls can be called using interrupt 0x80
-The EAX register should countain a syscall number
+The EAX register should countain a syscall number on calling and it will contain a return value (if applicable) after calling
 
 Here's a list of syscalls: (and their numbers)
 
-syscall(0) : Sleep()
+Syscall(0) : Sleep()
     Args: EBX - Number of miliseconds to sleep for
+
+Syscall(1) : Write()
+    Args: EBX - File descriptor
+          ECX - Buffer to write
+          EDX - Length
+    Returns: Status
+
+Syscall(2) : Read() #TBD
+
+Syscall(3) : Malloc()
+    Args: EBX - Amount of bytes to malloc
+    Returns: Address of allocated memory
+
+Syscall(4) : Free()
+    Args: EBX - Pointer to free
 
