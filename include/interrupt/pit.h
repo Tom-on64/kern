@@ -1,24 +1,30 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <stdint.h>
 #include <interrupt/idt.h>
 #include <interrupt/pic.h>
-#include <screen/text.h>
+#include <terminal/terminal.h>
+#include <memory/addresses.h>
+#include <stdint.h>
 
 #define CHANNEL_0 0x40 // Offset it by 1 or 2 for ch1 and ch2
 #define COMMAND   0x43
 #define INPUT_CLK 1193182
 
-static uint32_t* timerTicks = (uint32_t*)0x1000;
+static uint32_t* sleepTimerTicks = (uint32_t*)SLEEP_TIMER;
 
 __attribute__ ((interrupt))
 void timerHandler(intFrame_t* iframe) {
-    *timerTicks += 1;
+    static uint32_t cursorTicks = 0;
+    cursorTicks++;
 
-    // TODO: Improve the cursor rendering
-    if (*timerTicks % 500 == 0) putcAt(' ', cursor.x, cursor.y);
-    else if (*timerTicks % 250 == 0) putcAt(127, cursor.x, cursor.y);
+    
+    if (terminal->showCursor) {
+        if (cursorTicks % 500 == 0) putcAt(127, terminal->x, terminal->y);
+        else if (cursorTicks % 250 == 0) putcAt(' ', terminal->x, terminal->y);
+    }
+
+    if (*sleepTimerTicks > 0) { --(*sleepTimerTicks); }
 
     sendPicEOI(0);
 }

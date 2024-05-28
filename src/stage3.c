@@ -3,7 +3,7 @@
 #include <memory/addresses.h>
 #include <disk/disk.h>
 #include <disk/filesys.h>
-#include <screen/text.h>
+#include <screen/gfxmode.h>
 
 __attribute__ ((section("entry")))
 void main() {

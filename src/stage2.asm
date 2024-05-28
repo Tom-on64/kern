@@ -3,6 +3,7 @@
 
 %define STAGE3_LOC 0x50000
 %define VIDMEM 0xb800
+%define MODE_INFO_BLOCK_LOC 0x9000
 
 start:
     mov [driveNum], dl
@@ -319,7 +320,7 @@ protected_start:
 
     ; Store VBE Mode Info Block in memory
     mov esi, modeInfoBlock
-    mov edi, 0x9000 ; Destination
+    mov edi, MODE_INFO_BLOCK_LOC ; Destination
     mov ecx, 64 ; 64 * 4 = 256B (size of modeInfoBlock)
     rep movsd
 
@@ -369,9 +370,9 @@ DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
 ;; !! IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO !!
-width: dw 0
-height: dw 0
-bpp: db 0
+width: dw 1920
+height: dw 1080
+bpp: db 32
 
 offset: dw 0
 _segment: dw 0 ; segment is a keyword

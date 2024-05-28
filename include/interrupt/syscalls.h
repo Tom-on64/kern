@@ -6,17 +6,16 @@
 #include <terminal/terminal.h>
 #include <keyboard/keyboard.h>
 #include <memory/malloc.h>
+#include <memory/addresses.h>
 #include <syscall.h>
 #include <stdint.h>
 
 // Syscall(0) - Sleep()
 // Args: ebx - number of miliseconds
 void sys_sleep() {
-    uint32_t ms;
-    __asm__ volatile ("movl %%ebx, %0" : "=r"(ms));
+    __asm__ volatile ("movl %%ebx, %0" : "=r"(*sleepTimerTicks));
 
-    uint32_t requiredTicks = *timerTicks + ms;
-    while (*timerTicks != requiredTicks) { // Wait...
+    while (*sleepTimerTicks > 0) { // Wait...
         __asm__ volatile ("sti;hlt;cli;");
     }
 }

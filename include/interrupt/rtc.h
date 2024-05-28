@@ -19,7 +19,7 @@ typedef struct {
     uint16_t year;
 } __attribute__ ((packed)) datetime_t;
 
-static datetime_t* datetime = (datetime_t*)0x2000; // TODO: Put this at a constant address in memory
+static datetime_t* datetime = (datetime_t*)DATETIME_LOC;
 
 bool cmosUpdateProgress() {
     outb(CMOS_ADDRESS, 0x8a); // Read status reg A, disable NMI
@@ -128,7 +128,12 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
             strcat(buf, itoa(datetime->second, 10));
 
             // The clock is a little offset down (about 0.4 of a character) It does look nice though!
-            printAt(buf, gfxMode->xRes - strlen(buf) - 1, 0);
+            uint8_t len = strlen(buf);
+            uint32_t x = gfxMode->xRes - len - 1;
+            char* str = &buf[0];
+            for (uint8_t i = 0; i != len; i++, x++) {
+                putcAt(str[i], x, 0);
+            }
         }
     }
 

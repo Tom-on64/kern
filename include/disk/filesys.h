@@ -3,7 +3,6 @@
 
 #include <disk/disk.h>
 #include <memory/addresses.h>
-#include <screen/text.h>
 #include <string.h>
 
 typedef struct {
@@ -77,45 +76,5 @@ uint8_t writeFile(char* filename, void* buffer) { // TODO: Add length so we don'
     diskWrite(file->startAddress, file->length, buffer); // Write the file
     return 0; // Success
 }
-
-void printFiletable(char* ft) {
-    while (*ft != '\0') {
-        char filename[15] = { 0 };
-        uint8_t offset = 0;
-        for (uint8_t i = 0; i < 14; i++) {
-            if (i == 9) {
-                filename[offset++] = '.';
-                continue;
-            }
-            if (*ft != '\0') { filename[offset++] = *ft; }
-            ft++;
-        }
-        ft++; // RESERVED
-
-        uint8_t sector = *ft++;
-        uint8_t size = *ft++;
-
-        if (sector < 10) putc('0');
-        if (sector == 0) putc('0');
-        else print(itoa(sector, 10));
-        print(": ");
-        print(filename);
-
-        for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-            putc(' ');
-        }
-
-        print(" | ");
-        if (size >> 1) {
-            print(itoa(size >> 1, 10));
-            if (size & 0x01) { print(".5"); }
-            print("kB\n");
-        } else {
-            print(itoa(size*512, 10));
-            print("B\n");
-        }
-    }
-}
-
 
 #endif

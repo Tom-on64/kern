@@ -1,6 +1,7 @@
+#include <stdio.h> // TODO: Add stdio.h to every header that needs it
 #include <interrupt/idt.h>
 #include <interrupt/exceptions.h>
-#include <interrupt/syscall.h>
+#include <interrupt/syscalls.h>
 #include <interrupt/pic.h>
 #include <interrupt/pit.h>
 #include <interrupt/rtc.h>
@@ -25,6 +26,7 @@
 #define PROMPT "#> "
 
 // Function declarations
+void printFiletable(char* ft);
 void printPhysicalMemmap();
 
 __attribute__ ((section("entry")))
@@ -49,15 +51,15 @@ void main() {
     setupKeyboard();
  
     // Screen setup
-    readFile("term16n.fnt", font);
+    loadFont("term16n.fnt");
     clear();
     print("kern.\n\n");
-    
+
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
         print(PROMPT);
-        char input[MAX_INPUT_LENGTH];
+        char input[256];
         read(input);
 
         if (input[0] == '\n') continue;
@@ -300,7 +302,7 @@ void main() {
                 print("Loading ");
                 print(file->filename);
                 print("...\n");
-                memcpy(entryPoint, font, file->length * 512);
+                memcpy(entryPoint, (char*)FONT_LOC, file->length * 512);
                 print("Font loaded\n");
             } else {
                 for (size_t i = 0; i < file->length * 512; i++) {
@@ -324,6 +326,45 @@ void main() {
 
     outw(0x604, 0x2000); //  QEMU - Quit emulator
     while (1); // Just hang
+}
+
+void printFiletable(char* ft) {
+    while (*ft != '\0') {
+        char filename[15] = { 0 };
+        uint8_t offset = 0;
+        for (uint8_t i = 0; i < 14; i++) {
+            if (i == 9) {
+                filename[offset++] = '.';
+                continue;
+            }
+            if (*ft != '\0') { filename[offset++] = *ft; }
+            ft++;
+        }
+        ft++; // RESERVED
+
+        uint8_t sector = *ft++;
+        uint8_t size = *ft++;
+
+        if (sector < 10) putc('0');
+        if (sector == 0) putc('0');
+        else print(itoa(sector, 10));
+        print(": ");
+        print(filename);
+
+        for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
+            putc(' ');
+        }
+
+        print(" | ");
+        if (size >> 1) {
+            print(itoa(size >> 1, 10));
+            if (size & 0x01) { print(".5"); }
+            print("kB\n");
+        } else {
+            print(itoa(size*512, 10));
+            print("B\n");
+        }
+    }
 }
 
 void printPhysicalMemmap() {

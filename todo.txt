@@ -15,7 +15,8 @@ Legend:
 - [ ] "Text" mode (not actually)
     - [x] Scrolling
     - [ ] Scroll-back
-    - [ ] Color codes (and just multicolor text in general)
+    - [x] Color codes (and just multicolor text in general)
+    - [x] Controll sequences!
     - [x] VESA BIOS Extensions
     - [x] Better resolution
     - [x] Graphics mode
