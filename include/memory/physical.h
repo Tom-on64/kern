@@ -1,12 +1,12 @@
 #ifndef PHYSICAL_MEM_MANAGER_H
 #define PHYSICAL_MEM_MANAGER_H
 
+#include <memory/addresses.h>
 #include <string.h>
 #include <stdint.h>
 
 #define BLOCK_SIZE 4096 // 4kB
 #define BLOCKS_PER_BYTE 8
-#define SMAP_ADDRESS 0x8500
 
 typedef struct smapEntry_s {
     uint64_t baseAddress;

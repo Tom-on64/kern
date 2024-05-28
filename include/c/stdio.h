@@ -18,7 +18,7 @@ void putc(char c) {
 }
 
 char getc() {
-    char* character = (char*)0x3000;
+    char* character = (char*)0x2100;
     *character = '\0';
     while (*character == '\0') { __asm__ volatile ("hlt"); }
     return *character;

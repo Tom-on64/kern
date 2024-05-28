@@ -14,7 +14,7 @@ typedef struct {
     uint32_t width;     // Width in characters 
     uint32_t height;    // Height in characters
     char cursorChar;    // Character to use as a cursor
-    bool showCursor;    // Should we display the cursor
+    bool hideCursor;    // Should we display the cursor
 } terminal_t;
 
 terminal_t* terminal = (terminal_t*)TERMINAL_INFO_LOC;

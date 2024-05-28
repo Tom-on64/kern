@@ -1,4 +1,3 @@
-#include <stdio.h> // TODO: Add stdio.h to every header that needs it
 #include <interrupt/idt.h>
 #include <interrupt/exceptions.h>
 #include <interrupt/syscalls.h>
@@ -19,6 +18,7 @@
 #include <sound/notes.h>
 #include <ports/io.h>
 
+#include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -368,8 +368,8 @@ void printFiletable(char* ft) {
 }
 
 void printPhysicalMemmap() {
-    uint32_t entryCount = *(uint32_t*)SMAP_ADDRESS;
-    smapEntry_t* smapEntry = (smapEntry_t*)(SMAP_ADDRESS+4);
+    uint32_t entryCount = *(uint32_t*)SMAP_ENTRY_COUNT;
+    smapEntry_t* smapEntry = (smapEntry_t*)SMAP_ENTRIES;
 
     for (uint32_t i = 0; i < entryCount; i++) {
         print("Region ");
