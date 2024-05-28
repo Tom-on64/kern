@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <color.h>
 
 #define PROMPT "#> "
 
@@ -133,7 +134,27 @@ void main() {
                 continue;
             }
         } else if (strcmp(input, "echo") == 0) {
-            print(args);
+            char* str = args;
+            char* printStr = args;
+
+            while (*args != '\0') {
+                if (*args == '\\') {
+                    args++;
+                    if (*args == 'n') *str++ = '\n';
+                    else if (*args == 'b') *str++ = '\b';
+                    else if (*args == 'e') *str++ = '\x1b';
+                    else if (*args == '\\') *str++ = '\\';
+                    else {
+                        *str++ = '\\';
+                        *str++ = *args;
+                    }
+                    args++;
+                } else {
+                    *str++ = *args++;
+                }
+            }
+            *str = '\0';
+            print(printStr);
         } else if (strcmp(input, "exit") == 0) {
             break;
         } else if (strcmp(input, "gfx") == 0) {

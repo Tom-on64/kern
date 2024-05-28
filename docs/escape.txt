@@ -11,25 +11,36 @@ Note: the escape character will be denoted by ESC here
 Syntax:
     All escape sequenced start with the escape character followed by an opening square bracket '['
     The sequence can take any number of arguments in a semicolon separated list
-    If a argument is skipped, it will be implicitly set to 0
+    If a argument is skipped, it will be implicitly set to 0 unless stated otherwise 
     The escape sequence must end with a uppercase or lowercase letter
 
 Available escape sequences:
     - Cursor Controls -
-    `ESC[#A` - Moves cursor # rows up
-    `ESC[#B` - Moves cursor # rows down
-    `ESC[#C` - Moves cursor # columns left
-    `ESC[#D` - Moves cursor # columns right
+    `ESC[#A` - Moves cursor # rows up (default: 1)
+    `ESC[#B` - Moves cursor # rows down (default: 1)
+    `ESC[#C` - Moves cursor # columns left (default: 1)
+    `ESC[#D` - Moves cursor # columns right (default: 1)
     `ESC[#E` - Moves cursor to #th row
     `ESC[#F` - Moves cursor to #th column
     `ESC[#G` - Show (# = 1) or hide (# = 0) cursor
-    `ESC[{row};{col}H`  - Moves cursor to specified position (if not arguments given, moves to [0,0])a
+    `ESC[{row};{col}H`  - Moves cursor to specified position (if not arguments given, moves to [0,0])
     - Erase functions -
-    `ESC[I`  - Reserved
+    `ESC[I`  - Reserved (Falls though to erase screen)
     `ESC[J`  - Erase screen
     `ESC[K`  - Erase line (not implemented)
     `ESC[L`  - Erase column (not implemented)
     - Text Style -
-    `ESC[#M` - Sets foreground color to #
-    `ESC[#N` - Sets backgorund color to #
+    `ESC[#M` - Sets foreground color to # (default 8)
+    `ESC[#N` - Sets backgorund color to # (default 8)
+
+Color codes:
+    0 - Black   
+    1 - Red     
+    2 - Green   
+    3 - Yellow  
+    4 - Blue    
+    5 - Magenta 
+    6 - Cyan    
+    7 - White   
+    8 - Default
 
