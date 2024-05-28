@@ -52,6 +52,8 @@ void main() {
  
     // Screen setup
     loadFont("term16n.fnt");
+    terminal->fg = FG_COLOR;
+    terminal->bg = BG_COLOR;
     clear();
     print("kern.\n\n");
 
@@ -264,9 +266,7 @@ void main() {
                 uint32_t physicalAddress = (uint32_t)allocPage(&page);
                 
                 if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
-                    fgColor = RED;
-                    print("\nNot enough memory to allocate!\n");
-                    fgColor = FG_COLOR;
+                    print("\n\x1b[1MNot enough memory to allocate!\n");
                     break;
                 }
             }

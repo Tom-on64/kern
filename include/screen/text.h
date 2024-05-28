@@ -8,9 +8,6 @@
 #include <stdint.h>
 #include <string.h>
 
-uint32_t bgColor = BG_COLOR;
-uint32_t fgColor = FG_COLOR;
-
 // TODO: Make this check if it's a valid font
 // TODO: Make it take a fileEntry_t?
 uint8_t loadFont(char* filename) {
@@ -21,7 +18,7 @@ uint8_t loadFont(char* filename) {
 }
 
 // TODO: Reimplement larger text
-void putcAt(char c, uint32_t x, uint32_t y) {
+void drawChar(char c, uint32_t x, uint32_t y, uint32_t fgColor, uint32_t bgColor) {
     // Font info
     char* font = (char*)FONT_LOC;
     uint8_t charWidth = *(uint8_t*)FONT_WIDTH;
@@ -65,7 +62,7 @@ void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() help
         memcpy32((char*)address, (char*)(address - bytesPerLine), bytesPerLine);
     }
     
-    uint32_t color = convertColor(bgColor);
+    uint32_t color = convertColor(terminal->bg);
     uint8_t* lastLine = (uint8_t*)(vidmem + (lines-1) * bytesPerLine);
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
     
@@ -80,7 +77,7 @@ void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() help
 }
 
 // TODO: Make this comply with the new terminal.h thing!
-void clear() {
+void clearScreen(uint32_t bgColor) {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
 

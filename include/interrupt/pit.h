@@ -18,9 +18,8 @@ void timerHandler(intFrame_t* iframe) {
     static uint32_t cursorTicks = 0;
     cursorTicks++;
     
-    if (!terminal->hideCursor) {
-        if (cursorTicks % 500 == 0) putcAt(127, terminal->x, terminal->y);
-        else if (cursorTicks % 250 == 0) putcAt(' ', terminal->x, terminal->y);
+    if (!terminal->hideCursor) { // TODO: Make a better cursor drawing thing
+        if (cursorTicks % 500 == 0) toggleCursor();
     }
 
     if (*sleepTimerTicks > 0) { --(*sleepTimerTicks); }

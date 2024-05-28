@@ -11,6 +11,10 @@ void print(const char* s) {
     write(STDOUT, s, strlen(s));
 }
 
+void clear() {
+    print("\x1b[J");
+}
+
 void putc(char c) {
     static char _c; // We need to pass in a static address. Idk why
     _c = c;

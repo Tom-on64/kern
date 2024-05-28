@@ -4,6 +4,7 @@
 #include <interrupt/pic.h>
 #include <interrupt/idt.h>
 #include <screen/text.h>
+#include <screen/gfxmode.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -132,7 +133,7 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
             uint32_t x = gfxMode->xRes - len - 1;
             char* str = &buf[0];
             for (uint8_t i = 0; i != len; i++, x++) {
-                putcAt(str[i], x, 0);
+                drawChar(str[i], x, 0, FG_COLOR, BG_COLOR);
             }
         }
     }
