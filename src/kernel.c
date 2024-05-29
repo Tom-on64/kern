@@ -76,63 +76,6 @@ void main() {
 
         if (strcmp(input, "clear") == 0) {
             clear();
-        } else if (strcmp(input, "disk") == 0) {
-            char buf[512] = { 0 };
-            
-            if (*args == '\0') {
-                print("disk: ");
-                print("No arguments given\n");
-                print("Usage: disk <r/w> <sector> [data]\n");
-                continue;
-            }
-
-            while (isSpace(*args)) { args++; } // Skip whitespace
-            char mode = *args++;
-            while (isSpace(*args)) { args++; }
-            
-            if (mode == 'r') {
-                if (*args == '\0') {
-                    print("disk: ");
-                    print("Sector not specified\n");
-                    print("Usage: disk <r/w> <sector> [data]\n");
-                    continue;
-                }
-
-                uint32_t sector = atoi(args);
-                print("Reading...\n");
-                diskRead(sector, 1, buf);
-                
-                print("Contents:\n");
-                for (size_t i = 0; i < 512; i++) {
-                    if (buf[i] != '\0') {
-                        putc(buf[i]);
-                    }
-                }
-
-                putc('\n');
-            } else if (mode == 'w') {
-                char* data;
-                if ((data = strchr(args, ' ')) == NULL) {
-                    print("disk: ");
-                    print("No data given\n");
-                    print("Usage: disk <r/w> <sector> [data]\n");
-                    continue;
-                }
-
-                *data++ = '\0';
-                uint32_t sector = atoi(args);
-
-                while (isSpace(*args)) { args++; } // Skip whitespace
-
-                strcpy(buf, data);
-                print("Writing...\n");
-                diskWrite(sector, 1, buf);
-            } else { 
-                print("disk: ");
-                print("Invalid access mode. Use r(ead) or w(rite)\n");
-                print("Usage: disk <r/w> <sector> [data]\n");
-                continue;
-            }
         } else if (strcmp(input, "echo") == 0) {
             char* str = args;
             char* printStr = args;
@@ -193,7 +136,6 @@ void main() {
         } else if (strcmp(input, "help") == 0) {
             print("Available Commands:\n");
             print(" clear      | Clears the screen\n");
-            print(" disk       | Reads/Writes data from/to the disk\n");
             print(" echo       | Prints a message to stdout\n");
             print(" exit       | Exits shell\n");
             print(" gfx        | Does a graphics test\n");

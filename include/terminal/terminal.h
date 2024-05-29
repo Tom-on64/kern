@@ -119,7 +119,6 @@ int32_t terminalWrite(const void* buf, uint32_t len) {
                     break;
                 default: break;
             }
-            //i++;
         } else {
             drawChar(str[i], terminal->x, terminal->y, terminal->fg, terminal->bg);
             terminal->x++;
