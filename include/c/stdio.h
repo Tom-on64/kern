@@ -27,7 +27,7 @@ void clear() {
 // TODO: Support negative numbers
 // TODO: Printing individual characters doesn't let escape sequences work :(
 int printf(const char* fmt, ...) {
-    char* argPtr = (char*)&fmt + sizeof(char*); // First arg after fmt
+    uint32_t* argPtr = (uint32_t*)&fmt + 1; // First arg after fmt
     uint8_t state = 0;
     
     for (uint32_t i = 0; fmt[i] != '\0'; i++) {
@@ -40,22 +40,22 @@ int printf(const char* fmt, ...) {
             switch (c) {
                 case 'd': // Decimal number
                     print(itoa(*(uint32_t*)argPtr, 10));
-                    argPtr += sizeof(unsigned int);
+                    argPtr++;
                     break;
                 case 'x': // Hex number
                     print(itoa(*(uint32_t*)argPtr, 16));
-                    argPtr += sizeof(unsigned int);
+                    argPtr++;;
                     break;
                 case 's': // String
                     print(*(char**)argPtr);
-                    argPtr += sizeof(char*);
+                    argPtr++;
                     break;
                 case 'c': // Char
                     putc(*(char*)argPtr);
-                    argPtr += sizeof(char);
+                    argPtr++;
                     break;
                 case '%': // Just print '%'
-                    putc('%');
+                    putc(c);
                     break;
                 default:
                     putc('%');

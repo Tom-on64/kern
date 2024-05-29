@@ -304,7 +304,6 @@ void printPhysicalMemmap() {
     smapEntry_t* smapEntry = (smapEntry_t*)SMAP_ENTRIES;
 
     for (uint32_t i = 0; i < entryCount; i++) {
-        // Need to cast to uint32_t because they are uint64_t
         printf("Region %d - base: 0x%x length: 0x%x type: %d ", i, (uint32_t)smapEntry->baseAddress, (uint32_t)smapEntry->length, smapEntry->type);
 
         switch (smapEntry->type) {
