@@ -7,13 +7,13 @@
 // Exception handlers
 __attribute__ ((interrupt))
 void excp_divideErr(intFrame_t* iframe) { // ISR 0
-    print("\x1b[1M[ Division Error ]\n\x1b[8M");
+    printf("\x1b[1M[ Division Error ]\n\x1b[8M");
     iframe->eip++;
 }
 
 __attribute__ ((interrupt))
 void excp_doubleFault(intFrame_t* iframe, uint32_t errCode) { // ISR 8
-    print("\x1b[1M[ Double Fault ]\n\x1b[8M"); // Error code should be 0 (TODO: Maybe check if it's != 0?)
+    printf("\x1b[1M[ Double Fault ]\n\x1b[8M"); // Error code should be 0 (TODO: Maybe check if it's != 0?)
     __asm__ volatile ("cli; hlt");
 }
 
@@ -24,11 +24,7 @@ void excp_pageFault(intFrame_t* iframe, uint32_t errCode) { // ISR 14
     // cr2 should contain invalid address
     __asm__ volatile("movl %%cr2, %0" : "=r"(badAddress));
 
-    print("\x1b[1M[ Page Fault : 0x");
-    print(itoa(errCode, 16));
-    print(" ] - Tried to access 0x");
-    print(itoa(badAddress, 16));
-    print(".\n\x1b[8M");
+    printf("\x1b[1M[ Page Fault : 0x%x ] - Tried to access 0x%x.\n\x1b[8M", errCode, badAddress);
     __asm__ volatile ("cli; hlt");
 }
 

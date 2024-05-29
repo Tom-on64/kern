@@ -56,7 +56,7 @@ void main() {
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
     clear();
-    print("kern.\n\n");
+    printf("\x1b[2Mkern.\n\n\x1b[8M");
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -97,7 +97,7 @@ void main() {
                 }
             }
             *str = '\0';
-            print(printStr);
+            printf("%s", printStr);
         } else if (strcmp(input, "exit") == 0) {
             break;
         } else if (strcmp(input, "gfx") == 0) {
@@ -160,7 +160,7 @@ void main() {
 
             sleep(ms);
         } else if (strcmp(input, "soundtest") == 0) {
-            print("Playing...\n");
+            printf("Playing...\n");
             enableSpeaker();
 
             /*
@@ -185,38 +185,12 @@ void main() {
 
             disableSpeaker();
         } else if (strcmp(input, "test") == 0) {
-            print("Running Tests...\n");
-            uint8_t buf[512];
-            
-            print("Read Test .......... ");
-            diskRead(0, 1, (char*)buf);
-            if (buf[510] == 0x55 && buf[511] == 0xaa) {
-                print("[ DONE ]\n");
-            } else {
-                print("[ FAIL ]\n");
-            }
-            print("Write Test ......... ");
-            buf[510] = 0x55; buf[511] = 0xaa;
-            diskWrite(0, 1, (char*)buf);
-            diskRead(0, 1, (char*)buf); // Idk how else to test if the right data was written (also could break the bootloader if it fails)
-            if (buf[510] == 0x55 && buf[511] == 0xaa) {
-                print("[ DONE ]\n");
-            } else {
-                print("[ FAIL ]\n");
-            }
-            print("Malloc Test ........ ");
-            void* buffer = malloc(100);
-            free(buffer);
-            print("[ DONE ]\n");
-            
-            print("\nTests Finished!\n");
+            printf("\x1b[1MError: 'test' is not available.\x1b[8M");
         } else {
             fileEntry_t* file = findFile(input);
             
             if (file == NULL) {
-                print("Command not found: ");
-                print(input);
-                putc('\n');
+                printf("Command not found: %s\n", input);
                 continue;
             }
 
@@ -229,7 +203,7 @@ void main() {
                 uint32_t physicalAddress = (uint32_t)allocPage(&page);
                 
                 if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
-                    print("\n\x1b[1MNot enough memory to allocate!\n");
+                    printf("\n\x1b[1MNot enough memory to allocate!\n");
                     break;
                 }
             }
@@ -262,11 +236,9 @@ void main() {
             } else if (strcmp(file->filetype, "tab") == 0) {
                 printFiletable(entryPoint);
             } else if (strcmp(file->filetype, "fnt") == 0) {
-                print("Loading ");
-                print(file->filename);
-                print("...\n");
+                printf("Loading %s...\n", file->filename);
                 memcpy(entryPoint, (char*)FONT_LOC, file->length * 512);
-                print("Font loaded\n");
+                printf("Font loaded\n");
             } else {
                 for (size_t i = 0; i < file->length * 512; i++) {
                     if (entryPoint[i] != '\0') {
@@ -308,24 +280,21 @@ void printFiletable(char* ft) {
         uint8_t sector = *ft++;
         uint8_t size = *ft++;
 
+        // TODO: Use printf() here for padding
         if (sector < 10) putc('0');
         if (sector == 0) putc('0');
-        else print(itoa(sector, 10));
-        print(": ");
-        print(filename);
+        else printf("%d", sector);
+        printf(": %s", filename);
 
         for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-            putc(' ');
+            printf(" ");
         }
 
-        print(" | ");
+        printf(" | ");
         if (size >> 1) {
-            print(itoa(size >> 1, 10));
-            if (size & 0x01) { print(".5"); }
-            print("kB\n");
+            printf("%d%skB\n", size >> 1, (size & 0x01) ? ".5" : "");
         } else {
-            print(itoa(size*512, 10));
-            print("B\n");
+            printf("%dB\n", size * 512);
         }
     }
 }
@@ -335,39 +304,26 @@ void printPhysicalMemmap() {
     smapEntry_t* smapEntry = (smapEntry_t*)SMAP_ENTRIES;
 
     for (uint32_t i = 0; i < entryCount; i++) {
-        print("Region ");
-        print(itoa(i, 10));
-        print(" - base: 0x");
-        print(itoa(smapEntry->baseAddress, 16));
-        print(" length: 0x");
-        print(itoa(smapEntry->length, 16));
-        print(" type: ");
-        print(itoa(smapEntry->type, 10));
+        // Need to cast to uint32_t because they are uint64_t
+        printf("Region %d - base: 0x%x length: 0x%x type: %d ", i, (uint32_t)smapEntry->baseAddress, (uint32_t)smapEntry->length, smapEntry->type);
 
         switch (smapEntry->type) {
-            case 1: print(" (Available)"); break;
-            case 2: print(" (Reserved)"); break;
-            case 3: print(" (ACPI Reclaim)"); break;
-            case 4: print(" (ACPI NVS)"); break;
-            default: print(" (Reserved)"); break;
+            case 1: printf("(Available)\n"); break;
+            case 2: printf("(Reserved)\n"); break;
+            case 3: printf("(ACPI Reclaim)\n"); break;
+            case 4: printf("(ACPI NVS)\n"); break;
+            default: printf("(Reserved)\n"); break;
         }
 
-        putc('\n');
         smapEntry++;
     }
 
     smapEntry--; // We incremented it after the last entry
 
-    print("\nTotal memory: 0x");
-    print(itoa(smapEntry->baseAddress + smapEntry->length - 1, 16));
-    print(" Bytes\n");
+    printf("\nTotal memory: 0x%x Bytes\n", smapEntry->baseAddress + smapEntry->length - 1);
 
-    print("Total 4kB Blocks: ");
-    print(itoa(maxBlocks, 10));
-    print("\nUsed or reserved blocks: ");
-    print(itoa(usedBlocks, 10));
-    print("\nFree blocks: ");
-    print(itoa(maxBlocks - usedBlocks, 10));
-    print("\n\n");
+    printf("Total 4kB Blocks: %d\n", maxBlocks);
+    printf("Used or reserved blocks: %d\n", usedBlocks);
+    printf("Free blocks: %d\n\n", maxBlocks - usedBlocks);
 }
 

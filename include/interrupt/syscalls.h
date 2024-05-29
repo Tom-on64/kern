@@ -36,7 +36,7 @@ void sys_write() {
         int32_t result = terminalWrite(buf, len); // Call a terminal print function
         __asm__ volatile ("movl %0, %%eax" : : "r"(result));
     } else { // Not implemented
-        __asm__ volatile ("movl $1, %eax");
+        __asm__ volatile ("movl $-1, %eax");
     }
 }
 

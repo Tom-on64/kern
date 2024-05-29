@@ -9,7 +9,7 @@ Legend:
 
 - [x] Multistage Bootloader
 - [ ] Bootloader reads filetable to find files
-- [ ] The almighty 'printf()'
+- [x] The almighty 'printf()'
 - [!] Makefile refactorin'
 - [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
@@ -79,6 +79,7 @@ Legend:
     - [!] Utility for filesystem building (not just an assembly file)
     - [x] Better header for file i/o (disk/filesys.h)
     - [x] Filetable
+    - [ ] A better filesystem using INodes etc.
     - [ ] Files
         - [x] Larger than one sector (512B)
         - [ ] Any file size (Not multiples of 512B)
