@@ -50,6 +50,26 @@ void main() {
     setupTimer();
     setupRtc();
     setupKeyboard();
+
+    // Setup kernel malloc variables
+    mallocNode_t* kernelMallocListHead = 0;
+    uint32_t kernelMallocVirtualAddr = KERNEL_MALLOC_AREA;
+    uint32_t kernelMallocPhysicalAddr = (uint32_t)allocBlocks(1); // TODO: Kernel may use more than 4kB?
+    uint32_t kernelMallocPages = 1;
+
+    mapPage((void*)kernelMallocPhysicalAddr, (void*)kernelMallocVirtualAddr);
+    ptEntry_t* kernelMallocPage = getPage(kernelMallocVirtualAddr);
+    SET_ATTR(kernelMallocPage, PTE_READ_WRITE);
+    kernelMallocListHead = (mallocNode_t*)kernelMallocVirtualAddr;
+
+    kernelMallocListHead->size = PAGE_SIZE - sizeof(mallocNode_t);
+    kernelMallocListHead->free = true;
+    kernelMallocListHead->next = NULL;
+
+    mallocListHead = kernelMallocListHead;
+    mallocVirtualAddr = kernelMallocVirtualAddr;
+    mallocPhysicalAddr = kernelMallocPhysicalAddr;
+    mallocPages = kernelMallocPages;
  
     // Screen setup
     loadFont("term16n.fnt");
@@ -61,7 +81,7 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        print(PROMPT);
+        printf(PROMPT);
         char input[256];
         read(input);
 
@@ -134,18 +154,18 @@ void main() {
             getc(); // Wait until we get a 'q'
             clear();
         } else if (strcmp(input, "help") == 0) {
-            print("Available Commands:\n");
-            print(" clear      | Clears the screen\n");
-            print(" echo       | Prints a message to stdout\n");
-            print(" exit       | Exits shell\n");
-            print(" gfx        | Does a graphics test\n");
-            print(" help       | Prints this message\n");
-            print(" ls         | Lists all available files\n");
-            print(" memmap     | Prints the memory map and info\n");
-            print(" reboot     | Reboots the system\n");
-            print(" sleep      | Sleeps for input number of seconds\n");
-            print(" soundtest  | Plays a tune :)\n");
-            print(" test       | Performs tests\n");
+            printf("Available Commands:\n");
+            printf(" clear      | Clears the screen\n");
+            printf(" echo       | Prints a message to stdout\n");
+            printf(" exit       | Exits shell\n");
+            printf(" gfx        | Does a graphics test\n");
+            printf(" help       | Prints this message\n");
+            printf(" ls         | Lists all available files\n");
+            printf(" memmap     | Prints the memory map and info\n");
+            printf(" reboot     | Reboots the system\n");
+            printf(" sleep      | Sleeps for input number of seconds\n");
+            printf(" soundtest  | Plays a tune :)\n");
+            printf(" test       | Performs tests\n");
         } else if (strcmp(input, "ls") == 0) {
             printFiletable(filetable);
         } else if (strcmp(input, "memmap") == 0) {
@@ -228,11 +248,11 @@ void main() {
                         flushTlbEntry(virtualAddr);
                     }
                 }
-
-                mallocListHead = NULL;
-                mallocVirtualAddr = 0;
-                mallocPhysicalAddr = 0;
-                mallocPages = 0;
+                
+                mallocListHead = kernelMallocListHead;
+                mallocVirtualAddr = kernelMallocVirtualAddr;
+                mallocPhysicalAddr = kernelMallocPhysicalAddr;
+                mallocPages = kernelMallocPages;
             } else if (strcmp(file->filetype, "tab") == 0) {
                 printFiletable(entryPoint);
             } else if (strcmp(file->filetype, "fnt") == 0) {

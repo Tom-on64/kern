@@ -3,68 +3,91 @@
 
 #include <syscall.h>
 #include <string.h>
+#include <stdlib.h>
 
 // TODO: Make a proper file descriptor table
-#define STDOUT 1
+#define stdin  0
+#define stdout 1
+#define stderr 2
 
 /* --- Output --- */
 void putc(char c) {
-    // write(STDOUT, &c, 1); TODO: This doesn't work and we need to use a static variable
+    // write(stdout, &c, 1); TODO: This doesn't work and we need to use a static variable
     static char _c;
     _c = c;
-    write(STDOUT, &_c, 1);
+    write(stdout, &_c, 1);
 }
 
 void print(const char* s) {
-    write(STDOUT, s, strlen(s));
+    write(stdout, s, strlen(s));
 }
 
 void clear() {
     print("\x1b[J");
 }
 
-// TODO: Dynamically allocate memory and print once instead of calling putc for every character :/
 // TODO: Support negative numbers
-// TODO: Printing individual characters doesn't let escape sequences work :(
 int printf(const char* fmt, ...) {
     uint32_t* argPtr = (uint32_t*)&fmt + 1; // First arg after fmt
-    uint8_t state = 0;
     
-    for (uint32_t i = 0; fmt[i] != '\0'; i++) {
-        char c = fmt[i];
+    // Printing buffer
+    static char* buffer;
+    static uint32_t len;
+    uint32_t max = 256;
 
+    buffer = malloc(max);
+    len = 0;
+    
+    uint8_t state = 0;
+    for (uint32_t i = 0; fmt[i] != '\0'; i++) {
+        if (len > max) {
+            max *= 2;
+            // Reallocate larger buffer TODO: Use realloc();
+            char* temp = malloc(max);
+            strcpy(temp, buffer);
+            free(buffer);
+            buffer = temp;
+        }
+        buffer[len] = '\0';
+
+        char c = fmt[i];
         if (state == 0) {
              if (c == '%') state = '%';
-             else putc(c);
+             else buffer[len++] = c;
         } else if (state == '%') {
             switch (c) {
                 case 'd': // Decimal number
-                    print(itoa(*(uint32_t*)argPtr, 10));
-                    argPtr++;
+                    strcat(buffer, itoa(*(uint32_t*)argPtr++, 10));
+                    len += strlen(&buffer[len]); // Add the remaining length
                     break;
                 case 'x': // Hex number
-                    print(itoa(*(uint32_t*)argPtr, 16));
-                    argPtr++;;
+                    strcat(buffer, itoa(*(uint32_t*)argPtr++, 16));
+                    len += strlen(&buffer[len]);
                     break;
                 case 's': // String
-                    print(*(char**)argPtr);
-                    argPtr++;
+                    char* s = *(char**)argPtr++;
+                    
+                    while (*s != '\0') {
+                        buffer[len++] = *s++;
+                    }
                     break;
                 case 'c': // Char
-                    putc(*(char*)argPtr);
+                    buffer[len++] = *(char*)argPtr;
                     argPtr++;
                     break;
+                default: // This looks insane
+                    buffer[len++] = '%';
                 case '%': // Just print '%'
-                    putc(c);
-                    break;
-                default:
-                    putc('%');
-                    putc(c);
+                    buffer[len++] = c;
                     break;
             }
             state = 0;
         }
     }
+
+    buffer[len] = '\0';
+    write(stdout, buffer, len);
+    free(buffer);
 
     return 0;
 }

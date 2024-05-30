@@ -42,6 +42,7 @@
 
 // Other addresses
 #define KERNEL_LOC              0x100000
+#define KERNEL_MALLOC_AREA      0x300000
 #define MEMMAP_AREA             0x30000
 
 #endif
