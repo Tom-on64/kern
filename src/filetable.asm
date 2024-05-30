@@ -18,7 +18,7 @@ filetable:
     db "term16n",0,0,0,    "fnt",0,56,4
     db "testfont",0,0,     "fnt",0,60,4
     db "test",0,0,0,0,0,0, "txt",0,64,1
-    db "calc",0,0,0,0,0,0, "bin",0,65,2
+    db "calc",0,0,0,0,0,0, "bin",0,65,6
 
 times 512-($-$$) db 0
 
