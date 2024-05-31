@@ -76,51 +76,64 @@ void main() {
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
     clear();
-    printf("\x1b[2Mkern.\n\n\x1b[8M");
+    printf("kern.\n\n");
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
         printf(PROMPT);
         char input[256];
+        char* inputPtr = input;
+
         read(input);
 
-        if (input[0] == '\n') continue;
+        if (*input == '\0') continue;
 
-        char* args;
-        if ((args = strchr(input, ' ')) == NULL) {
-            args = strchr(input, '\n');
+        int argc = 0;
+        char* argv[10] = { NULL };
+
+        while (*inputPtr == ' ') inputPtr++;
+        argv[argc++] = inputPtr;
+
+        while (*inputPtr != '\0') {
+            if (*inputPtr == ' ') {
+                *inputPtr++ = '\0';
+                while (*inputPtr == ' ') inputPtr++; // Skip extra spaces
+                argv[argc++] = inputPtr;
+            } else {
+                inputPtr++;
+            }
         }
 
-        *args++ = '\0'; // Separate command from args
-
-        if (strcmp(input, "clear") == 0) {
+        if (strcmp(argv[0], "clear") == 0) {
             clear();
-        } else if (strcmp(input, "echo") == 0) {
-            char* str = args;
-            char* printStr = args;
+        } else if (strcmp(argv[0], "echo") == 0) {
+            if (argc < 2) continue;
 
-            while (*args != '\0') {
-                if (*args == '\\') {
-                    args++;
-                    if (*args == 'n') *str++ = '\n';
-                    else if (*args == 'b') *str++ = '\b';
-                    else if (*args == 'e') *str++ = '\x1b';
-                    else if (*args == '\\') *str++ = '\\';
+            char* str = argv[1];
+            char* printStr = argv[1];
+
+            while (*argv[1] != '\0') {
+                if (*argv[1] == '\\') {
+                    argv[1]++;
+                    if (*argv[1] == 'n') *str++ = '\n';
+                    else if (*argv[1] == 'b') *str++ = '\b';
+                    else if (*argv[1] == 'e') *str++ = '\x1b';
+                    else if (*argv[1] == '\\') *str++ = '\\';
                     else {
                         *str++ = '\\';
-                        *str++ = *args;
+                        *str++ = *argv[1];
                     }
-                    args++;
+                    argv[1]++;
                 } else {
-                    *str++ = *args++;
+                    *str++ = *argv[1]++;
                 }
             }
             *str = '\0';
-            printf("%s", printStr);
-        } else if (strcmp(input, "exit") == 0) {
+            printf("%s\n", printStr);
+        } else if (strcmp(argv[0], "exit") == 0) {
             break;
-        } else if (strcmp(input, "gfx") == 0) {
+        } else if (strcmp(argv[0], "gfx") == 0) {
             clear();
 
             // Draw some stuff :)
@@ -153,7 +166,7 @@ void main() {
 
             getc(); // Wait until we get a 'q'
             clear();
-        } else if (strcmp(input, "help") == 0) {
+        } else if (strcmp(argv[0], "help") == 0) {
             printf("Available Commands:\n");
             printf(" clear      | Clears the screen\n");
             printf(" echo       | Prints a message to stdout\n");
@@ -166,20 +179,20 @@ void main() {
             printf(" sleep      | Sleeps for input number of seconds\n");
             printf(" soundtest  | Plays a tune :)\n");
             printf(" test       | Performs tests\n");
-        } else if (strcmp(input, "ls") == 0) {
+        } else if (strcmp(argv[0], "ls") == 0) {
             printFiletable(filetable);
-        } else if (strcmp(input, "memmap") == 0) {
+        } else if (strcmp(argv[0], "memmap") == 0) {
             printPhysicalMemmap();
-        } else if (strcmp(input, "reboot") == 0) {
+        } else if (strcmp(argv[0], "reboot") == 0) {
             outb(0x64, 0xFE);
-        } else if (strcmp(input, "sleep") == 0) {
-            if (*args == '\0') continue;
+        } else if (strcmp(argv[0], "sleep") == 0) {
+            if (*argv[1] == '\0') continue;
 
-            uint32_t ms = atoi(args) * 1000; // Convert seconds to miliseconds
+            uint32_t ms = atoi(argv[1]) * 1000; // Convert seconds to miliseconds
             if (ms == 0) continue;
 
             sleep(ms);
-        } else if (strcmp(input, "soundtest") == 0) {
+        } else if (strcmp(argv[0], "soundtest") == 0) {
             printf("Playing...\n");
             enableSpeaker();
 
@@ -204,13 +217,13 @@ void main() {
             rest(120);
 
             disableSpeaker();
-        } else if (strcmp(input, "test") == 0) {
+        } else if (strcmp(argv[0], "test") == 0) {
             printf("\x1b[1MError: 'test' is not available.\x1b[8M");
         } else {
-            fileEntry_t* file = findFile(input);
+            fileEntry_t* file = findFile(argv[0]);
             
             if (file == NULL) {
-                printf("Command not found: %s\n", input);
+                printf("Command not found: %s\n", argv[0]);
                 continue;
             }
 
@@ -228,7 +241,7 @@ void main() {
                 }
             }
 
-            readFile(input, entryPoint);
+            readFile(argv[0], entryPoint);
 
             if (strcmp(file->filetype, "bin") == 0) {
                 // Reset malloc
@@ -237,7 +250,9 @@ void main() {
                 mallocPhysicalAddr = 0;
                 mallocPages = 0;
 
-                ((void(*)(void))entryPoint)(); // Call program
+                // Call program
+                // TODO: Use return value
+                ((int(*)(int argc, char** argv))entryPoint)(argc, argv);
 
                 for (uint32_t i = 0, virtualAddr = mallocVirtualAddr; i < mallocPages; i++, virtualAddr += PAGE_SIZE) {
                     ptEntry_t* page = getPage(virtualAddr);

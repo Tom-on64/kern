@@ -117,8 +117,7 @@ void read(char* buffer) {
         }
     }
 
-    buffer[len++] = c; // Add newline
-    putc(c);
+    putc(c); // Print the newline
     buffer[len] = '\0'; // Null terminate
 }
 
