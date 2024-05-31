@@ -19,6 +19,7 @@ filetable:
     db "testfont",0,0,     "fnt",0,60,4
     db "test",0,0,0,0,0,0, "txt",0,64,1
     db "calc",0,0,0,0,0,0, "bin",0,65,6
+    db "editor",0,0,0,0,   "bin",0,71,10
 
 times 512-($-$$) db 0
 

@@ -8,7 +8,7 @@ CFLAGS = -std=c17 -ffreestanding -fno-builtin -fno-stack-protector -fno-pie \
 
 SRC = ./src
 BUILD = ./build
-C_FILES = calc
+C_FILES = calc editor
 FONTS = testfont term16n
 
 .PHONY: os clean run
@@ -30,6 +30,7 @@ filesystem: bootloader kernel $(C_FILES) $(FONTS)
 	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=60 conv=notrunc status=none
 	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=64 conv=notrunc status=none
 	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=65 conv=notrunc status=none
+	@dd if=$(BUILD)/editor.bin    of=kern.iso bs=512 seek=71 conv=notrunc status=none
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
