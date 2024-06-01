@@ -9,14 +9,13 @@ int parseNumber(char** ptr);
 // TODO: Parsing doesn't account for addition/subtraction inside brackets, fix that
 
 __attribute__ ((section("entry")))
-void main() {
+int main(int argc, char** argv) {
     printf("Welcome to calc.\n");   
     char input[256];
 
     while (1) {
         printf("> ");
         read(input);
-        *strchr(input, '\n') = '\0';
 
         // Remove whitespace
         char* old = input;
@@ -39,7 +38,7 @@ void main() {
         }
     }
 
-    return;
+    return 0;
 }
 
 int evalExpr(char* expr, int* res) {

@@ -23,6 +23,7 @@
 #include <string.h>
 #include <time.h>
 #include <color.h>
+#include <fs/fs.h>
 
 #define PROMPT "#> "
 

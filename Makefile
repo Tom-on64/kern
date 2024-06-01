@@ -26,8 +26,8 @@ filesystem: bootloader kernel $(C_FILES) $(FONTS)
 	@dd if=$(BUILD)/boot.bin      of=kern.iso bs=512 seek=0  conv=notrunc status=none
 	@dd if=$(BUILD)/filetable.bin of=kern.iso bs=512 seek=15 conv=notrunc status=none
 	@dd if=$(BUILD)/kernel.bin    of=kern.iso bs=512 seek=16 conv=notrunc status=none
-	@dd if=$(BUILD)/term16n.bin   of=kern.iso bs=512 seek=56 conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.bin  of=kern.iso bs=512 seek=60 conv=notrunc status=none
+	@dd if=$(BUILD)/term16n.fnt   of=kern.iso bs=512 seek=56 conv=notrunc status=none
+	@dd if=$(BUILD)/testfont.fnt  of=kern.iso bs=512 seek=60 conv=notrunc status=none
 	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=64 conv=notrunc status=none
 	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=65 conv=notrunc status=none
 	@dd if=$(BUILD)/editor.bin    of=kern.iso bs=512 seek=71 conv=notrunc status=none
@@ -63,7 +63,7 @@ $(C_FILES):
 
 $(FONTS):
 	@echo "Assembling $(SRC)/fonts/$@.asm..."
-	@$(AS) -fbin -o $(BUILD)/$@.bin $(SRC)/fonts/$@.asm
+	@$(AS) -fbin -o $(BUILD)/$@.fnt $(SRC)/fonts/$@.asm
 
 # Run QEMU
 run:
