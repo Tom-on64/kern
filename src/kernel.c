@@ -25,10 +25,10 @@
 #include <color.h>
 #include <fs/fs.h>
 
-#define PROMPT "#> "
+#define PROMPT "/ #> "
 
 // Function declarations
-void printFiletable(char* ft);
+void listFiles();
 void printPhysicalMemmap();
 
 __attribute__ ((section("entry")))
@@ -71,13 +71,11 @@ void main() {
     mallocVirtualAddr = kernelMallocVirtualAddr;
     mallocPhysicalAddr = kernelMallocPhysicalAddr;
     mallocPages = kernelMallocPages;
- 
-    // Screen setup
-    loadFont("term16n.fnt");
+
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
     clear();
-    printf("kern.\n\n");
+    print("kern.\n\n");
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -174,14 +172,14 @@ void main() {
             printf(" exit       | Exits shell\n");
             printf(" gfx        | Does a graphics test\n");
             printf(" help       | Prints this message\n");
-            printf(" ls         | Lists all available files\n");
+            printf(" ls         | Lists files in current directory\n");
             printf(" memmap     | Prints the memory map and info\n");
             printf(" reboot     | Reboots the system\n");
             printf(" sleep      | Sleeps for input number of seconds\n");
             printf(" soundtest  | Plays a tune :)\n");
             printf(" test       | Performs tests\n");
         } else if (strcmp(argv[0], "ls") == 0) {
-            printFiletable(filetable);
+            listFiles();
         } else if (strcmp(argv[0], "memmap") == 0) {
             printPhysicalMemmap();
         } else if (strcmp(argv[0], "reboot") == 0) {
@@ -269,8 +267,6 @@ void main() {
                 mallocVirtualAddr = kernelMallocVirtualAddr;
                 mallocPhysicalAddr = kernelMallocPhysicalAddr;
                 mallocPages = kernelMallocPages;
-            } else if (strcmp(file->filetype, "tab") == 0) {
-                printFiletable(entryPoint);
             } else if (strcmp(file->filetype, "fnt") == 0) {
                 printf("Loading %s...\n", file->filename);
                 memcpy(entryPoint, (char*)FONT_LOC, file->length * 512);
@@ -299,40 +295,17 @@ void main() {
     while (1); // Just hang
 }
 
-void printFiletable(char* ft) {
-    while (*ft != '\0') {
-        char filename[15] = { 0 };
-        uint8_t offset = 0;
-        for (uint8_t i = 0; i < 14; i++) {
-            if (i == 9) {
-                filename[offset++] = '.';
-                continue;
-            }
-            if (*ft != '\0') { filename[offset++] = *ft; }
-            ft++;
-        }
-        ft++; // RESERVED
-
-        uint8_t sector = *ft++;
-        uint8_t size = *ft++;
-
-        // TODO: Use printf() here for padding
-        if (sector < 10) putc('0');
-        if (sector == 0) putc('0');
-        else printf("%d", sector);
-        printf(": %s", filename);
-
-        for (uint8_t i = 14 - strlen(filename); i > 0; i--) {
-            printf(" ");
-        }
-
-        printf(" | ");
-        if (size >> 1) {
-            printf("%d%skB\n", size >> 1, (size & 0x01) ? ".5" : "");
-        } else {
-            printf("%dB\n", size * 512);
-        }
-    }
+void listFiles() {
+    // TODO: Make this real
+    printf("Total 8\n");
+    printf(".               [dir]\n");
+    printf("..              [dir]\n");
+    printf("stage3.bin      2868B\n");
+    printf("kernel.bin      13536B\n");
+    printf("testfont.fnt    2048B\n");
+    printf("term16n.fnt     2048B\n");
+    printf("calc.bin        1724B\n");
+    printf("editor.bin      1280B\n");
 }
 
 void printPhysicalMemmap() {

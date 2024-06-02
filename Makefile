@@ -14,23 +14,10 @@ FONTS = testfont term16n
 .PHONY: os clean run
 
 # Main compilation target
-os: $(BUILD) filesystem
+os: $(BUILD) bootloader kernel $(C_FILES) $(FONTS)
+	@cc ./makedisk.c -o ./makedisk
+	@./makedisk # TODO: List of files
 	@echo "\nDone!\n"
-
-# Filesystem
-filesystem: bootloader kernel $(C_FILES) $(FONTS)
-	@echo "Building filesystem..."
-	@$(AS) -fbin -o $(BUILD)/filetable.bin $(SRC)/filetable.asm
-	@dd if=/dev/zero of=kern.iso bs=512 count=2880 status=none
-# TODO: Make this not so manual
-	@dd if=$(BUILD)/boot.bin      of=kern.iso bs=512 seek=0  conv=notrunc status=none
-	@dd if=$(BUILD)/filetable.bin of=kern.iso bs=512 seek=15 conv=notrunc status=none
-	@dd if=$(BUILD)/kernel.bin    of=kern.iso bs=512 seek=16 conv=notrunc status=none
-	@dd if=$(BUILD)/term16n.fnt   of=kern.iso bs=512 seek=56 conv=notrunc status=none
-	@dd if=$(BUILD)/testfont.fnt  of=kern.iso bs=512 seek=60 conv=notrunc status=none
-	@dd if=$(SRC)/fs/test.txt     of=kern.iso bs=512 seek=64 conv=notrunc status=none
-	@dd if=$(BUILD)/calc.bin      of=kern.iso bs=512 seek=65 conv=notrunc status=none
-	@dd if=$(BUILD)/editor.bin    of=kern.iso bs=512 seek=71 conv=notrunc status=none
 
 $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
@@ -55,12 +42,14 @@ kernel: $(SRC)/kernel.c
 	@$(LD) -T$(SRC)/kernel.ld -z notext --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/kernel.o
 	@rm $(BUILD)/kernel.o
 
+# This target compiles *.c (except kernel.c)
 $(C_FILES):
 	@echo "Compiling $(SRC)/$@.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c 
 	@$(LD) -T$(SRC)/$@.ld -z notext --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
 
+# This target builds all fonts inside src/fonts
 $(FONTS):
 	@echo "Assembling $(SRC)/fonts/$@.asm..."
 	@$(AS) -fbin -o $(BUILD)/$@.fnt $(SRC)/fonts/$@.asm

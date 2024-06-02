@@ -2,34 +2,40 @@
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <disk/disk.h>
-#include <disk/filesys.h>
+//#include <disk/filesys.h>
 #include <screen/gfxmode.h>
+
+#include <fs/fs.h>
+
+uint8_t loadFile(char* filename, void* dest);
 
 __attribute__ ((section("entry")))
 void main() {
-    diskRead(15, 1, filetable); // Load filetable into memory; TODO: Make a filetableUpdate() function that just keeps the stored and memory verisons in sync
-    
     // Physical memory manager setup
     uint32_t smapEntryCount = *(uint32_t*)SMAP_ENTRY_COUNT;
-    smapEntry_t* smapEntries = (smapEntry_t*)SMAP_ENTRIES; // After a unit32_t
-    uint32_t totalMemory = smapEntries[smapEntryCount - 1].baseAddress + smapEntries[smapEntryCount - 1].length - 1;
+    smapEntry_t* smapEntries = (smapEntry_t*)SMAP_ENTRIES;
+    smapEntries += smapEntryCount - 1;
+    uint32_t totalMemory = smapEntries->baseAddress + smapEntries->length - 1;
 
     setupPhysicalMemoryManager(MEMMAP_AREA, totalMemory);
 
+    smapEntries = (smapEntry_t*)SMAP_ENTRIES;
     for (uint32_t i = 0; i < smapEntryCount; i++) {
         if (smapEntries[i].type == 1) {
             initMemoryRegion(smapEntries[i].baseAddress, smapEntries[i].length);
         }
     }
 
-    deinitMemoryRegion(0x1000, 0x9000); // Reserve kernel memory (under 0xa000)
+    deinitMemoryRegion(0x1000, 0x11000); // Reserve kernel memory (under 0x12000)
     deinitMemoryRegion(MEMMAP_AREA, maxBlocks / BLOCKS_PER_BYTE);
 
-    // Load kernel into memory
-    if (readFile("kernel.bin", (void*)KERNEL_LOC) != 0) { // Check if kernel.bin was loaded
-        // TODO: Add error messages
-        while (1);
-    }
+    // Load root dir, find kernel INode and parse it
+    superBlock_t* superblock = (superBlock_t*)SUPERBLOCK_LOC;
+    superblock->rootInodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
+    diskRead(superblock->firstDataBlock * 8, 8, (void*)SCRATCH_BLOCK_LOC);
+
+    if (loadFile("kernel.bin", (void*)KERNEL_LOC) != 0) __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
+    if (loadFile("term16n.fnt", (void*)FONT_LOC) != 0) __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
 
     // Virtual memory manager setup
     if (setupVirtualMemoryManager() != 0) {
@@ -58,5 +64,35 @@ void main() {
 
     // Call/jump to kernel
     ((void(*)(void))0xC0000000)();
+}
+
+uint8_t loadFile(char* filename, void* dest) {
+    dirEntry_t* dirEntry = (dirEntry_t*)SCRATCH_BLOCK_LOC;
+    while (dirEntry->name[0] != '\0') {
+        if (strcmp(dirEntry->name, filename) == 0) break;
+        dirEntry++;
+    }
+
+    if (dirEntry->name[0] == '\0') return 1;
+
+    inode_t* inode = (inode_t*)BOOT_FIRST_INODE_LOC;
+    while (inode->id != dirEntry->id) {
+        inode++;
+    }
+
+    uint32_t totalBlocks = bytesToBlocks(inode->sizeBytes);
+    uint32_t addressOffset = 0;
+
+    for (uint8_t i = 0; i < 4 && totalBlocks > 0; i++) {
+        diskRead(inode->extent[i].firstBlock * 8, inode->extent[i].length * 8, dest + addressOffset);
+        addressOffset += inode->extent[i].length * FS_BLOCK_SIZE;
+        totalBlocks -= inode->extent[i].length;
+    }
+
+    if (totalBlocks > 0) {
+        // TODO: Indirect extents
+    }
+
+    return 0;
 }
 

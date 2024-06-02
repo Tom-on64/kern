@@ -83,10 +83,9 @@ int main(int argc, char** argv) {
     printf("Free blocks: %d (%d Bytes)\n", bytesToBlocks(diskSize) - writtenBlocks, diskSize - writtenBlocks * FS_BLOCK_SIZE);
 
     // Pad out to the whole disk size
-    /*
     for (uint32_t i = 0; i < bytesToBlocks(diskSize) - writtenBlocks; i++) {
         assert(fwrite(nullBlock, FS_BLOCK_SIZE, 1, imagePtr) == 1);
-    } */
+    }
     
     // Cleanup
     for (uint32_t i = 0; i < fileCount; i++) {
@@ -120,9 +119,9 @@ void writeSuperblock() {
     superblock.inodeCount = fileCount;  // 2 reserved INodes (0 - Invalid, 1 - Root)
     superblock.firstInodeBitmapBlock = 2;   // Block 0 - Boot, Block 1 - Superblock
     superblock.inodeBitmapBlockCount = superblock.inodeCount / (FS_BLOCK_SIZE * 8) + ((superblock.inodeCount % (FS_BLOCK_SIZE * 8) > 0) ? 1 : 0);
-    superblock.firstDataBitmapBlock = superblock.firstInodeBlock + superblock.inodeBitmapBlockCount;
+    superblock.firstDataBitmapBlock = superblock.firstInodeBitmapBlock + superblock.inodeBitmapBlockCount;
     superblock.inodeBlockCount = bytesToBlocks(superblock.inodeCount * sizeof(inode_t));
-    
+
     dataBlocks = bytesToBlocks(diskSize);
     dataBitCount = (dataBlocks - superblock.firstDataBitmapBlock - superblock.inodeBlockCount);
 
@@ -195,13 +194,16 @@ void writeINodeBlocks() {
         .id = 1,
         .filetype = FILETYPE_DIR,
         .sizeBytes = sizeof(dirEntry_t) * fileCount,
-        .sizeSectors = bytesToSectors(inode.sizeBytes),
+        // .sizeSectors = bytesToSectors(inode.sizeBytes), Set below
         .timestamp = defaultTimestamp,
         .extent[0] = (extent_t) {
             .firstBlock = superblock.firstDataBlock,
-            .length = bytesToBlocks(inode.sizeBytes),
+            // .length = bytesToBlocks(inode.sizeBytes), Set below
         },
     };
+
+    inode.sizeSectors = bytesToSectors(inode.sizeBytes);
+    inode.extent[0].length = bytesToBlocks(inode.sizeBytes);
         
     assert(fwrite(&inode, sizeof(inode), 1, imagePtr) == 1);
 
@@ -216,8 +218,9 @@ void writeINodeBlocks() {
         inode.timestamp = defaultTimestamp;
         inode.extent[0] = (extent_t) {
             .firstBlock = block,
-            .length = bytesToBlocks(inode.sizeBytes),
+            // .length = bytesToBlocks(inode.sizeBytes),
         };
+        inode.extent[0].length = bytesToBlocks(inode.sizeBytes);
 
         assert(fwrite(&inode, sizeof(inode), 1, imagePtr) == 1);
         

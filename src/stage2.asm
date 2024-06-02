@@ -2,8 +2,7 @@
 [org 0x7e00]
 
 %define STAGE3_LOC 0x50000
-%define VIDMEM 0xb800
-%define MODE_INFO_BLOCK_LOC 0x9000
+%define MODE_INFO_BLOCK_LOC 0x6000
 
 start:
     mov [driveNum], dl
@@ -12,9 +11,9 @@ start:
     xor ax, ax
     mov es, ax
 
-memMapEntries equ 0x8500
+memMapEntries equ 0x7000
 getMemoryMap:
-    mov di, 0x8504 ; 4 bytes after memMapEntries
+    mov di, memMapEntries + 4 ; 4 bytes after memMapEntries
     xor ebx, ebx
     xor bp, bp
     mov edx, "PAMS" ; SMAP in little endian
@@ -370,9 +369,9 @@ DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
 ;; !! IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO !!
-width: dw 1920
-height: dw 1080
-bpp: db 32
+width: dw 0
+height: dw 0
+bpp: db 0
 
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
