@@ -29,6 +29,7 @@
 
 // Function declarations
 void listFiles();
+void printRegs();
 void printPhysicalMemmap();
 
 __attribute__ ((section("entry")))
@@ -175,6 +176,7 @@ void main() {
             printf(" ls         | Lists files in current directory\n");
             printf(" memmap     | Prints the memory map and info\n");
             printf(" reboot     | Reboots the system\n");
+            printf(" regs       | Prints register values\n");
             printf(" sleep      | Sleeps for input number of seconds\n");
             printf(" soundtest  | Plays a tune :)\n");
             printf(" test       | Performs tests\n");
@@ -184,6 +186,8 @@ void main() {
             printPhysicalMemmap();
         } else if (strcmp(argv[0], "reboot") == 0) {
             outb(0x64, 0xFE);
+        } else if (strcmp(argv[0], "regs") == 0) {
+            printRegs();
         } else if (strcmp(argv[0], "sleep") == 0) {
             if (*argv[1] == '\0') continue;
 
@@ -217,8 +221,8 @@ void main() {
 
             disableSpeaker();
         } else if (strcmp(argv[0], "test") == 0) {
-            printf("\x1b[1MError: 'test' is not available.\x1b[8M");
-        } else {
+            printf("\x1b[1MError: 'test' is not available.\x1b[8M\n");
+        } else { // TODO: Use new filesystem!
             fileEntry_t* file = findFile(argv[0]);
             
             if (file == NULL) {
@@ -306,6 +310,42 @@ void listFiles() {
     printf("term16n.fnt     2048B\n");
     printf("calc.bin        1724B\n");
     printf("editor.bin      1280B\n");
+}
+
+void printRegs() {
+    uint32_t val;
+
+    // a, b, c, d
+    __asm__ volatile ("movl %%eax, %0" : "=r"(val));
+    printf("eax     0x%x\n", val);
+    __asm__ volatile ("movl %%ebx, %0" : "=r"(val));
+    printf("ebx     0x%x\n", val);
+    __asm__ volatile ("movl %%ecx, %0" : "=r"(val));
+    printf("ecx     0x%x\n", val);
+    __asm__ volatile ("movl %%edx, %0" : "=r"(val));
+    printf("edx     0x%x\n", val);
+
+    // si, di
+    __asm__ volatile ("movl %%esi, %0" : "=r"(val));
+    printf("esi     0x%x\n", val);
+    __asm__ volatile ("movl %%edi, %0" : "=r"(val));
+    printf("edi     0x%x\n", val);
+
+    // cs, ds, es, ss
+    __asm__ volatile ("movl %%cs, %0" : "=r"(val));
+    printf("cs      0x%x\n", val);
+   __asm__ volatile ("movl %%ds, %0" : "=r"(val));
+    printf("ds      0x%x\n", val);
+    __asm__ volatile ("movl %%es, %0" : "=r"(val));
+    printf("es      0x%x\n", val);
+    __asm__ volatile ("movl %%ss, %0" : "=r"(val));
+    printf("ss      0x%x\n", val);
+
+    // stack
+    __asm__ volatile ("movl %%esp, %0" : "=r"(val));
+    printf("esp     0x%x\n", val);
+    __asm__ volatile ("movl %%ebp, %0" : "=r"(val));
+    printf("ebp     0x%x\n", val);
 }
 
 void printPhysicalMemmap() {

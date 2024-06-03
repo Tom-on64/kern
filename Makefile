@@ -58,8 +58,7 @@ $(FONTS):
 run:
 	qemu-system-x86_64\
 		-drive format=raw,file="./kern.iso",index=0,media=disk\
-		-m 256M\
-		-accel tcg\
+		-m 256M -accel tcg -monitor stdio\
 		-rtc base=localtime,clock=host,driftfix=slew\
 		-audiodev coreaudio,id=audio0 -machine pcspk-audiodev=audio0
 
