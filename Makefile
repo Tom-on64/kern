@@ -5,6 +5,7 @@ AS = nasm
 
 CFLAGS = -std=c17 -ffreestanding -fno-builtin -fno-stack-protector -fno-pie \
 		 -Os -nostdinc -mgeneral-regs-only -m32 -march=i386 -Wall -Iinclude/c
+LDFLAGS = -z notext -melf_i386
 
 SRC = ./src
 BUILD = ./build
@@ -23,7 +24,7 @@ $(BUILD):
 	@[ -d $(BUILD) ] || mkdir $(BUILD)
 	@rm -rf $(BUILD)/*
 
-# Bootloader: This target is responsible for creating boot.bin
+# Bootloader: This target is responsible for creating stage?.bin (1,2,3)
 bootloader: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@echo "Assembling $(SRC)/stage1.asm..."
 	@$(AS) -fbin -o $(BUILD)/stage1.bin $(SRC)/stage1.asm
@@ -31,22 +32,21 @@ bootloader: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@$(AS) -fbin -o $(BUILD)/stage2.bin $(SRC)/stage2.asm
 	@echo "Compiling $(SRC)/stage3.c..."
 	@$(CC) $(CFLAGS) -Iinclude -o $(BUILD)/stage3.o -c $(SRC)/stage3.c
-	@$(LD) -T$(SRC)/stage3.ld -z notext --oformat binary -o $(BUILD)/stage3.bin $(BUILD)/stage3.o
-	@cat $(BUILD)/stage1.bin $(BUILD)/stage2.bin $(BUILD)/stage3.bin > $(BUILD)/boot.bin
+	@$(LD) $(LDFLAGS) -T$(SRC)/stage3.ld --oformat binary -o $(BUILD)/stage3.bin $(BUILD)/stage3.o
 	@rm $(BUILD)/stage3.o
 
 # Kernel: This target is responsible for creating kernel.bin
 kernel: $(SRC)/kernel.c
 	@echo "Compiling $(SRC)/kernel.c..."
 	@$(CC) $(CFLAGS) -Iinclude -o $(BUILD)/kernel.o -c $(SRC)/kernel.c
-	@$(LD) -T$(SRC)/kernel.ld -z notext --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/kernel.o
+	@$(LD) $(LDFLAGS) -T$(SRC)/kernel.ld --oformat binary -o $(BUILD)/kernel.bin $(BUILD)/kernel.o
 	@rm $(BUILD)/kernel.o
 
 # This target compiles *.c (except kernel.c)
 $(C_FILES):
 	@echo "Compiling $(SRC)/$@.c..."
 	@$(CC) $(CFLAGS) -o $(BUILD)/$@.o -c $(SRC)/$@.c 
-	@$(LD) -T$(SRC)/$@.ld -z notext --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
+	@$(LD) $(LDFLAGS) -T$(SRC)/$@.ld --oformat binary -o $(BUILD)/$@.bin $(BUILD)/$@.o
 	@rm $(BUILD)/$@.o
 
 # This target builds all fonts inside src/fonts
@@ -67,4 +67,5 @@ run:
 clean:
 	@rm -rf $(BUILD)
 	@rm -f kern.iso
+	@rm makedisk
 
