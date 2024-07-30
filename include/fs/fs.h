@@ -27,11 +27,11 @@ typedef struct {
 typedef struct {
     uint32_t inodeCount;
 
-    uint16_t firstInodeBitmapBlock;
+    uint16_t firstINodeBitmapBlock;
     uint16_t firstDataBitmapBlock;
     uint16_t inodeBitmapBlockCount;
     uint16_t dataBitmapBlockCount;
-    uint32_t firstInodeBlock;
+    uint32_t firstINodeBlock;
     uint32_t firstDataBlock;
     uint16_t inodeBlockCount;
     uint16_t dataBlockCount;
@@ -40,14 +40,14 @@ typedef struct {
     uint16_t blockSize; // in bytes
     uint8_t inodeSize; // in bytes
     
-    uint32_t rootInodePtr;
+    uint32_t rootINodePtr;
     uint8_t inodesPerBlock;
-    uint8_t directExtentsPerInode;
+    uint8_t directExtentsPerINode;
     uint16_t extentsPerIndirectBlock;
-    uint32_t firstFreeInodeBit;
+    uint32_t firstFreeINodeBit;
     uint32_t firstFreeDataBit;
     uint16_t deviceNumber;
-    uint8_t firstUnreservedInode;
+    uint8_t firstUnreservedINode;
 
     uint8_t reserved[14];
 } __attribute__ ((packed)) superBlock_t;
@@ -87,5 +87,4 @@ uint32_t bytesToSectors(uint32_t bytes) {
     if (bytes <= FS_SECTOR_SIZE) return 1;
     return (bytes / FS_SECTOR_SIZE) + ((bytes % FS_SECTOR_SIZE) > 0 ? 1 : 0);
 }
-
 #endif

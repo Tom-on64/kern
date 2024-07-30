@@ -10,8 +10,8 @@
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <memory/malloc.h>
-#include <disk/filesys.h>
-#include <disk/disk.h>
+#include <fs/fs.h>
+#include <fs/impl.h>
 #include <screen/text.h>
 #include <screen/graphics.h>
 #include <sound/pcspk.h>
@@ -23,14 +23,22 @@
 #include <string.h>
 #include <time.h>
 #include <color.h>
-#include <fs/fs.h>
 
-#define PROMPT "/ #> "
+#define PROMPT "#>"
+
+//openFileTable_t* openFileTable;
+inode_t* openINodeTable;
+uint32_t maxOpenFiles = 256;
+uint32_t openFileCount = 3; // First 3 reserved for stdin, stdout, stderr
+uint32_t maxOpenINodes = 256;
+uint32_t openINodeCount = 0;
 
 // Function declarations
 void listFiles();
 void printRegs();
 void printPhysicalMemmap();
+void initOpenFileTable();
+void initOpenINodeTable();
 
 __attribute__ ((section("entry")))
 void main() {
@@ -73,6 +81,18 @@ void main() {
     mallocPhysicalAddr = kernelMallocPhysicalAddr;
     mallocPages = kernelMallocPages;
 
+    // Setup filesystem
+    currentDir = malloc(1024);
+    strcpy(currentDir, "/"); // Start at root
+    
+
+    // Setup kernel open file table and open inode table
+    initOpenFileTable();
+    initOpenINodeTable();
+    currentDir = malloc(1024);
+    strcpy(currentDir, "/");
+
+    // Terminal setup
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
     clear();
@@ -81,7 +101,7 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf(PROMPT);
+        printf("%s %s ", currentDir, PROMPT);
         char input[256];
         char* inputPtr = input;
 
@@ -223,12 +243,13 @@ void main() {
         } else if (strcmp(argv[0], "test") == 0) {
             printf("\x1b[1MError: 'test' is not available.\x1b[8M\n");
         } else { // TODO: Use new filesystem!
+            /*
             fileEntry_t* file = findFile(argv[0]);
             
-            if (file == NULL) {
+            if (file == NULL) {*/
                 printf("Command not found: %s\n", argv[0]);
                 continue;
-            }
+            /*}
 
             uint32_t neededPages = (file->length * 512) / PAGE_SIZE;
             if ((file->length * 512) % PAGE_SIZE > 0) { neededPages++; }
@@ -291,7 +312,7 @@ void main() {
                     unmapPage((void*)virtualAddr);
                     flushTlbEntry(virtualAddr); // Invalidate unused page
                 }
-            }
+            }*/
         }
     }
 
@@ -373,5 +394,15 @@ void printPhysicalMemmap() {
     printf("Total 4kB Blocks: %d\n", maxBlocks);
     printf("Used or reserved blocks: %d\n", usedBlocks);
     printf("Free blocks: %d\n\n", maxBlocks - usedBlocks);
+}
+
+void initOpenFileTable() {
+    //openFileTable = malloc(sizeof(openFileTable_t) * maxOpenFiles);
+    //*openFileTable = (openFileTable_t) { 0 };
+}
+
+void initOpenINodeTable() {
+    openINodeTable = malloc(sizeof(inode_t) * maxOpenINodes);
+    *openINodeTable = (inode_t) { 0 };
 }
 

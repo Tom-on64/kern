@@ -4,18 +4,8 @@
 #include <terminal/terminal.h>
 #include <memory/addresses.h>
 #include <screen/gfxmode.h>
-#include <disk/filesys.h>
 #include <stdint.h>
 #include <string.h>
-
-// TODO: Make this check if it's a valid font
-// TODO: Make it take a fileEntry_t?
-uint8_t loadFont(char* filename) {
-    if (readFile(filename, (void*)FONT_LOC) != 0) { return 1; } // File not found
-    if (*(uint8_t*)FONT_WIDTH == 0 || *(uint8_t*)FONT_HEIGHT == 0) { return 1; } // Not a font
-
-    return 0; // Success
-}
 
 // TODO: Reimplement larger text
 void drawChar(char c, uint32_t x, uint32_t y, uint32_t fgColor, uint32_t bgColor) {

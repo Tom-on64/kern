@@ -9,8 +9,12 @@
 #include <memory/addresses.h>
 #include <syscall.h>
 #include <stdint.h>
+#include <fs/fs.h>
 
-// Syscall(0) - Sleep()
+/*
+ * TODO WARNING - Update MAX_SYSCALLS in the handler TODO
+ */
+
 // Args: ebx - number of miliseconds
 void sys_sleep() {
     __asm__ volatile ("movl %%ebx, %0" : "=r"(*sleepTimerTicks));
@@ -20,7 +24,6 @@ void sys_sleep() {
     }
 }
 
-// Syscall(1) - Write()
 // Args: ebx - int fd
 //       ecx - void* buf
 //       edx - uint32_t len
@@ -48,7 +51,6 @@ void sys_gets() {
     read(s);
 }
 
-// Syscall(3) - Malloc()
 // Args: ebx - amount of bytes to malloc
 // Returns: eax - Pointer to allocated memory
 void sys_malloc() {
@@ -67,7 +69,6 @@ void sys_malloc() {
     __asm__ volatile ("movl %0, %%eax" : : "r"(ptr));
 }
 
-// Syscall(4) - Free()
 // Args: ebx - allocated pointer
 void sys_free() {
     void* ptr = NULL;
@@ -75,13 +76,39 @@ void sys_free() {
     mallocFree(ptr);
 }
 
+// Args: ebx - path, ecx - oflag
+void sys_open() {
+    int32_t fd = -1;
+    char* path = NULL;
+    uint32_t oflag = 0;
+
+    // From kernel.c
+    //extern openFileTable_t* openFileTable;
+    //extern inode_t* openINodeTable;
+    //extern uint32_t maxOpenFiles;
+    //extern uint32_t openFileCount;
+    //extern uint32_t maxOpenInodes;
+    //extern uint32_t openInodeCount;
+
+    __asm__ volatile ("nop" : "=b"(path), "=c"(oflag));
+    
+    __asm__ volatile ("movl %0, %%eax" : : "a"(fd));
+}
+
+void sys_close() {}
+
+void sys_seek() {}
+
 // System call table
 void (*syscalls[MAX_SYSCALLS])(void) = {
     [SYS_SLEEP]     = sys_sleep,  
     [SYS_WRITE]     = sys_write,  
     [SYS_GETS]      = sys_gets,   
     [SYS_MALLOC]    = sys_malloc, 
-    [SYS_FREE]      = sys_free,   
+    [SYS_FREE]      = sys_free,
+    [SYS_OPEN]      = sys_open,
+    [SYS_CLOSE]     = sys_close,
+    [SYS_SEEK]      = sys_seek,
 };
 
 // int 0x80 - Syscall interrupt, handled by this function
@@ -92,7 +119,7 @@ void syscallHandler(intFrame_t* iframe) {
     // We should also push these regs: ax, gs, fs, es, ds, bp, di, si, dx, cx, bx
     __asm__ volatile (
             ".intel_syntax noprefix\n" // We use intel syntax
-            ".equ MAX_SYSCALLS, 5\n" // Define MAX_SYSCALLS again TODO: I don't want to have to do this
+            ".equ MAX_SYSCALLS, 9\n" // Define MAX_SYSCALLS again TODO: I don't want to have to do this
 
             // Check if syscall exists
             "cmp eax, MAX_SYSCALLS - 1\n"
@@ -127,7 +154,7 @@ void syscallHandler(intFrame_t* iframe) {
             "iretd\n" // Return from interrupt (32 bit)
 
             // TODO: Send an error or something here
-            "invalidSyscall:\n"
+        "invalidSyscall:\n"
             "mov eax, -1\n" // Current error thing
             "iretd\n"
 

@@ -2,12 +2,9 @@
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <disk/disk.h>
-//#include <disk/filesys.h>
-#include <screen/gfxmode.h>
-
+#include <fs/impl.h>
 #include <fs/fs.h>
-
-uint8_t loadFile(char* filename, void* dest);
+#include <screen/gfxmode.h>
 
 __attribute__ ((section("entry")))
 void main() {
@@ -31,11 +28,17 @@ void main() {
 
     // Load root dir, find kernel INode and parse it
     superBlock_t* superblock = (superBlock_t*)SUPERBLOCK_LOC;
-    superblock->rootInodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
+    superblock->rootINodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
     diskRead(superblock->firstDataBlock * 8, 8, (void*)SCRATCH_BLOCK_LOC);
 
-    if (loadFile("kernel.bin", (void*)KERNEL_LOC) != 0) __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
-    if (loadFile("term16n.fnt", (void*)FONT_LOC) != 0) __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
+    inode_t* inode;
+    if ((inode = getINode("kernel.bin")) == NULL) {
+        __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
+    } else { loadFile(inode, (void*)KERNEL_LOC); }
+
+    if ((inode = getINode("term16n.fnt")) == NULL) {
+        __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
+    } else { loadFile(inode, (void*)FONT_LOC); }
 
     // Virtual memory manager setup
     if (setupVirtualMemoryManager() != 0) {
@@ -64,35 +67,5 @@ void main() {
 
     // Call/jump to kernel
     ((void(*)(void))0xC0000000)();
-}
-
-uint8_t loadFile(char* filename, void* dest) {
-    dirEntry_t* dirEntry = (dirEntry_t*)SCRATCH_BLOCK_LOC;
-    while (dirEntry->name[0] != '\0') {
-        if (strcmp(dirEntry->name, filename) == 0) break;
-        dirEntry++;
-    }
-
-    if (dirEntry->name[0] == '\0') return 1;
-
-    inode_t* inode = (inode_t*)BOOT_FIRST_INODE_LOC;
-    while (inode->id != dirEntry->id) {
-        inode++;
-    }
-
-    uint32_t totalBlocks = bytesToBlocks(inode->sizeBytes);
-    uint32_t addressOffset = 0;
-
-    for (uint8_t i = 0; i < 4 && totalBlocks > 0; i++) {
-        diskRead(inode->extent[i].firstBlock * 8, inode->extent[i].length * 8, dest + addressOffset);
-        addressOffset += inode->extent[i].length * FS_BLOCK_SIZE;
-        totalBlocks -= inode->extent[i].length;
-    }
-
-    if (totalBlocks > 0) {
-        // TODO: Indirect extents
-    }
-
-    return 0;
 }
 

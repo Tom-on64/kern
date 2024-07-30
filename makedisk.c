@@ -8,6 +8,7 @@
 #include "include/fs/fs.h"
 
 #define IMAGE_NAME "kern.iso"
+#define BIN_DIR "./bin/"
 #define DISK_SIZE  (2880 * 512) // 1.44MB
 
 uint8_t nullBlock[FS_BLOCK_SIZE] = { 0 };
@@ -19,15 +20,15 @@ typedef struct {
 } fileInfo_t;
 
 fileInfo_t files[] = { // TODO: Not have to list all of the files, loop through a directory or smth
-    { "./build/stage1.bin" },
-    { "./build/stage2.bin" },
-    { "./build/stage3.bin" },
-    { "./build/kernel.bin" },
-    { "./build/term16n.fnt" },
-    { "./build/testfont.fnt" },
+    { BIN_DIR"stage1.bin" },
+    { BIN_DIR"stage2.bin" },
+    { BIN_DIR"stage3.bin" },
+    { BIN_DIR"kernel.bin" },
+    { BIN_DIR"term16n.fnt" },
+    { BIN_DIR"testfont.fnt" },
     { "./src/fs/test.txt" },
-    { "./build/calc.bin" },
-    { "./build/editor.bin" },
+    { BIN_DIR"calc.bin" },
+    { BIN_DIR"editor.bin" },
 };
 
 superBlock_t superblock = { 0 };
@@ -117,29 +118,29 @@ void writeBootblock() {
 
 void writeSuperblock() {
     superblock.inodeCount = fileCount;  // 2 reserved INodes (0 - Invalid, 1 - Root)
-    superblock.firstInodeBitmapBlock = 2;   // Block 0 - Boot, Block 1 - Superblock
+    superblock.firstINodeBitmapBlock = 2;   // Block 0 - Boot, Block 1 - Superblock
     superblock.inodeBitmapBlockCount = superblock.inodeCount / (FS_BLOCK_SIZE * 8) + ((superblock.inodeCount % (FS_BLOCK_SIZE * 8) > 0) ? 1 : 0);
-    superblock.firstDataBitmapBlock = superblock.firstInodeBitmapBlock + superblock.inodeBitmapBlockCount;
+    superblock.firstDataBitmapBlock = superblock.firstINodeBitmapBlock + superblock.inodeBitmapBlockCount;
     superblock.inodeBlockCount = bytesToBlocks(superblock.inodeCount * sizeof(inode_t));
 
     dataBlocks = bytesToBlocks(diskSize);
     dataBitCount = (dataBlocks - superblock.firstDataBitmapBlock - superblock.inodeBlockCount);
 
     superblock.dataBitmapBlockCount = dataBitCount / (FS_BLOCK_SIZE * 8) + ((dataBitCount % (FS_BLOCK_SIZE * 8) > 0) ? 1 : 0);
-    superblock.firstInodeBlock = superblock.firstDataBitmapBlock + superblock.dataBitmapBlockCount;
-    superblock.firstDataBlock = superblock.firstInodeBlock + superblock.inodeBlockCount;
+    superblock.firstINodeBlock = superblock.firstDataBitmapBlock + superblock.dataBitmapBlockCount;
+    superblock.firstDataBlock = superblock.firstINodeBlock + superblock.inodeBlockCount;
     superblock.dataBlockCount = (fileBlocks - 2) + 1; // 1 Block for root dir (-1 for boot block)
     superblock.maxFileSize = 0xffffffff; 
     superblock.blockSize = FS_BLOCK_SIZE;
     superblock.inodeSize = sizeof(inode_t);
-    superblock.rootInodePtr = 0; // Gets setup at runtime
+    superblock.rootINodePtr = 0; // Gets setup at runtime
     superblock.inodesPerBlock = FS_BLOCK_SIZE / sizeof(inode_t);
-    superblock.directExtentsPerInode = 4;
+    superblock.directExtentsPerINode = 4;
     superblock.extentsPerIndirectBlock = FS_BLOCK_SIZE / sizeof(extent_t);
-    superblock.firstFreeInodeBit = superblock.inodeCount;
+    superblock.firstFreeINodeBit = superblock.inodeCount;
     superblock.firstFreeDataBit = (fileBlocks - 2) + 1; // +1 for root dir
     superblock.deviceNumber = 0x01;
-    superblock.firstUnreservedInode = 3; // 0 - Invalid; 1 - Root dir; 2 - Bootloader INode
+    superblock.firstUnreservedINode = 3; // 0 - Invalid; 1 - Root dir; 2 - Bootloader INode
     
     assert(fwrite(&superblock, sizeof(superBlock_t), 1, imagePtr) == 1);
     assert(fwrite(nullBlock, paddingBytes(sizeof(superBlock_t), FS_BLOCK_SIZE), 1, imagePtr) == 1); // Padding

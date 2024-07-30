@@ -1,3 +1,15 @@
-build
-kern.iso
+.DS_Store
+
+# Binaries
+bin/
+*.bin
 makedisk
+
+# Object files
+*.o
+*.obj
+*.elf
+
+# Vim swap files
+*.swp
+
