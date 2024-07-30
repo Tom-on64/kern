@@ -65,6 +65,6 @@ run:
 # Clean all build files
 clean:
 	@rm -rf $(BIN)
-	@rm -f kern.iso
-	@rm makedisk
+	@#rm -f kern.iso
+	@rm -f makedisk
 
