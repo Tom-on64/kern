@@ -1,0 +1,39 @@
+= fsys =
+
+Sector = 512 Bytes
+Block  = 4096 Bytes
+
+Reserved sectors:
+ Sector    0 - Bootsector, will be loaded by the Bios into memory and executed  (512B)
+ Sector 1..4 - Superblock, contains metadata about the filesystem itself        (4KiB)
+
+Superblock structure: (4096B)
+ FS Name
+ FS Size (Sector)
+ FS Size (Block)
+ INode Count
+ INodes per sector
+ INode Bitmap Block
+ Data Bitmap Block
+ INodes Start
+ Data Start
+ Root INode Number
+ Extents per indirect
+
+INode structure: (64B)
+ Type
+ Size (bytes)
+ Block Count (size in blocks)
+ Mode
+ Extents[]
+ Single Indirect
+ Double Indirect?
+
+Extent: (8B)
+ Block
+ Length
+ 
+Directory Entry: (64B)
+ INode Number
+ Name (max length 60 Bytes)
+
