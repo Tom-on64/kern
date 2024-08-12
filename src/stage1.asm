@@ -2,9 +2,9 @@
 [org 0x7c00]
 
 %define SUPERBLOCK 0x8c00
-%define FIRST_INODE_BLOCK (SUPERBLOCK) + 12
-%define STAGE3_INODE 0xb000 + 128
-%define EXTENT0 (STAGE3_INODE) + 21      ; Offset of extent[0] in inode_t
+%define FIRST_INODE_BLOCK (SUPERBLOCK) + 18
+%define STAGE3_INODE 0xb000 + (2 * 64)
+%define EXTENT0 (STAGE3_INODE) + 14      ; Offset of extent[0] in inode_t
 
 start:
     xor ax, ax

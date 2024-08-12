@@ -4,28 +4,29 @@ Sector = 512 Bytes
 Block  = 4096 Bytes
 
 Reserved sectors:
- Sector    0 - Bootsector, will be loaded by the Bios into memory and executed  (512B)
- Sector 1..4 - Superblock, contains metadata about the filesystem itself        (4KiB)
+ Sector 0..3 - Bootblock, will be loaded by the Bios into memory and executed   (512B)
+ Sector 4..7 - Superblock, contains metadata about the filesystem itself        (4KiB)
 
 Superblock structure: (4096B)
- FS Name
- FS Size (Sector)
- FS Size (Block)
+ Device ID
+ Max File Size
  INode Count
- INodes per sector
  INode Bitmap Block
- Data Bitmap Block
  INodes Start
+ INode Block Count
+ INodes per sector
+ Data Bitmap Block
  Data Start
- Root INode Number
- Extents per indirect
+ Data Block Count
+ Root INode Pointer
+ First Unreserved INode
 
 INode structure: (64B)
  Type
  Size (bytes)
- Block Count (size in blocks)
+ Sector Count (size in sectors)
  Mode
- Extents[]
+ Extent[4]
  Single Indirect
  Double Indirect?
 
@@ -36,4 +37,12 @@ Extent: (8B)
 Directory Entry: (64B)
  INode Number
  Name (max length 60 Bytes)
+
+Filetypes:
+ File
+ Directory
+ #TODO
+ Link
+ Device
+ Stream?
 

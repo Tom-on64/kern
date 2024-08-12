@@ -31,7 +31,7 @@ fileInfo_t files[] = { // TODO: Not have to list all of the files, loop through 
     { BIN_DIR"editor.bin" },
 };
 
-superBlock_t superblock = { 0 };
+superblock_t superblock = { 0 };
 
 FILE* imagePtr;
 uint32_t diskSize = DISK_SIZE;
@@ -63,11 +63,11 @@ int main(int argc, char** argv) {
         fseek(files[i].fp, 0, SEEK_END);
         files[i].size = ftell(files[i].fp);
         rewind(files[i].fp);
-        fileBlocks += bytesToBlocks(files[i].size);
+        fileBlocks += BYTES2BLOCKS(files[i].size);
     }
 
     printf("Building disk image %s...\n", IMAGE_NAME);
-    printf("Block size: %d Bytes, Total disk blocks: %d (%d Bytes)\n\n", FS_BLOCK_SIZE, bytesToBlocks(diskSize), diskSize);
+    printf("Block size: %d Bytes, Total disk blocks: %d (%d Bytes)\n\n", FS_BLOCK_SIZE, BYTES2BLOCKS(diskSize), diskSize);
 
     printf("%d files (2 hidden)\n", fileCount); // Stage 1 and 2 is hidden
     
@@ -79,12 +79,12 @@ int main(int argc, char** argv) {
     writeINodeBlocks();
     writeDataBlocks();
 
-    uint32_t writtenBlocks = 2 + superblock.inodeBitmapBlockCount + superblock.dataBitmapBlockCount + superblock.inodeBlockCount + superblock.dataBlockCount; 
+    uint32_t writtenBlocks = 4 + superblock.inodeBlockCount + superblock.dataBlockCount; 
     printf("\nWritten blocks: %d (%d Bytes)\n", writtenBlocks, writtenBlocks * FS_BLOCK_SIZE);
-    printf("Free blocks: %d (%d Bytes)\n", bytesToBlocks(diskSize) - writtenBlocks, diskSize - writtenBlocks * FS_BLOCK_SIZE);
+    printf("Free blocks: %d (%d Bytes)\n", BYTES2BLOCKS(diskSize) - writtenBlocks, diskSize - writtenBlocks * FS_BLOCK_SIZE);
 
     // Pad out to the whole disk size
-    for (uint32_t i = 0; i < bytesToBlocks(diskSize) - writtenBlocks; i++) {
+    for (uint32_t i = 0; i < BYTES2BLOCKS(diskSize) - writtenBlocks; i++) {
         assert(fwrite(nullBlock, FS_BLOCK_SIZE, 1, imagePtr) == 1);
     }
     
@@ -98,10 +98,10 @@ int main(int argc, char** argv) {
 }
 
 void writeBootblock() {
-    bootBlock_t bootBlock = { 0 };
+    bootblock_t bootBlock = { 0 };
     assert(fread(bootBlock.sectors[0], FS_SECTOR_SIZE, 1, files[0].fp) == 1); // File 0 - Stage 1
 
-    for (uint8_t i = 1; i < bytesToSectors(files[i].size); i++) {
+    for (uint8_t i = 1; i < BYTES2SECTORS(files[i].size); i++) {
         if (i > 7) {
             fprintf(stderr, "%s is too large, maximum size of bootblock is 7 sectors (%d Bytes)\n", files[1].name, 7 * FS_SECTOR_SIZE);
             exit(1);
@@ -117,33 +117,39 @@ void writeBootblock() {
 }
 
 void writeSuperblock() {
-    superblock.inodeCount = fileCount;  // 2 reserved INodes (0 - Invalid, 1 - Root)
-    superblock.firstINodeBitmapBlock = 2;   // Block 0 - Boot, Block 1 - Superblock
-    superblock.inodeBitmapBlockCount = superblock.inodeCount / (FS_BLOCK_SIZE * 8) + ((superblock.inodeCount % (FS_BLOCK_SIZE * 8) > 0) ? 1 : 0);
-    superblock.firstDataBitmapBlock = superblock.firstINodeBitmapBlock + superblock.inodeBitmapBlockCount;
-    superblock.inodeBlockCount = bytesToBlocks(superblock.inodeCount * sizeof(inode_t));
+    /* Block Layout
+     * 0 - Boot
+     * 1 - Super
+     * 2 - INode Bitmap
+     * 3 - Data Bitmap
+     * 4 - First INode Block
+     */
 
-    dataBlocks = bytesToBlocks(diskSize);
-    dataBitCount = (dataBlocks - superblock.firstDataBitmapBlock - superblock.inodeBlockCount);
+    // Constant
+    superblock.deviceId = 0x01;
+    superblock.extentsPerIndirect = FS_BLOCK_SIZE / sizeof(extent_t);
+    superblock.maxFileSize = 0xffffffff;
+    superblock.inodesPerSector = (FS_SECTOR_SIZE / sizeof(inode_t));
 
-    superblock.dataBitmapBlockCount = dataBitCount / (FS_BLOCK_SIZE * 8) + ((dataBitCount % (FS_BLOCK_SIZE * 8) > 0) ? 1 : 0);
-    superblock.firstINodeBlock = superblock.firstDataBitmapBlock + superblock.dataBitmapBlockCount;
-    superblock.firstDataBlock = superblock.firstINodeBlock + superblock.inodeBlockCount;
-    superblock.dataBlockCount = (fileBlocks - 2) + 1; // 1 Block for root dir (-1 for boot block)
-    superblock.maxFileSize = 0xffffffff; 
-    superblock.blockSize = FS_BLOCK_SIZE;
-    superblock.inodeSize = sizeof(inode_t);
-    superblock.rootINodePtr = 0; // Gets setup at runtime
-    superblock.inodesPerBlock = FS_BLOCK_SIZE / sizeof(inode_t);
-    superblock.directExtentsPerINode = 4;
-    superblock.extentsPerIndirectBlock = FS_BLOCK_SIZE / sizeof(extent_t);
-    superblock.firstFreeINodeBit = superblock.inodeCount;
-    superblock.firstFreeDataBit = (fileBlocks - 2) + 1; // +1 for root dir
-    superblock.deviceNumber = 0x01;
-    superblock.firstUnreservedINode = 3; // 0 - Invalid; 1 - Root dir; 2 - Bootloader INode
-    
-    assert(fwrite(&superblock, sizeof(superBlock_t), 1, imagePtr) == 1);
-    assert(fwrite(nullBlock, paddingBytes(sizeof(superBlock_t), FS_BLOCK_SIZE), 1, imagePtr) == 1); // Padding
+    // INode
+    superblock.inodeCount = fileCount + 2; // 2 reserved INodes (0 - Invalid, 1 - Root)
+    superblock.inodeBitmapBlock = 2;
+    superblock.inodesStart = 4;
+    superblock.inodeBlockCount = BYTES2BLOCKS(superblock.inodeCount * sizeof(inode_t));
+
+    // Data
+    dataBlocks = BYTES2BLOCKS(diskSize);
+
+    superblock.dataBitmapBlock = 3;
+    superblock.dataStart = superblock.inodesStart + superblock.inodeBlockCount;
+    superblock.dataBlockCount = fileBlocks; // +1 for Root, -1 for Boot
+
+    // Other
+    superblock.rootInodePtr = 0; // Will be filled at runtime
+    superblock.firstUnreservedInode = 3; // 0 - Invalid, 1 - Root, 2 - Bootloader
+
+    assert(fwrite(&superblock, sizeof(superblock_t), 1, imagePtr) == 1);
+    assert(fwrite(nullBlock, paddingBytes(sizeof(superblock_t), FS_BLOCK_SIZE), 1, imagePtr) == 1); // Padding
 }
 
 void writeINodeBitmapBlocks() {
@@ -178,50 +184,33 @@ void writeDataBitmapBlocks() {
 
 void writeINodeBlocks() {
     inode_t inode = { 0 };
-    fsDatetime_t defaultTimestamp = {
-        .second = 12,
-        .minute = 12,
-        .hour   = 12,
-        .day    = 20,
-        .month  = 4,
-        .year   = 2024,
-    };
 
     // INode 0 - Invalid
     assert(fwrite(&inode, sizeof(inode), 1, imagePtr) == 1);
 
     // INode 1 - Root directory
-    inode = (inode_t) { // OOP In C???
-        .id = 1,
-        .filetype = FILETYPE_DIR,
-        .sizeBytes = sizeof(dirEntry_t) * fileCount,
-        // .sizeSectors = bytesToSectors(inode.sizeBytes), Set below
-        .timestamp = defaultTimestamp,
-        .extent[0] = (extent_t) {
-            .firstBlock = superblock.firstDataBlock,
-            // .length = bytesToBlocks(inode.sizeBytes), Set below
-        },
-    };
+    inode.id = 1;
+    inode.type = FT_DIR;
+    inode.sizeBytes = sizeof(dirEntry_t) * fileCount;
+    inode.sizeSectors = BYTES2SECTORS(inode.sizeBytes);
+    // TODO: Mode
 
-    inode.sizeSectors = bytesToSectors(inode.sizeBytes);
-    inode.extent[0].length = bytesToBlocks(inode.sizeBytes);
+    inode.extent[0].block = superblock.dataStart;
+    inode.extent[0].length = BYTES2BLOCKS(inode.sizeBytes);
         
     assert(fwrite(&inode, sizeof(inode), 1, imagePtr) == 1);
 
     // INode 2 - Bootloader (stage 3) followed by other INodes
-    uint32_t block = superblock.firstDataBlock + inode.extent[0].length;
+    uint32_t block = superblock.dataStart + inode.extent[0].length;
     for (uint32_t i = 2; i < fileCount; i++) {
         memset(&inode, 0, sizeof(inode));
         inode.id = i;
-        inode.filetype = FILETYPE_FILE;
+        inode.type = FT_FILE;
         inode.sizeBytes = files[i].size;
-        inode.sizeSectors = bytesToSectors(inode.sizeBytes);
-        inode.timestamp = defaultTimestamp;
-        inode.extent[0] = (extent_t) {
-            .firstBlock = block,
-            // .length = bytesToBlocks(inode.sizeBytes),
-        };
-        inode.extent[0].length = bytesToBlocks(inode.sizeBytes);
+        inode.sizeSectors = BYTES2SECTORS(inode.sizeBytes);
+
+        inode.extent[0].block = block,
+        inode.extent[0].length = BYTES2BLOCKS(inode.sizeBytes);
 
         assert(fwrite(&inode, sizeof(inode), 1, imagePtr) == 1);
         
@@ -248,12 +237,12 @@ void writeDataBlocks() {
         assert(fwrite(&dirEntry, sizeof(dirEntry), 1, imagePtr) == 1);
     }
 
-    // Padd out
+    // Pad out
     assert(fwrite(nullBlock, paddingBytes(fileCount * sizeof(dirEntry_t), FS_BLOCK_SIZE), 1, imagePtr) == 1);
 
     // Write actual file data
     for (uint32_t i = 2; i < fileCount; i++) {
-        uint32_t blockCount = bytesToBlocks(files[i].size);
+        uint32_t blockCount = BYTES2BLOCKS(files[i].size);
         uint32_t bytesWritten = 0;
 
         printf("%s, %d Bytes -> %d Blocks\n", files[i].name, files[i].size, blockCount);

@@ -27,16 +27,16 @@ void main() {
     deinitMemoryRegion(MEMMAP_AREA, maxBlocks / BLOCKS_PER_BYTE);
 
     // Load root dir, find kernel INode and parse it
-    superBlock_t* superblock = (superBlock_t*)SUPERBLOCK_LOC;
-    superblock->rootINodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
-    diskRead(superblock->firstDataBlock * 8, 8, (void*)SCRATCH_BLOCK_LOC);
+    superblock_t* superblock = (superblock_t*)SUPERBLOCK_LOC;
+    superblock->rootInodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
+    diskRead(superblock->dataStart * 8, 8, (void*)SCRATCH_BLOCK_LOC);
 
     inode_t* inode;
-    if ((inode = getINode("kernel.bin")) == NULL) {
+    if ((inode = getInode("kernel.bin")) == NULL) {
         __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
     } else { loadFile(inode, (void*)KERNEL_LOC); }
 
-    if ((inode = getINode("term16n.fnt")) == NULL) {
+    if ((inode = getInode("term16n.fnt")) == NULL) {
         __asm__ volatile ("cli; hlt" : : "a"(0xDeadBeef));
     } else { loadFile(inode, (void*)FONT_LOC); }
 

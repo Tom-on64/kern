@@ -1,90 +1,83 @@
 #ifndef FS_H
 #define FS_H
 
+/*
+ * For info, read the fs-spec.txt document inside of docs/
+ */
+
 #include <stdint.h>
 
-#define FS_BLOCK_SIZE  4096
+// FS Definitions
 #define FS_SECTOR_SIZE 512
+#define FS_BLOCK_SIZE 4096
 
-#define FILETYPE_FILE 0
-#define FILETYPE_DIR  1
+// Conversion Macros (beatiful)
+#define BYTES2BLOCKS(_n)  ( (_n) == 0 ? 0 : \
+                            (_n) <= (FS_BLOCK_SIZE) ? 1 : \
+                            ((_n) / FS_BLOCK_SIZE) + (((_n) % FS_BLOCK_SIZE) > 0 ? 1 : 0) )
 
-// Filesystem structures
-typedef struct {
-    uint8_t second;
-    uint8_t minute;
-    uint8_t hour;
-    uint8_t day;
-    uint8_t month;
-    uint16_t year;
-    uint8_t reserved;
-} __attribute__ ((packed)) fsDatetime_t;
+#define BYTES2SECTORS(_n) ( (_n) == 0 ? 0 : \
+                            (_n) <= (FS_SECTOR_SIZE) ? 1 : \
+                            ((_n) / FS_SECTOR_SIZE) + (((_n) % FS_SECTOR_SIZE) > 0 ? 1 : 0) )
+
+// Filetypes
+#define FT_FILE 0
+#define FT_DIR  1
+
+// FS Structures
+// TODO: datetime_t?
 
 typedef struct {
     uint8_t sectors[FS_BLOCK_SIZE / FS_SECTOR_SIZE][FS_SECTOR_SIZE];
-} __attribute__ ((packed)) bootBlock_t;
+} __attribute__ ((packed)) bootblock_t;
 
+// Superblock - Padded to 4096 Bytes
 typedef struct {
+    // Constant data
+    uint16_t deviceId;
+    uint16_t extentsPerIndirect;
+    uint32_t maxFileSize;
+    uint16_t inodesPerSector;
+
+    // INode data
     uint32_t inodeCount;
+    uint32_t inodeBitmapBlock;
+    uint32_t inodesStart;
+    uint32_t inodeBlockCount;
 
-    uint16_t firstINodeBitmapBlock;
-    uint16_t firstDataBitmapBlock;
-    uint16_t inodeBitmapBlockCount;
-    uint16_t dataBitmapBlockCount;
-    uint32_t firstINodeBlock;
-    uint32_t firstDataBlock;
-    uint16_t inodeBlockCount;
-    uint16_t dataBlockCount;
+    // Data data :)
+    uint32_t dataBitmapBlock;
+    uint32_t dataStart;
+    uint32_t dataBlockCount;
 
-    uint32_t maxFileSize; // in bytes
-    uint16_t blockSize; // in bytes
-    uint8_t inodeSize; // in bytes
-    
-    uint32_t rootINodePtr;
-    uint8_t inodesPerBlock;
-    uint8_t directExtentsPerINode;
-    uint16_t extentsPerIndirectBlock;
-    uint32_t firstFreeINodeBit;
-    uint32_t firstFreeDataBit;
-    uint16_t deviceNumber;
-    uint8_t firstUnreservedINode;
+    // Other
+    uint32_t rootInodePtr;
+    uint32_t firstUnreservedInode;
+} __attribute__ ((packed)) superblock_t;
 
-    uint8_t reserved[14];
-} __attribute__ ((packed)) superBlock_t;
-
+// Extent - 8 Bytes
 typedef struct {
-    uint32_t firstBlock;
+    uint32_t block;
     uint32_t length;
 } __attribute__ ((packed)) extent_t;
 
+// INode - 64 Bytes
 typedef struct {
-    uint32_t id;        // Idetifier
-    uint8_t filetype;
-    uint32_t sizeBytes;
-    uint32_t sizeSectors;
-    fsDatetime_t timestamp;
+    uint32_t id;
+    uint8_t type;
+    uint32_t sizeBytes; // Size in bytes
+    uint32_t sizeSectors; // Size in sectors
+    uint8_t mode; // Access permisions
     extent_t extent[4];
-    uint32_t singleIndirectBlock;
-    uint32_t doubleIndirectBlock;
-    uint8_t refCount;
-    uint8_t reserved[2];
+    uint32_t singleIndirect;
+    uint32_t doubleIndirect;
+
+    uint8_t reserved[10];
 } __attribute__ ((packed)) inode_t;
 
 typedef struct {
-    uint32_t id;        // Matching ID with INode
     char name[60];
+    uint32_t id;
 } __attribute__ ((packed)) dirEntry_t;
 
-// Utility functions
-uint32_t bytesToBlocks(uint32_t bytes) {
-    if (bytes == 0) return 0;
-    if (bytes <= FS_BLOCK_SIZE) return 1;
-    return (bytes / FS_BLOCK_SIZE) + ((bytes % FS_BLOCK_SIZE) > 0 ? 1 : 0);
-}
-
-uint32_t bytesToSectors(uint32_t bytes) {
-    if (bytes == 0) return 0;
-    if (bytes <= FS_SECTOR_SIZE) return 1;
-    return (bytes / FS_SECTOR_SIZE) + ((bytes % FS_SECTOR_SIZE) > 0 ? 1 : 0);
-}
 #endif
