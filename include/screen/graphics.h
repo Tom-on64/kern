@@ -26,7 +26,6 @@ void drawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint32_t color) {
     int8_t sx = (x1 < x2) ? 1 : -1;
     int8_t sy = (y1 < y2) ? 1 : -1;
     int16_t err = dx + dy;
-
     
     // TODO: Sometimes the condition isn't met for some reason and it breaks everything
     while (!(x1 == x2 && y1 == y2)) {

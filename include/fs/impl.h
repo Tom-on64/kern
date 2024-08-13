@@ -36,6 +36,7 @@ uint8_t loadFile(inode_t* inode, void* dest) {
 
     if (totalBlocks > 0) {
         // TODO: Indirect extents
+        return 1;
     }
 
     return 0;
