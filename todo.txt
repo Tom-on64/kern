@@ -8,9 +8,9 @@ Legend:
 - [?] Optional
 
 - [x] Multistage Bootloader
-- [ ] Bootloader reads filetable to find files
+- [x] Bootloader reads filesystem to find files
 - [x] The almighty 'printf()'
-- [!] Makefile refactorin'
+- [_] Makefile refactorin'
 - [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
     - [x] Scrolling
@@ -76,16 +76,17 @@ Legend:
     - [x] PI
     - [ ] Floating point macros/functions
 - [ ] Filesystem
-    - [!] Utility for filesystem building (not just an assembly file)
-    - [x] Better header for file i/o (disk/filesys.h)
+    - [x] Utility for filesystem building (not just an assembly file)
+    - [_] Better header for file i/o (disk/filesys.h)
     - [x] Filetable
-    - [ ] A better filesystem using INodes etc.
-    - [ ] Files
+    - [x] A better filesystem using INodes etc.
+    - [x] Files
         - [x] Larger than one sector (512B)
-        - [ ] Any file size (Not multiples of 512B)
-        - [ ] Filetypes
+        - [x] Any file size (Not multiples of 512B)
+        - [x] Filetypes
     - [ ] Directories
-        - [ ] File tree
+        - [x] File tree
+        - [x] Dir Entries
         - [ ] cd command
     - [ ] Links??
         - [ ] Symbolic
@@ -103,6 +104,11 @@ Legend:
     - [ ] Separate file/program
     - [ ] ';' separated commands
     - [ ] I/O Redirection with '<' '>'
+    - [x] Display directory in prompt
+    - [ ] Custom prompts
+    - [ ] Variables
+        - [ ] Enviromental/Global
+        - [ ] Normal
     - [ ] Commands
         - [x] echo
         - [x] clear
@@ -130,10 +136,10 @@ Legend:
     - [x] Exit back to kernel/shell
     - [x] Let them use libs
     - [ ] Proper include files (LibC?)
-    - [ ] argc, argv[]
+    - [x] argc, argv[]
 - [ ] Standalone shell program
 - [ ] Userspace programs
-    - [ ] Calculator
+    - [x] Calculator
     - [ ] Calendar
 - [ ] Code Editor
     - [ ] Text editor

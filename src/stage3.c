@@ -36,14 +36,14 @@ void main() {
     diskRead(root->extent[0].block * 8, root->extent[0].length * 8, (void*)SCRATCH_BLOCK_LOC);
 
     inode_t* inode;
-    if ((inode = getInode("kernel.bin")) == NULL) {
+    if ((inode = getInode("kernel.bin", (dirEntry_t*)SCRATCH_BLOCK_LOC)) == NULL) {
         // kernel.bin doesn't exist??? very bad -> error
         bigError(0xDEAD);
     } else { loadFile(inode, (void*)KERNEL_LOC); }
 
-    if ((inode = getInode("term16n.fnt")) != NULL) {
+    if ((inode = getInode("term16n.fnt", (dirEntry_t*)SCRATCH_BLOCK_LOC)) != NULL) {
         loadFile(inode, (void*)FONT_LOC);
-    } else if ((inode = getInode("testfont.fnt")) != NULL) {
+    } else if ((inode = getInode("testfont.fnt", (dirEntry_t*)SCRATCH_BLOCK_LOC)) != NULL) {
         loadFile(inode, (void*)FONT_LOC);
     } else {
         // No font found, bad.

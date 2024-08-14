@@ -26,19 +26,13 @@
 
 #define PROMPT "#>"
 
-//openFileTable_t* openFileTable;
-inode_t* openINodeTable;
-uint32_t maxOpenFiles = 256;
-uint32_t openFileCount = 3; // First 3 reserved for stdin, stdout, stderr
-uint32_t maxOpenINodes = 256;
-uint32_t openINodeCount = 0;
-
 // Function declarations
 void listFiles();
 void printRegs();
 void printPhysicalMemmap();
-void initOpenFileTable();
-void initOpenINodeTable();
+
+// FS things
+char* cwd;
 
 __attribute__ ((section("entry")))
 void main() {
@@ -81,16 +75,9 @@ void main() {
     mallocPhysicalAddr = kernelMallocPhysicalAddr;
     mallocPages = kernelMallocPages;
 
-    // Setup filesystem
-    currentDir = malloc(1024);
-    strcpy(currentDir, "/"); // Start at root
-    
-
-    // Setup kernel open file table and open inode table
-    initOpenFileTable();
-    initOpenINodeTable();
-    currentDir = malloc(1024);
-    strcpy(currentDir, "/");
+    // FS Setup
+    cwd = malloc(1024);
+    strcpy(cwd, "/");
 
     // Terminal setup
     terminal->fg = FG_COLOR;
@@ -101,7 +88,7 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf("%s %s ", currentDir, PROMPT);
+        printf("%s %s ", cwd, PROMPT);
         char input[256];
         char* inputPtr = input;
 
@@ -394,15 +381,5 @@ void printPhysicalMemmap() {
     printf("Total 4kB Blocks: %d\n", maxBlocks);
     printf("Used or reserved blocks: %d\n", usedBlocks);
     printf("Free blocks: %d\n\n", maxBlocks - usedBlocks);
-}
-
-void initOpenFileTable() {
-    //openFileTable = malloc(sizeof(openFileTable_t) * maxOpenFiles);
-    //*openFileTable = (openFileTable_t) { 0 };
-}
-
-void initOpenINodeTable() {
-    openINodeTable = malloc(sizeof(inode_t) * maxOpenINodes);
-    *openINodeTable = (inode_t) { 0 };
 }
 
