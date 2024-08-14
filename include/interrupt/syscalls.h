@@ -2,7 +2,6 @@
 #define SYSCALL_H
 
 #include <interrupt/idt.h>
-#include <interrupt/pit.h>
 #include <terminal/terminal.h>
 #include <keyboard/keyboard.h>
 #include <memory/malloc.h>
@@ -12,11 +11,13 @@
 #include <fs/fs.h>
 
 /*
- * TODO WARNING - Update MAX_SYSCALLS in the handler TODO
+ * XXX WARNING - Update MAX_SYSCALLS in the handler XXX
  */
 
 // Args: ebx - number of miliseconds
 void sys_sleep() {
+    uint32_t* sleepTimerTicks = (uint32_t*)SLEEP_TIMER;
+    
     __asm__ volatile ("movl %%ebx, %0" : "=r"(*sleepTimerTicks));
 
     while (*sleepTimerTicks > 0) { // Wait...
@@ -27,6 +28,7 @@ void sys_sleep() {
 // Args: ebx - int fd
 //       ecx - void* buf
 //       edx - uint32_t len
+// Rets: Number of bytes written
 void sys_write() {
     int32_t fd = 0;
     void* buf = NULL;
@@ -48,55 +50,52 @@ void sys_write() {
 void sys_gets() {
     char* s;
     __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
-    read(s);
+    reads(s);
 }
 
-// Args: ebx - amount of bytes to malloc
-// Returns: eax - Pointer to allocated memory
+// Args: ebx - size_t count
+// Rets: Pointer to malloc-ed memory
 void sys_malloc() {
-    uint32_t size = 0;
-    __asm__ volatile ("movl %%ebx, %0" : "=b"(size));
+    uint32_t count = 0;
+    __asm__ volatile ("movl %%ebx, %0" : "=b"(count));
     
     // First Malloc()
     if (!mallocListHead) {
-        mallocInit(size); // Setup malloc linked list
+        mallocInit(count); // Setup malloc linked list
     }
 
-    void* ptr = mallocNextNode(size);
+    void* ptr = mallocNextNode(count);
     mallocMergeFree();
 
     // Return allocated address in eax
     __asm__ volatile ("movl %0, %%eax" : : "r"(ptr));
 }
 
-// Args: ebx - allocated pointer
+// Args: ebx - void* ptr
 void sys_free() {
     void* ptr = NULL;
     __asm__ volatile ("movl %%ebx, %0" : "=b"(ptr));
     mallocFree(ptr);
 }
 
-// Args: ebx - path, ecx - oflag
+// Args: ebx - path, 
+//       ecx - oflag
+// Rets: Opened file descriptor
 void sys_open() {
-    int32_t fd = -1;
+    uint32_t fd = 0;
     char* path = NULL;
     uint32_t oflag = 0;
-
-    // From kernel.c
-    //extern openFileTable_t* openFileTable;
-    //extern inode_t* openINodeTable;
-    //extern uint32_t maxOpenFiles;
-    //extern uint32_t openFileCount;
-    //extern uint32_t maxOpenInodes;
-    //extern uint32_t openInodeCount;
 
     __asm__ volatile ("nop" : "=b"(path), "=c"(oflag));
     
     __asm__ volatile ("movl %0, %%eax" : : "a"(fd));
 }
 
+// Args: ebx - int fd
+// Rets: status
 void sys_close() {}
 
+// TODO
 void sys_seek() {}
 
 // System call table

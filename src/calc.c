@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 
     while (1) {
         printf("> ");
-        read(input);
+        reads(input);
 
         // Remove whitespace
         char* old = input;

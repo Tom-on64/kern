@@ -75,6 +75,14 @@ void main() {
     mallocPhysicalAddr = kernelMallocPhysicalAddr;
     mallocPages = kernelMallocPages;
 
+    // Setup stdio FILE*
+    stdin->_file = 0;
+    stdin->_oflag = O_RDONLY;
+    stdout->_file = 1;
+    stdout->_oflag = O_WRONLY | O_APPEND;
+    stderr->_file = 2;
+    stderr->_oflag = O_WRONLY | O_APPEND;
+
     // FS Setup
     cwd = malloc(1024);
     strcpy(cwd, "/");
@@ -92,7 +100,7 @@ void main() {
         char input[256];
         char* inputPtr = input;
 
-        read(input);
+        reads(input);
 
         if (*input == '\0') continue;
 

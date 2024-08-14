@@ -18,24 +18,13 @@ typedef enum {
 } SYSCALL_NUMBERS;
 
 typedef enum {
-    O_CREAT     = 0x1,  // Create if does not exist
-    O_RDONLY    = 0x2,  // Read only
-    O_WRONLY    = 0x4,  // Write only
-    O_RDWR      = 0x8,  // Read and write
+    O_CREAT     = 0x01,  // Create if does not exist
+    O_RDONLY    = 0x02,  // Read only
+    O_WRONLY    = 0x04,  // Write only
+    O_RDWR      = 0x08,  // Read and write
     O_APPEND    = 0x10, // Always writes at the end (appends)
     O_TRUNC     = 0x20, // Truncate file size and position to 0 on Open
+    O_BIN       = 0x40, // Read bytes, not text
 } OFLAGS;
-
-int write(int fd, const void* buf, unsigned int len) {
-    int result = -1;
-    __asm__ volatile ("int $0x80" : "=a"(result) : "a"(SYS_WRITE), "b"(fd), "c"(buf), "d"(len));
-    return result;
-}
-
-int open(const char* path, int oflag) {
-    int result = -1;
-    __asm__ volatile ("int $0x80" : "=a"(result) : "a"(SYS_OPEN), "b"(path), "c"(oflag));
-    return result;
-}
 
 #endif

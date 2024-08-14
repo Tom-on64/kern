@@ -26,7 +26,7 @@ void main() {
         }
     }
 
-    deinitMemoryRegion(0x1000, 0x11000); // Reserve kernel memory (under 0x12000)
+    deinitMemoryRegion(0x1000, 0x11fff); // Reserve kernel memory (under 0x12000)
     deinitMemoryRegion(MEMMAP_AREA, maxBlocks / BLOCKS_PER_BYTE);
 
     // Load root dir, find kernel INode and parse it

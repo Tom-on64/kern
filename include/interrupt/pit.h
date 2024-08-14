@@ -11,8 +11,6 @@
 #define COMMAND   0x43
 #define INPUT_CLK 1193182
 
-static uint32_t* sleepTimerTicks = (uint32_t*)SLEEP_TIMER;
-
 __attribute__ ((interrupt))
 void timerHandler(intFrame_t* iframe) {
     static uint32_t cursorTicks = 0;
@@ -22,7 +20,7 @@ void timerHandler(intFrame_t* iframe) {
         if (cursorTicks % 500 == 0) toggleCursor();
     }
 
-    if (*sleepTimerTicks > 0) { --(*sleepTimerTicks); }
+    if (*(uint32_t*)SLEEP_TIMER > 0) { --(*(uint32_t*)SLEEP_TIMER); }
 
     sendPicEOI(0);
 }
