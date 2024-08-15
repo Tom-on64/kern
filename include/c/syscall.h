@@ -3,8 +3,6 @@
 
 #define MAX_SYSCALLS 9
 
-// TODO: Add malloc() and free() syscall wrappers??
-
 typedef enum {
     SYS_RESERVED,
     SYS_SLEEP, 
