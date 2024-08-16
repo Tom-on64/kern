@@ -1,5 +1,5 @@
-#ifndef PIC_H
-#define PIC_H
+#ifndef INTERRUPT_PIC_H
+#define INTERRUPT_PIC_H
 
 #include <ports/io.h>
 

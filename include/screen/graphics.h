@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef SCREEN_GRAPHICS_H
+#define SCREEN_GRAPHICS_H
 
 #include <stdint.h>
 #include <screen/text.h>

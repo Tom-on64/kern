@@ -1,5 +1,5 @@
-#ifndef ADDRESSES_H
-#define ADDRESSES_H
+#ifndef MEMORY_ADDRESSES_H
+#define MEMORY_ADDRESSES_H
 
 /*
  * Memory layout of addresses 0x0000 - 0x12000

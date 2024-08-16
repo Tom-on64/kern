@@ -1,5 +1,5 @@
-#ifndef PHYSICAL_MEM_MANAGER_H
-#define PHYSICAL_MEM_MANAGER_H
+#ifndef MEMORY_PHYSICAL_H
+#define MEMORY_PHYSICAL_H
 
 #include <memory/addresses.h>
 #include <string.h>

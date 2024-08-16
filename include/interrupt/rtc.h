@@ -1,5 +1,5 @@
-#ifndef RTC_H
-#define RTC_H
+#ifndef INTERRUPT_RTC_H
+#define INTERRUPT_RTC_H
 
 #include <interrupt/pic.h>
 #include <interrupt/idt.h>

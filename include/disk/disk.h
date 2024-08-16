@@ -1,5 +1,5 @@
-#ifndef DRIVE_H
-#define DRIVE_H
+#ifndef DISK_DISK_H
+#define DISK_DISK_H
 
 #include <stdint.h>
 #include <ports/io.h>

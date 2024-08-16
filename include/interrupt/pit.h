@@ -1,5 +1,5 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef INTERRUPT_PIT_H
+#define INTERRUPT_PIT_H
 
 #include <interrupt/idt.h>
 #include <interrupt/pic.h>

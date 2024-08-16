@@ -1,5 +1,5 @@
-#ifndef TERMINAL_H
-#define TERMINAL_H
+#ifndef TERMINAL_TERMINAL_H
+#define TERMINAL_TERMINAL_H
 
 #include <screen/gfxmode.h>
 #include <memory/addresses.h>

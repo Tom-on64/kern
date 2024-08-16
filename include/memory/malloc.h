@@ -1,5 +1,5 @@
-#ifndef MALLOC_H
-#define MALLOC_H
+#ifndef MEMORY_MALLOC_H
+#define MEMORY_MALLOC_H
 
 #include <stdint.h>
 #include <memory/virtual.h>

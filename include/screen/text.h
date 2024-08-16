@@ -1,5 +1,5 @@
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef SCREEN_TEXT_H
+#define SCREEN_TEXT_H
 
 #include <terminal/terminal.h>
 #include <memory/addresses.h>

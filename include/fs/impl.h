@@ -1,5 +1,5 @@
-#ifndef IMPL_H
-#define IMPL_H
+#ifndef FS_IMPL_H
+#define FS_IMPL_H
 
 #include <fs/fs.h>
 #include <memory/addresses.h>

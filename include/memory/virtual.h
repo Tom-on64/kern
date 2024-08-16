@@ -1,5 +1,5 @@
-#ifndef VIRTUAL_H
-#define VIRTUAL_H
+#ifndef MEMORY_VIRTUAL_H
+#define MEMORY_VIRTUAL_H
 
 #include <stdint.h>
 #include <memory/physical.h>

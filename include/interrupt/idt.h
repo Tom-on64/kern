@@ -1,5 +1,5 @@
-#ifndef IDT_H
-#define IDT_H
+#ifndef INTERRUPT_IDT_H
+#define INTERRUPT_IDT_H
 
 #include <stdint.h>
 

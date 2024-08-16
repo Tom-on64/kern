@@ -1,5 +1,5 @@
-#ifndef FS_H
-#define FS_H
+#ifndef FS_FS_H
+#define FS_FS_H
 
 /*
  * For info, read the fs-spec.txt document inside of docs/

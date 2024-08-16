@@ -1,5 +1,5 @@
-#ifndef KEYS_H
-#define KEYS_H
+#ifndef KEYBOARD_KEYS_H
+#define KEYBOARD_KEYS_H
 
 #include <stdbool.h>
 

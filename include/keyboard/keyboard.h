@@ -1,5 +1,5 @@
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef KEYBOARD_KEYBOARD_H
+#define KEYBOARD_KEYBOARD_H
 
 #include <interrupt/idt.h>
 #include <interrupt/pic.h>

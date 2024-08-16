@@ -1,5 +1,5 @@
-#ifndef ISRS_H
-#define ISRS_H
+#ifndef INTERRUPT_EXCEPTIONS_H
+#define INTERRUPT_EXCEPTIONS_H
 
 #include <interrupt/idt.h>
 #include <stdio.h>

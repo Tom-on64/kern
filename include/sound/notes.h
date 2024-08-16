@@ -1,5 +1,5 @@
-#ifndef NOTES_H
-#define NOTES_H
+#ifndef SOUND_NOTES_H
+#define SOUND_NOTES_H
 
 /*
 

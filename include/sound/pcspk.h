@@ -1,5 +1,5 @@
-#ifndef PCSPK_H
-#define PCSPK_H
+#ifndef SOUND_PCSPK_H
+#define SOUND_PCSPK_H
 
 #include <stdint.h>
 #include <sound/notes.h>

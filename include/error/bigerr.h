@@ -1,5 +1,5 @@
-#ifndef BIGERR_H
-#define BIGERR_H
+#ifndef ERROR_BIGERR_H
+#define ERROR_BIGERR_H
 
 /*
  * Something went VERY wrong. 
