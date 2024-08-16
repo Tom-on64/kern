@@ -5,15 +5,11 @@
 #include <syscall.h>
 
 void* malloc(const uint32_t size) { 
-    void* ptr = 0;
-    __asm__ volatile ("int $0x80" : : "a"(SYS_MALLOC), "b"(size));
-    __asm__ volatile ("movl %%eax, %0" : "=r"(ptr));
-
-    return ptr;
+    return (void*)syscall(SYS_MALLOC, size, 0, 0);
 }
 
 void free(const void* ptr) { 
-    __asm__ volatile ("int $0x80" : : "a"(SYS_FREE), "b"(ptr));
+    syscall(SYS_FREE, (int)ptr, 0, 0);
 }
 
 #endif

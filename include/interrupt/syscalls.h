@@ -1,5 +1,5 @@
-#ifndef SYSCALL_H
-#define SYSCALL_H
+#ifndef INTERRUPT_SYSCALLS_H
+#define INTERRUPT_SYSCALLS_H
 
 #include <interrupt/idt.h>
 #include <terminal/terminal.h>
@@ -47,7 +47,7 @@ void sys_write() {
 
 // TODO: Use a Read() sycall and read from stdin
 // Args: ebx - char* buffer
-void sys_gets() {
+void sys_read() {
     char* s;
     __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
     reads(s);
@@ -102,7 +102,7 @@ void sys_seek() {}
 void (*syscalls[MAX_SYSCALLS])(void) = {
     [SYS_SLEEP]     = sys_sleep,  
     [SYS_WRITE]     = sys_write,  
-    [SYS_GETS]      = sys_gets,   
+    [SYS_READ]      = sys_read,   
     [SYS_MALLOC]    = sys_malloc, 
     [SYS_FREE]      = sys_free,
     [SYS_OPEN]      = sys_open,

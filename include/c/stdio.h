@@ -17,31 +17,6 @@ FILE* stdin;
 FILE* stdout;
 FILE* stderr;
 
-/* --- Syscall Wrappers --- */
-int write(int fd, const void* ptr, size_t count) {
-    int result = 0;
-    __asm__ volatile ("int $0x80" : "=a"(result) : "a"(SYS_WRITE), "b"(fd), "c"(ptr), "d"(count));
-    return result;
-}
-
-int read(int fd, void* ptr, size_t count) {
-    int result = 0;
-    __asm__ volatile ("int $0x80" : "=a"(result) : "a"(SYS_GETS), "b"(fd), "c"(ptr), "d"(count));
-    return result;
-}
-
-int open(const char* path, int oflag) {
-    int fd = -1;
-    __asm__ volatile ("int $0x80" : "=a"(fd) : "a"(SYS_OPEN), "b"(path), "c"(oflag));
-    return fd;
-}
-
-int close(int fd) {
-    int result = -1;
-    __asm__ volatile ("int $0x80" : "=a"(result) : "a"(SYS_CLOSE), "b"(fd));
-    return result;
-}
-
 /* --- file I/O --- */
 FILE* fopen(const char* filename, const char* mode) {
     FILE* stream = malloc(sizeof(FILE));
@@ -90,7 +65,6 @@ size_t fwrite(const void* ptr, size_t size, size_t count, FILE* stream) {
     }
 
     return writtenEl;
-
 }
 
 int fseek(FILE* stream, long int origin, int offset) {
