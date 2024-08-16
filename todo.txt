@@ -100,6 +100,8 @@ Legend:
     - [x] Malloc()
     - [x] Free()
     - [ ] Seek()
+    - [ ] Tell()
+    - [ ] Exit()
 - [ ] Shell
     - [ ] Separate file/program
     - [ ] ';' separated commands
@@ -122,7 +124,7 @@ Legend:
         - [ ] cd
 - [ ] Standard I/O stuff
     - [ ] stdin
-    - [ ] stdout
+    - [x] stdout
     - [ ] stderr
 - [x] Memory manager
     - [x] Memory map

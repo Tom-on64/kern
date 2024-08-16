@@ -316,16 +316,29 @@ void main() {
 }
 
 void listFiles() {
-    // TODO: Make this real
-    printf("Total 8\n");
-    printf(".               [dir]\n");
-    printf("..              [dir]\n");
-    printf("stage3.bin      2868B\n");
-    printf("kernel.bin      13536B\n");
-    printf("testfont.fnt    2048B\n");
-    printf("term16n.fnt     2048B\n");
-    printf("calc.bin        1724B\n");
-    printf("editor.bin      1280B\n");
+    inode_t* root = (inode_t*)impl_superblock->rootInodePtr;
+    diskRead(root->extent[0].block * 8, root->extent[0].length * 8, (void*)SCRATCH_BLOCK_LOC);
+    dirEntry_t* dentry = (dirEntry_t*)SCRATCH_BLOCK_LOC;
+
+    uint32_t total = 0;
+    while ((dentry + total)->name[0] != '\0') { total++; }
+
+    putc(' '); // TODO
+    printf("\bTotal %d\n", total);
+
+    while (dentry->name[0] != '\0') {
+        inode_t* inode = (inode_t*)BOOT_FIRST_INODE_LOC + dentry->id;
+
+        printf("%s", dentry->name);
+        for (uint32_t pad = (16 - strlen(dentry->name)); pad > 0; pad--) { putc(' '); }
+
+        switch (inode->type) {
+            case FT_FILE: printf("%dB\n", inode->sizeBytes); break;
+            case FT_DIR: printf("[dir]\n"); break;
+        }
+
+        dentry++;
+    }
 }
 
 void printRegs() {
