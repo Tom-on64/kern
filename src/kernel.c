@@ -26,13 +26,18 @@
 
 #define PROMPT "#>"
 
+// FS things
+char* cwd;
+
+FILE* openFileTable;
+uint32_t maxOpenFiles;
+uint32_t openFiles;
+
 // Function declarations
 void listFiles();
 void printRegs();
 void printPhysicalMemmap();
-
-// FS things
-char* cwd;
+void initOpenFileTable();
 
 __attribute__ ((section("entry")))
 void main() {
@@ -74,16 +79,9 @@ void main() {
     mallocVirtualAddr = kernelMallocVirtualAddr;
     mallocPhysicalAddr = kernelMallocPhysicalAddr;
     mallocPages = kernelMallocPages;
-
-    // Setup stdio FILE*
-    stdin->_file = 0;
-    stdin->_oflag = O_RDONLY;
-    stdout->_file = 1;
-    stdout->_oflag = O_WRONLY | O_APPEND;
-    stderr->_file = 2;
-    stderr->_oflag = O_WRONLY | O_APPEND;
-
+    
     // FS Setup
+    initOpenFileTable();
     cwd = malloc(1024);
     strcpy(cwd, "/");
 
@@ -343,5 +341,27 @@ void printPhysicalMemmap() {
     printf("Total 4kB Blocks: %d\n", maxBlocks);
     printf("Used or reserved blocks: %d\n", usedBlocks);
     printf("Free blocks: %d\n\n", maxBlocks - usedBlocks);
+}
+
+void initOpenFileTable() {
+    maxOpenFiles = 256;
+
+    openFileTable = malloc(sizeof(FILE) * maxOpenFiles);
+    memset(openFileTable, 0, sizeof(FILE) * maxOpenFiles);
+
+    // offset and ptr are unused in these
+    stdin = openFileTable + 0;
+    stdin->_file = 0;
+    stdin->_oflag = O_RDONLY;
+
+    stdout = openFileTable + 1;
+    stdout->_file = 1;
+    stdout->_oflag = O_WRONLY | O_APPEND;
+
+    stderr = openFileTable + 2;
+    stderr->_file = 2;
+    stderr->_oflag = O_WRONLY | O_APPEND;
+
+    openFiles = 3;
 }
 

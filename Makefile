@@ -51,8 +51,7 @@ $(C_FILES):
 
 # This target builds all fonts inside src/fonts
 $(FONTS):
-	@echo "Assembling $(SRC)/fonts/$@.asm..."
-	@$(AS) -fbin -o $(BIN)/$@.fnt $(SRC)/fonts/$@.asm
+	@cp $(SRC)/fonts/$@.fnt $(BIN)/$@.fnt
 
 # Run QEMU
 run:

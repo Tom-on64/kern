@@ -87,6 +87,8 @@ void sys_open() {
     uint32_t oflag = 0;
 
     __asm__ volatile ("nop" : "=b"(path), "=c"(oflag));
+
+
     
     __asm__ volatile ("movl %0, %%eax" : : "a"(fd));
 }

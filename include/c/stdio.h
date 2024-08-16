@@ -7,10 +7,11 @@
 #include <stdint.h>
 
 // Nobody should have to interface with the internals of this structure
-typedef struct _iobuf {
-    char* _ptr;
-    int _file;
-    int _oflag;
+typedef struct _iobuf { // 16B
+    char* _ptr; // Virtual address of file base
+    int _offset; // Offset into file; Seek()
+    int _file; // File descriptor
+    int _oflag; // Flags used to open file
 } FILE;
 
 FILE* stdin;
