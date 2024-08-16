@@ -237,77 +237,18 @@ void main() {
             disableSpeaker();
         } else if (strcmp(argv[0], "test") == 0) {
             printf("\x1b[1MError: 'test' is not available.\x1b[8M\n");
-        } else { // TODO: Use new filesystem!
-            /*
-            fileEntry_t* file = findFile(argv[0]);
+        } else { // TODO: Use cwd for this
+            inode_t* root = (inode_t*)impl_superblock->rootInodePtr;
+            diskRead(root->extent[0].block * 8, root->extent[0].length * 8, (void*)SCRATCH_BLOCK_LOC);
+            dirEntry_t* dentry = (dirEntry_t*)SCRATCH_BLOCK_LOC;
             
-            if (file == NULL) {*/
+            inode_t* inode = getInode(argv[0], dentry);
+            if (inode == NULL) {
                 printf("Command not found: %s\n", argv[0]);
                 continue;
-            /*}
-
-            uint32_t neededPages = (file->length * 512) / PAGE_SIZE;
-            if ((file->length * 512) % PAGE_SIZE > 0) { neededPages++; }
-
-            char* entryPoint = (char*)0x400000; // Right after first 4MB
-            for (uint32_t i = 0; i < neededPages; i++) {
-                ptEntry_t page = 0;
-                uint32_t physicalAddress = (uint32_t)allocPage(&page);
-                
-                if (mapPage((void*)physicalAddress, (void*)(entryPoint + i * PAGE_SIZE)) != 0) {
-                    printf("\n\x1b[1MNot enough memory to allocate!\n");
-                    break;
-                }
             }
 
-            readFile(argv[0], entryPoint);
-
-            if (strcmp(file->filetype, "bin") == 0) {
-                // Reset malloc
-                mallocListHead = NULL;
-                mallocVirtualAddr = (uint32_t)entryPoint + neededPages * PAGE_SIZE;
-                mallocPhysicalAddr = 0;
-                mallocPages = 0;
-
-                // Call program
-                // TODO: Use return value
-                ((int(*)(int argc, char** argv))entryPoint)(argc, argv);
-
-                for (uint32_t i = 0, virtualAddr = mallocVirtualAddr; i < mallocPages; i++, virtualAddr += PAGE_SIZE) {
-                    ptEntry_t* page = getPage(virtualAddr);
-
-                    if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) {
-                        freePage(page);
-                        unmapPage((void*)virtualAddr);
-                        flushTlbEntry(virtualAddr);
-                    }
-                }
-                
-                mallocListHead = kernelMallocListHead;
-                mallocVirtualAddr = kernelMallocVirtualAddr;
-                mallocPhysicalAddr = kernelMallocPhysicalAddr;
-                mallocPages = kernelMallocPages;
-            } else if (strcmp(file->filetype, "fnt") == 0) {
-                printf("Loading %s...\n", file->filename);
-                memcpy(entryPoint, (char*)FONT_LOC, file->length * 512);
-                printf("Font loaded\n");
-            } else {
-                for (size_t i = 0; i < file->length * 512; i++) {
-                    if (entryPoint[i] != '\0') {
-                        putc(entryPoint[i]);
-                    }
-                }
-                putc('\n');    
-            }
-
-            for (uint32_t i = 0, virtualAddr = (uint32_t)entryPoint; i < neededPages; i++, virtualAddr += PAGE_SIZE) {
-                ptEntry_t* page = getPage(virtualAddr);
-                if (PAGE_PHYS_ADDRESS(page) && TEST_ATTR(page, PTE_PRESENT)) { // Check if the page is used
-                    freePage(page);
-                    unmapPage((void*)virtualAddr);
-                    flushTlbEntry(virtualAddr); // Invalidate unused page
-                }
-            }*/
+            printf("%d: %s %dB\n", inode->id, argv[0], inode->sizeBytes);
         }
     }
 
