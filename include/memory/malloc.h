@@ -1,10 +1,10 @@
 #ifndef MEMORY_MALLOC_H
 #define MEMORY_MALLOC_H
 
-#include <stdint.h>
 #include <memory/virtual.h>
 #include <memory/physical.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 // Singly linked list!
 typedef struct mallocNode_s {

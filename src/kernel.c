@@ -29,8 +29,7 @@
 // FS things
 char* cwd;
 
-FILE* openFileTable;
-uint32_t maxOpenFiles;
+FILE* openFileTable = (FILE*)OPEN_FILE_TABLE_LOC;
 uint32_t openFiles;
 
 // Function declarations
@@ -94,7 +93,7 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf("%s %s ", cwd, PROMPT);
+        printf("\e[6M\e[8N%s \e[2M%s \e[8M", cwd, PROMPT);
         char input[256];
         char* inputPtr = input;
 
@@ -192,7 +191,6 @@ void main() {
             printf(" regs       | Prints register values\n");
             printf(" sleep      | Sleeps for input number of seconds\n");
             printf(" soundtest  | Plays a tune :)\n");
-            printf(" test       | Performs tests\n");
         } else if (strcmp(argv[0], "ls") == 0) {
             listFiles();
         } else if (strcmp(argv[0], "memmap") == 0) {
@@ -233,20 +231,15 @@ void main() {
             rest(120);
 
             disableSpeaker();
-        } else if (strcmp(argv[0], "test") == 0) {
-            printf("\x1b[1MError: 'test' is not available.\x1b[8M\n");
         } else { // TODO: Use cwd for this
-            inode_t* root = (inode_t*)impl_superblock->rootInodePtr;
-            diskRead(root->extent[0].block * 8, root->extent[0].length * 8, (void*)SCRATCH_BLOCK_LOC);
-            dirEntry_t* dentry = (dirEntry_t*)SCRATCH_BLOCK_LOC;
-            
-            inode_t* inode = getInode(argv[0], dentry);
-            if (inode == NULL) {
-                printf("Command not found: %s\n", argv[0]);
-                continue;
-            }
+            char* fileName = argv[0];
+            //FILE* fp = fopen(fileName, "rb");
 
-            printf("%d: %s %dB\n", inode->id, argv[0], inode->sizeBytes);
+            //if (fp == NULL) {
+                printf("Command not found: %s\n", fileName);
+            //    continue;
+            //}
+
         }
     }
 
@@ -344,23 +337,22 @@ void printPhysicalMemmap() {
 }
 
 void initOpenFileTable() {
-    maxOpenFiles = 256;
-
-    openFileTable = malloc(sizeof(FILE) * maxOpenFiles);
-    memset(openFileTable, 0, sizeof(FILE) * maxOpenFiles);
+    openFileTable = malloc(sizeof(FILE) * MAX_OPEN_FILES);
+    if (openFileTable == NULL) { printf("\e[1MFailed to init file table! Malloc() error.\e[8M"); }
+    memset(openFileTable, 0, sizeof(FILE) * MAX_OPEN_FILES);
 
     // offset and ptr are unused in these
     stdin = openFileTable + 0;
     stdin->_file = 0;
-    stdin->_oflag = O_RDONLY;
+    stdin->_flag = O_RDONLY;
 
     stdout = openFileTable + 1;
     stdout->_file = 1;
-    stdout->_oflag = O_WRONLY | O_APPEND;
+    stdout->_flag = O_WRONLY | O_APPEND;
 
     stderr = openFileTable + 2;
     stderr->_file = 2;
-    stderr->_oflag = O_WRONLY | O_APPEND;
+    stderr->_flag = O_WRONLY | O_APPEND;
 
     openFiles = 3;
 }

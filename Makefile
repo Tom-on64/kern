@@ -9,7 +9,7 @@ LDFLAGS = -z notext -melf_i386
 
 SRC = ./src
 BIN = ./bin
-C_FILES = calc editor
+C_FILES = calc edit
 FONTS = testfont term16n
 
 .PHONY: os clean run

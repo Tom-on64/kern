@@ -20,15 +20,18 @@ typedef struct {
 } fileInfo_t;
 
 fileInfo_t files[] = { // TODO: Not have to list all of the files, loop through a directory or smth
+    /* Bootloader */
     { BIN_DIR"stage1.bin" },
     { BIN_DIR"stage2.bin" },
     { BIN_DIR"stage3.bin" },
+    /* Kernel stuff */
     { BIN_DIR"kernel.bin" },
     { BIN_DIR"term16n.fnt" },
     { BIN_DIR"testfont.fnt" },
+    /* Userspace files */
     { "./src/fs/test.txt" },
     { BIN_DIR"calc.bin" },
-    { BIN_DIR"editor.bin" },
+    { BIN_DIR"edit.bin" },
 };
 
 superblock_t superblock = { 0 };

@@ -6,58 +6,80 @@
 #include <keyboard/keyboard.h>
 #include <memory/malloc.h>
 #include <memory/addresses.h>
+#include <memory/physical.h>
+#include <fs/fs.h>
+#include <fs/impl.h>
+#include <error/bigerr.h>
 #include <syscall.h>
 #include <stdint.h>
-#include <fs/fs.h>
+#include <stdlib.h>
 
 /*
  * XXX WARNING - Update MAX_SYSCALLS in the handler XXX
  */
 
-// Args: ebx - number of miliseconds
-void sys_sleep() {
-    uint32_t* sleepTimerTicks = (uint32_t*)SLEEP_TIMER;
-    
-    __asm__ volatile ("movl %%ebx, %0" : "=r"(*sleepTimerTicks));
+typedef struct {
+    uint32_t esp;
+    uint32_t ebx;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t esi;
+    uint32_t edi;
+    uint32_t ebp;
+    uint32_t ds;
+    uint32_t es;
+    uint32_t fs;
+    uint32_t gs;
+    uint32_t eax;
+} __attribute__ ((packed)) sys_regs_t;
 
+int sys_reserved(sys_regs_t) { 
+    printf("\e[1N\e[6M Illegal use of Reserved() system call! \e[8M\e[8N\n");
+    return -1;
+}
+
+// Args: ebx - number of miliseconds
+int sys_sleep(sys_regs_t regs) {
+    uint32_t* sleepTimerTicks = (uint32_t*)SLEEP_TIMER;
+    *sleepTimerTicks = regs.ebx;
+    
     while (*sleepTimerTicks > 0) { // Wait...
         __asm__ volatile ("sti;hlt;cli;");
     }
+
+    return 0;
 }
 
 // Args: ebx - int fd
 //       ecx - void* buf
 //       edx - uint32_t len
 // Rets: Number of bytes written
-void sys_write() {
-    int32_t fd = 0;
-    void* buf = NULL;
-    uint32_t len = 0;
-
-    __asm__ volatile ("nop" : "=b"(fd), "=c"(buf), "=d"(len));
+int sys_write(sys_regs_t regs) {
+    int32_t fd = regs.ebx;
+    void* buf = (void*)regs.ecx;
+    uint32_t len = regs.edx;
 
     // TODO: Open fd table?
     if (fd == 1) { // "stdout"
-        int32_t result = terminalWrite(buf, len); // Call a terminal print function
-        __asm__ volatile ("movl %0, %%eax" : : "r"(result));
-    } else { // Not implemented
-        __asm__ volatile ("movl $-1, %eax");
+        return terminalWrite(buf, len); // Call a terminal print function
+    } else { 
+        return -1;
     }
 }
 
 // TODO: Use a Read() sycall and read from stdin
 // Args: ebx - char* buffer
-void sys_read() {
-    char* s;
-    __asm__ volatile ("movl %%ebx, %0" : "=r"(s));
+int sys_read(sys_regs_t regs) {
+    char* s = (char*)regs.ebx;
     reads(s);
+
+    return 0;
 }
 
 // Args: ebx - size_t count
 // Rets: Pointer to malloc-ed memory
-void sys_malloc() {
-    uint32_t count = 0;
-    __asm__ volatile ("movl %%ebx, %0" : "=b"(count));
+int sys_malloc(sys_regs_t regs) {
+    uint32_t count = regs.ebx;
     
     // First Malloc()
     if (!mallocListHead) {
@@ -67,41 +89,88 @@ void sys_malloc() {
     void* ptr = mallocNextNode(count);
     mallocMergeFree();
 
-    // Return allocated address in eax
-    __asm__ volatile ("movl %0, %%eax" : : "r"(ptr));
+    return (uint32_t)ptr;
 }
 
 // Args: ebx - void* ptr
-void sys_free() {
-    void* ptr = NULL;
-    __asm__ volatile ("movl %%ebx, %0" : "=b"(ptr));
+int sys_free(sys_regs_t regs) {
+    void* ptr = (void*)regs.ebx;
     mallocFree(ptr);
+    return 0;
 }
 
 // Args: ebx - path, 
 //       ecx - oflag
 // Rets: Opened file descriptor
-void sys_open() {
-    uint32_t fd = 0;
-    char* path = NULL;
-    uint32_t oflag = 0;
+int sys_open(sys_regs_t regs) {
+    int fd = 0;
+    char* path = (char*)regs.ebx;
+    uint32_t oflag = regs.ecx;
 
-    __asm__ volatile ("nop" : "=b"(path), "=c"(oflag));
+    extern FILE* openFileTable;
+    extern uint32_t openFiles;
 
+    // TODO: better file finding
+    inode_t* root = (inode_t*)impl_superblock->rootInodePtr;
+    loadFile(root, (void*)SCRATCH_BLOCK_LOC);
 
+    inode_t* inode = getInode(path, (dirEntry_t*)SCRATCH_BLOCK_LOC);
+
+    // TODO: check if max open files have'nt been reached
+    fd = openFiles++;
+    FILE* fp = openFileTable + fd;
+    fp->_ptr = 0;
+    fp->_offset = 0;
+    fp->_size = inode->sizeBytes;
+    fp->_flag = oflag;
+    fp->_file = fd;
+
+    /*fp->_ptr = (unsigned char*)nextAvailableVirtualAddress;
+
+    // Read file from disk
+    uint32_t pageCount = BYTES2BLOCKS(inode->sizeBytes);
+    if (pageCount == 0) { pageCount++; }
+
+    for (size_t i = 0; i < pageCount; i++) {
+        ptEntry_t page = 0;
+        uint32_t physAddr = (uint32_t)allocPage(&page);
+
+        if (!mapPage((void*)physAddr, (void*)nextAvailableVirtualAddress)) {
+            fd = -1; // TODO errno
+            break;
+        }
+
+        nextAvailableVirtualAddress += PAGE_SIZE;
+    }
+
+    if (!loadFile(inode, fp->_ptr)) {
+        fd = -1; // TODO errno
+    }*/
     
-    __asm__ volatile ("movl %0, %%eax" : : "a"(fd));
+    return fd;
 }
 
 // Args: ebx - int fd
 // Rets: status
-void sys_close() {}
+int sys_close(sys_regs_t regs) {
+    int fd = regs.ebx;
+
+    extern FILE* openFileTable;
+    extern uint32_t openFiles;
+
+    FILE* fp = openFileTable + fd;
+    //free(fp->_ptr);
+    openFiles--;
+
+    return 0;
+}
 
 // TODO
-void sys_seek() {}
+int sys_seek(sys_regs_t regs) { return -1; }
 
 // System call table
-void (*syscalls[MAX_SYSCALLS])(void) = {
+int (*syscalls[MAX_SYSCALLS])(sys_regs_t) = {
+    [SYS_RESERVED]  = sys_reserved,
     [SYS_SLEEP]     = sys_sleep,  
     [SYS_WRITE]     = sys_write,  
     [SYS_READ]      = sys_read,   
@@ -127,7 +196,7 @@ void syscallHandler(intFrame_t* iframe) {
             "ja invalidSyscall\n"
 
             // Call the syscall
-            "push eax\n" // Push required values
+            "push eax\n"
             "push gs\n"
             "push fs\n"
             "push es\n"
@@ -139,11 +208,13 @@ void syscallHandler(intFrame_t* iframe) {
             "push ecx\n"
             "push ebx\n"
             "push esp\n" // Push stack pointer again (for variables and such idk)
+
             "call [syscalls + eax * 4]\n" // Call syscall from table. Syscall number should be in eax
-            "add esp, 4\n"
-            "pop ebx\n" // Pop pushed values
+            "add esp, 4\n" // Do not override ESP
+            "pop ebx\n"
             "pop ecx\n"
-            "pop edx\n"
+            "add esp, 4\n" // Do not override EDX, some syscalls use it
+
             "pop esi\n"
             "pop edi\n"
             "pop ebp\n"
@@ -159,7 +230,7 @@ void syscallHandler(intFrame_t* iframe) {
             "mov eax, -1\n" // Current error thing
             "iretd\n"
 
-            ".att_syntax" // Switch back to Att Syntax (Just in case)
+            ".att_syntax" // Switch back to AT&T Syntax (Just in case)
     );
 }
 
