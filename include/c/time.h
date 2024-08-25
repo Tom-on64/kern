@@ -1,11 +1,11 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include <syscall.h>
 #include <stdint.h>
 
 void sleep(uint32_t ms) {
-    // Call syscall 0 (eax) with 'ms' miliseconds (ebx)
-    __asm__ volatile ("int $0x80" : : "a"(0), "b"(ms));
+    syscall(SYS_SLEEP, ms, 0, 0);
 }
 
 #endif
