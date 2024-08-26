@@ -30,7 +30,7 @@
 #define DATETIME_LOC            0x2200
 
 // Filesystem Area 0x3000 - 0x3fff
-#define FILETABLE_LOC           0x3000
+#define OPEN_FILE_TABLE_LOC     0x3000
 
 // Font area 0x4000 - 0x4fff
 #define FONT_LOC                0x4000
@@ -58,5 +58,6 @@
 #define KERNEL_LOC              0x100000
 #define KERNEL_MALLOC_AREA      0x300000
 #define MEMMAP_AREA             0x30000
+#define OPEN_FILE_LOC           0xd000
 
 #endif

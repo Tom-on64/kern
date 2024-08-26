@@ -6,6 +6,8 @@
 #include <disk/disk.h>
 #include <stdint.h>
 
+#define MAX_OPEN_FILES 256
+
 superblock_t* impl_superblock = (superblock_t*)SUPERBLOCK_LOC;
 
 inode_t* getInode(char* path, dirEntry_t* dentries) {
@@ -13,8 +15,7 @@ inode_t* getInode(char* path, dirEntry_t* dentries) {
         if (strcmp(dentries->name, path) == 0) break;
         dentries++;
     }
-
-    if (dentries->name[0] == '\0') return NULL;
+    if (dentries->name[0] == '\0') { return NULL; }
 
     inode_t* inode = (inode_t*)BOOT_FIRST_INODE_LOC + dentries->id;
 

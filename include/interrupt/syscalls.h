@@ -115,38 +115,21 @@ int sys_open(sys_regs_t regs) {
     loadFile(root, (void*)SCRATCH_BLOCK_LOC);
 
     inode_t* inode = getInode(path, (dirEntry_t*)SCRATCH_BLOCK_LOC);
+    if (inode == NULL) {
+        return -1;
+    }
 
     // TODO: check if max open files have'nt been reached
     fd = openFiles++;
     FILE* fp = openFileTable + fd;
-    fp->_ptr = 0;
+    fp->_ptr = (void*)0xd000;
     fp->_offset = 0;
     fp->_size = inode->sizeBytes;
     fp->_flag = oflag;
     fp->_file = fd;
 
-    /*fp->_ptr = (unsigned char*)nextAvailableVirtualAddress;
+    loadFile(inode, fp->_ptr);
 
-    // Read file from disk
-    uint32_t pageCount = BYTES2BLOCKS(inode->sizeBytes);
-    if (pageCount == 0) { pageCount++; }
-
-    for (size_t i = 0; i < pageCount; i++) {
-        ptEntry_t page = 0;
-        uint32_t physAddr = (uint32_t)allocPage(&page);
-
-        if (!mapPage((void*)physAddr, (void*)nextAvailableVirtualAddress)) {
-            fd = -1; // TODO errno
-            break;
-        }
-
-        nextAvailableVirtualAddress += PAGE_SIZE;
-    }
-
-    if (!loadFile(inode, fp->_ptr)) {
-        fd = -1; // TODO errno
-    }*/
-    
     return fd;
 }
 
@@ -159,7 +142,7 @@ int sys_close(sys_regs_t regs) {
     extern uint32_t openFiles;
 
     FILE* fp = openFileTable + fd;
-    //free(fp->_ptr);
+    free(fp->_ptr);
     openFiles--;
 
     return 0;

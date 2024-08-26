@@ -62,7 +62,7 @@ void main() {
     // Setup kernel malloc variables
     mallocNode_t* kernelMallocListHead = 0;
     uint32_t kernelMallocVirtualAddr = KERNEL_MALLOC_AREA;
-    uint32_t kernelMallocPhysicalAddr = (uint32_t)allocBlocks(1); // TODO: Kernel may use more than 4kB?
+    uint32_t kernelMallocPhysicalAddr = (uint32_t)allocBlocks(16); // TODO: Kernel may use more than 64kB?
     uint32_t kernelMallocPages = 1;
 
     mapPage((void*)kernelMallocPhysicalAddr, (void*)kernelMallocVirtualAddr);
@@ -176,7 +176,7 @@ void main() {
             drawCircle(1500, 600, 300, WHITE);
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
-            getc(); // Wait until we get a 'q'
+            getc(); // Wait until we get a keystroke
             clear();
         } else if (strcmp(argv[0], "help") == 0) {
             printf("Available Commands:\n");
@@ -233,13 +233,33 @@ void main() {
             disableSpeaker();
         } else { // TODO: Use cwd for this
             char* fileName = argv[0];
-            //FILE* fp = fopen(fileName, "rb");
-
-            //if (fp == NULL) {
+            
+            FILE* _f = fopen(fileName, "rb");
+            if (_f == NULL) {
                 printf("Command not found: %s\n", fileName);
-            //    continue;
-            //}
+                continue;
+            }
+            FILE* fp = openFileTable + _f->_file;
 
+            printf("%d: 0x%x Bytes", fp->_file, fp->_size);
+            for (size_t i = 0; i < fp->_size; i++) {
+                if (i % 32 == 0) {
+                    if (i != 0) {
+                        size_t oldi = i;
+                        i -= 32;
+                        while (i < oldi) {
+                            char c = fp->_ptr[i++];
+                            printf("%c", c < 32 ? '.' : c);
+                        }
+                    }
+                    printf("\n%x: ", i);
+                }
+                printf("%x ", fp->_ptr[i]);
+            }
+            printf("\n");
+
+            free(_f);
+            fclose(fp);
         }
     }
 
