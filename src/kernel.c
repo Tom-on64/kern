@@ -241,20 +241,36 @@ void main() {
             }
             FILE* fp = openFileTable + _f->_file;
 
-            printf("%d: 0x%x Bytes", fp->_file, fp->_size);
+            printf("%d: 0x%x Bytes\n", fp->_file, fp->_size);
             for (size_t i = 0; i < fp->_size; i++) {
                 if (i % 32 == 0) {
                     if (i != 0) {
+                        printf("    ");
                         size_t oldi = i;
                         i -= 32;
                         while (i < oldi) {
                             char c = fp->_ptr[i++];
                             printf("%c", c < 32 ? '.' : c);
                         }
+                        putc('\n');
                     }
-                    printf("\n%x: ", i);
+                    if (i < 0x10) printf("0");
+                    if (i < 0x100) printf("0");
+                    if (i < 0x1000) printf("0");
+                    printf("%x: ", i);
                 }
+                if (fp->_ptr[i] < 0x10) putc('0');
                 printf("%x ", fp->_ptr[i]);
+            }
+            if (fp->_size % 32 != 0) {
+                for (size_t i = 0; i < 32-(fp->_size % 32); i++) {
+                    printf("00 ");
+                }
+            }
+            printf("    ");
+            for (size_t i = fp->_size-(fp->_size%32); i < fp->_size; i++) {
+                char c = fp->_ptr[i];
+                printf("%c", c < 32 ? '.' : c);
             }
             printf("\n");
 
