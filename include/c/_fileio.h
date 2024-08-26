@@ -1,8 +1,9 @@
 #ifndef _FILEIO_H
 #define _FILEIO_H
 
-#include <stdint.h>
 #include <syscall.h>
+#include <stdlib.h>
+#include <stddef.h>
 
 // Nobody should have to interface with the internals of this structure
 typedef struct _iobuf { // 24B

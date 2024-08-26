@@ -4,6 +4,7 @@
 #include <syscall.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 
 /* Declarations */
 void putc(char);
