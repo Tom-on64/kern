@@ -3,10 +3,12 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 // TODO: Support negative numbers
 int printf(const char* fmt, ...) {
-    unsigned int* argPtr = (unsigned int*)&fmt + 1; // First arg after fmt
+    va_list args;
+    va_start(args, fmt);
     
     // Printing buffer
     static char* buffer;
@@ -35,23 +37,22 @@ int printf(const char* fmt, ...) {
         } else if (state == '%') {
             switch (c) {
                 case 'd': // Decimal number
-                    strcat(buffer, itoa(*argPtr++, 10));
+                    strcat(buffer, itoa(va_arg(args, int), 10));
                     len += strlen(&buffer[len]); // Add the remaining length
                     break;
                 case 'x': // Hex number
-                    strcat(buffer, itoa(*argPtr++, 16));
+                    strcat(buffer, itoa(va_arg(args, int), 16));
                     len += strlen(&buffer[len]);
                     break;
                 case 's': // String
-                    char* s = *(char**)argPtr++;
+                    char* s = va_arg(args, char*);
                     
                     while (*s != '\0') {
                         buffer[len++] = *s++;
                     }
                     break;
                 case 'c': // Char
-                    buffer[len++] = *(char*)argPtr;
-                    argPtr++;
+                    buffer[len++] = va_arg(args, char);
                     break;
                 default: // This looks insane
                     buffer[len++] = '%';
@@ -66,6 +67,7 @@ int printf(const char* fmt, ...) {
     buffer[len] = '\0';
     write(1, buffer, len);
     free(buffer);
+    va_end(args);
 
     return 0;
 }
