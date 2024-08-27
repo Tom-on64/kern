@@ -88,7 +88,7 @@ void main() {
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
     clear();
-    print("kern.\n\n");
+    printf("kern.\n\n");
 
     // Run Interactive Shell Program
     // TODO: Make it in another file
@@ -254,17 +254,13 @@ void main() {
                         }
                         putc('\n');
                     }
-                    if (i < 0x10) printf("0");
-                    if (i < 0x100) printf("0");
-                    if (i < 0x1000) printf("0");
-                    printf("%x: ", i);
+                    printf("%04x: ", i);
                 }
-                if (fp->_ptr[i] < 0x10) putc('0');
-                printf("%x ", fp->_ptr[i]);
+                printf("%02x ", fp->_ptr[i]);
             }
             if (fp->_size % 32 != 0) {
                 for (size_t i = 0; i < 32-(fp->_size % 32); i++) {
-                    printf("00 ");
+                    printf("   ");
                 }
             }
             printf("    ");
@@ -314,35 +310,35 @@ void printRegs() {
 
     // a, b, c, d
     __asm__ volatile ("movl %%eax, %0" : "=r"(val));
-    printf("eax     0x%x\n", val);
+    printf("eax     0x%08x\n", val);
     __asm__ volatile ("movl %%ebx, %0" : "=r"(val));
-    printf("ebx     0x%x\n", val);
+    printf("ebx     0x%08x\n", val);
     __asm__ volatile ("movl %%ecx, %0" : "=r"(val));
-    printf("ecx     0x%x\n", val);
+    printf("ecx     0x%08x\n", val);
     __asm__ volatile ("movl %%edx, %0" : "=r"(val));
-    printf("edx     0x%x\n", val);
+    printf("edx     0x%08x\n", val);
 
     // si, di
     __asm__ volatile ("movl %%esi, %0" : "=r"(val));
-    printf("esi     0x%x\n", val);
+    printf("esi     0x%08x\n", val);
     __asm__ volatile ("movl %%edi, %0" : "=r"(val));
-    printf("edi     0x%x\n", val);
+    printf("edi     0x%08x\n", val);
 
     // cs, ds, es, ss
     __asm__ volatile ("movl %%cs, %0" : "=r"(val));
-    printf("cs      0x%x\n", val);
+    printf("cs      0x%08x\n", val);
    __asm__ volatile ("movl %%ds, %0" : "=r"(val));
-    printf("ds      0x%x\n", val);
+    printf("ds      0x%08x\n", val);
     __asm__ volatile ("movl %%es, %0" : "=r"(val));
-    printf("es      0x%x\n", val);
+    printf("es      0x%08x\n", val);
     __asm__ volatile ("movl %%ss, %0" : "=r"(val));
-    printf("ss      0x%x\n", val);
+    printf("ss      0x%08x\n", val);
 
     // stack
     __asm__ volatile ("movl %%esp, %0" : "=r"(val));
-    printf("esp     0x%x\n", val);
+    printf("esp     0x%08x\n", val);
     __asm__ volatile ("movl %%ebp, %0" : "=r"(val));
-    printf("ebp     0x%x\n", val);
+    printf("ebp     0x%08x\n", val);
 }
 
 void printPhysicalMemmap() {
@@ -350,7 +346,7 @@ void printPhysicalMemmap() {
     smapEntry_t* smapEntry = (smapEntry_t*)SMAP_ENTRIES;
 
     for (uint32_t i = 0; i < entryCount; i++) {
-        printf("Region %d - base: 0x%x length: 0x%x type: %d ", i, (uint32_t)smapEntry->baseAddress, (uint32_t)smapEntry->length, smapEntry->type);
+        printf("Region %02d - base: 0x%08x length: 0x%08x type: %2d ", i, (uint32_t)smapEntry->baseAddress, (uint32_t)smapEntry->length, smapEntry->type);
 
         switch (smapEntry->type) {
             case 1: printf("(Available)\n"); break;

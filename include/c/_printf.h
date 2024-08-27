@@ -1,75 +1,129 @@
 #ifndef _PRINTF_H
 #define _PRINTF_H
 
+#include <syscall.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <stdarg.h>
+#include <_fileio.h>
 
-// TODO: Support negative numbers
-int printf(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    
-    // Printing buffer
+// Warning: returns a allocated buffer, must be freed!
+char* _format(const char* fmt, va_list args) {
     static char* buffer;
-    static unsigned int len;
-    int max = 256;
+    size_t len = 0;
+    size_t max = 256;
 
     buffer = malloc(max);
-    len = 0;
-    
-    int state = 0;
-    for (int i = 0; fmt[i] != '\0'; i++) {
+
+    size_t i = 0;
+    while (fmt[i] != '\0') {
         if (len > max) {
             max *= 2;
-            // Reallocate larger buffer TODO: Use realloc();
+            // Reallocate a larger buffer
             char* temp = malloc(max);
             strcpy(temp, buffer);
             free(buffer);
             buffer = temp;
         }
-        buffer[len] = '\0';
 
-        char c = fmt[i];
-        if (state == 0) {
-             if (c == '%') state = '%';
-             else buffer[len++] = c;
-        } else if (state == '%') {
-            switch (c) {
-                case 'd': // Decimal number
-                    strcat(buffer, itoa(va_arg(args, int), 10));
-                    len += strlen(&buffer[len]); // Add the remaining length
-                    break;
-                case 'x': // Hex number
-                    strcat(buffer, itoa(va_arg(args, int), 16));
-                    len += strlen(&buffer[len]);
-                    break;
-                case 's': // String
-                    char* s = va_arg(args, char*);
-                    
-                    while (*s != '\0') {
-                        buffer[len++] = *s++;
-                    }
-                    break;
-                case 'c': // Char
-                    buffer[len++] = va_arg(args, char);
-                    break;
-                default: // This looks insane
-                    buffer[len++] = '%';
-                case '%': // Just print '%'
-                    buffer[len++] = c;
-                    break;
-            }  
-            state = 0;
-        }
+        // Formatting magic...
+        if (fmt[i] == '%') { i++;
+            /* TODO:
+             %p - pointer (0x########)
+             %n - ""
+             */
+            int pad = -1;
+            char padc = ' ';
+
+            if (fmt[i] == '0') { i++; padc = '0'; }
+            if (fmt[i] >= '0' && fmt[i] <= '9') {
+                pad = atoi(fmt + i);
+                while (fmt[i] >= '0' && fmt[i] <= '9') { i++; }
+            }
+            while (pad > 0) { buffer[len++] = padc; pad--; }
+
+            char c = fmt[i++];
+            if (c == 'd' || c == 'x' || c == 'o') {
+                int base = 10;
+                if (c == 'x') base = 16;
+                else if (c == 'o') base = 8;
+                
+                char* s = itoa(va_arg(args, int), base);
+                if (pad == 0) len -= strlen(s);
+                while ((buffer[len++] = *s++) != '\0');
+                len--;
+            } else if (c == 'c') {
+                if (pad == 0) len--;
+                buffer[len++] = va_arg(args, char);
+            } else if (c == 's') {
+                char* s = va_arg(args, char*);
+                if (pad == 0) len -= strlen(s);
+                while ((buffer[len++] = *s++) != '\0');
+                len--;
+            } else if (c == '%') {
+                buffer[len++] = '%';
+            } else {
+                buffer[len++] = '%';
+                if (padc == '0') { buffer[len++] = '0'; }
+                if (pad > 0) { buffer[len++] = '#'; } // TODO
+                buffer[len++] = c;
+            }
+        } else { buffer[len++] = fmt[i++]; }
     }
-
+    
     buffer[len] = '\0';
-    write(1, buffer, len);
+    return buffer;
+}
+
+int sprintf(char* str, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    char* buffer = _format(fmt, args);
+    strcpy(str, buffer);
     free(buffer);
     va_end(args);
 
-    return 0;
+    return strlen(str);
+}
+
+int snprintf(char* str, size_t n, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    char* buffer = _format(fmt, args);
+    strncpy(str, buffer, n);
+    free(buffer);
+    va_end(args);
+
+    return strlen(str);
+}
+
+int fprintf(FILE* stream, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    char* buffer = _format(fmt, args);
+    size_t len = strlen(buffer);
+    write(stream->_file, buffer, len); // TODO: use fwrite()
+    
+    free(buffer);
+    va_end(args);
+    return len;
+}
+
+int printf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    char* buffer = _format(fmt, args);
+    size_t len = strlen(buffer);
+    write(stdout->_file, buffer, len); // TODO: use fwrite()
+    
+    free(buffer);
+    va_end(args);
+    return len;
 }
 
 #endif
