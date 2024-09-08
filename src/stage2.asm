@@ -369,9 +369,9 @@ DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
 ;; XXX IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO XXX
-width: dw 1920
-height: dw 1080
-bpp: db 32
+width: dw 0
+height: dw 0
+bpp: db 0
 
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
