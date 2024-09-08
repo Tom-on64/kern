@@ -7,10 +7,33 @@ Legend:
 - [!] Important todo
 - [?] Optional
 
+- [!] The Big Refactor
+    - [?] Use GRUB
+        - [ ] Multiboot
+        - [ ] boot.s
+    - [ ] project structure
+        - [ ] system root
+        - [ ] arch/
+        - [ ] lib/
+        - [ ] include/
+        - [ ] cross compiler setup
+    - [ ] libc - User space
+    - [ ] libk - Kernel libc
+    - [ ] kernel
+        - [ ] use libk
+        - [ ] makefile
+        - [ ] probably a full rewrite
+    - [ ] userspace
+        - [ ] shell
+        - [ ] calc
+        - [ ] editor
+    - [ ] filesystem
+        - [ ] proper file organization
+    - [_] Makefile refactorin'
+
 - [x] Multistage Bootloader
 - [x] Bootloader reads filesystem to find files
 - [x] The almighty 'printf()'
-- [_] Makefile refactorin'
 - [x] Write down where stuff is in memory (in notes.txt)
 - [ ] "Text" mode (not actually)
     - [x] Scrolling
