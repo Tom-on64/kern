@@ -1,19 +1,19 @@
 # Variables
-CC = i686-elf-gcc
-LD = i686-elf-ld
-AS = nasm
+CC := i686-elf-gcc
+LD := i686-elf-ld
+AS := nasm
 
-CFLAGS = -std=c17 -ffreestanding -fno-builtin -fno-stack-protector -fno-pie \
+CFLAGS := -g -std=c17 -ffreestanding -fno-builtin -fno-stack-protector -fno-pie \
 		 -Os -nostdinc -mgeneral-regs-only -m32 -march=i386 -Wall -Iinclude/c
-LDFLAGS = -z notext -melf_i386
-ASFLAGS =
-
-SRC = ./src
-BIN = ./bin
-C_FILES = calc edit
-FONTS = testfont term16n
+LDFLAGS := -z notext -melf_i386 -nostdlib
+ASFLAGS :=
 
 include make.config
+
+SRC := ./src
+BIN := ./bin
+C_FILES := calc edit
+FONTS := testfont term16n
 
 .PHONY: os clean run
 
@@ -30,9 +30,9 @@ $(BIN):
 # Bootloader: This target is responsible for creating stage?.bin (1,2,3)
 bootloader: $(SRC)/stage1.asm $(SRC)/stage2.asm
 	@echo "Assembling $(SRC)/stage1.asm..."
-	@$(AS) $(ASFLAGS) -fbin -o $(BIN)/stage1.bin $(SRC)/stage1.asm
+	@$(AS) -fbin -o $(BIN)/stage1.bin $(SRC)/stage1.asm $(ASFLAGS) 
 	@echo "Assembling $(SRC)/stage2.asm..."
-	@$(AS) $(ASFLAGS) -fbin -o $(BIN)/stage2.bin $(SRC)/stage2.asm
+	@$(AS) -fbin -o $(BIN)/stage2.bin $(SRC)/stage2.asm $(ASFLAGS) 
 	@echo "Compiling $(SRC)/stage3.c..."
 	@$(CC) $(CFLAGS) -Iinclude -o $(BIN)/stage3.o -c $(SRC)/stage3.c
 	@$(LD) $(LDFLAGS) -T$(SRC)/stage3.ld --oformat binary -o $(BIN)/stage3.bin $(BIN)/stage3.o

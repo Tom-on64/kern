@@ -368,12 +368,26 @@ CODE_SEG equ GDT.codeDescriptor - GDT.start
 DATA_SEG equ GDT.dataDescriptor - GDT.start
 
 ;; VBE Stuff
-;; XXX IF YOU WANT TO SELECT ANY VALUE IN THE SETUP, SET THESE TO ZERO XXX
-%ifdef DEF_RES
-width: dw 1920
+; Default width
+%ifndef DEF_W
+%define DEF_W 0
 %endif
-height: dw 1080
-bpp: db 32
+; Default height
+%ifndef DEF_H
+%define DEF_H 0
+%endif
+; Default bpp
+%ifndef DEF_BPP
+%define DEF_BPP 0
+%endif
+; Use defaults
+%ifdef DEF_RES
+width: dw DEF_W
+%else
+width: dw 0
+%endif
+height: dw DEF_H
+bpp: db DEF_BPP
 
 offset: dw 0
 _segment: dw 0 ; segment is a keyword
