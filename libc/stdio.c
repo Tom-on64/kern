@@ -1,20 +1,12 @@
-#ifndef STDIO_H
-#define STDIO_H
-
+#include <stdio.h>
 #include <syscall.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
 
-/* Declarations */
-void putc(char);
-char getc();
-
-int printf(const char*, ...);
-
-/* STDIO Include */
-#include <_fileio.h>
-#include <_printf.h>
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
 
 void putc(char c) {
     // write(stdout, &c, 1); TODO: This doesn't work and we need to use a static variable
@@ -59,4 +51,3 @@ void reads(char* buffer) {
     buffer[len] = '\0'; // Null terminate
 }
 
-#endif

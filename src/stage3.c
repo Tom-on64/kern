@@ -6,6 +6,7 @@
 #include <fs/fs.h>
 #include <screen/gfxmode.h>
 #include <error/bigerr.h>
+#include <stdio.h>
 
 void bigError();
 

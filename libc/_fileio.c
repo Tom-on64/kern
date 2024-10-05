@@ -1,24 +1,7 @@
-#ifndef _FILEIO_H
-#define _FILEIO_H
-
+#include <stdio.h>
 #include <syscall.h>
 #include <stdlib.h>
 #include <stddef.h>
-
-// Nobody should have to interface with the internals of this structure
-typedef struct _iobuf { // 24B
-    unsigned char*  _ptr; // File buffer base
-    unsigned int    _size; // Size of buffer
-    int             _offset; // Offset into file
-    unsigned short  _flag; // Open flags
-    int             _file; // File descriptor
-    
-    char            __reserved[6];
-} FILE;
-
-FILE* stdin;
-FILE* stdout;
-FILE* stderr;
 
 FILE* fopen(const char* filename, const char* mode) {
     int oflag = O_RDWR | O_CREAT | O_BIN; // TODO!
@@ -78,6 +61,4 @@ long int ftell(FILE* stream) {
     // TODO
     return -1;
 }
-
-#endif
 

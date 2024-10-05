@@ -1,14 +1,11 @@
-#ifndef _PRINTF_H
-#define _PRINTF_H
-
+#include <stdio.h>
 #include <syscall.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdarg.h>
-#include <_fileio.h>
 
-// Warning: returns a allocated buffer, must be freed!
+// Warning: returns an allocated buffer, must be freed!
 char* _format(const char* fmt, va_list args) {
     static char* buffer;
     size_t len = 0;
@@ -125,6 +122,4 @@ int printf(const char* fmt, ...) {
     va_end(args);
     return len;
 }
-
-#endif
 

@@ -1,11 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
-
+#include <string.h>
 #include <stdint.h>
-
-void* memcpy(void* src, void* dst, uint32_t length);
-void* memcpy32(void* src, void* dst, uint32_t length);
-void* memset(void* dst, uint8_t value, uint32_t length);
 
 // Source: http://www.strudel.org.uk/itoa/
 char* itoa(uint32_t val, uint8_t base) {
@@ -84,7 +78,7 @@ char* strchr(const char* str, char c) {
     return (*s == c) ? (char*)s : NULL;
 }
 
-// char* strrchr(const char* str, char c);
+char* strrchr(const char* str, char c) { return NULL; } // TODO
 
 int strcmp(const char* str1, const char* str2) {
     while (*str1 != '\0' && *str1 == *str2) {
@@ -140,4 +134,3 @@ void* memset(void* dst, uint8_t value, uint32_t length) {
     return dst;
 }
 
-#endif
