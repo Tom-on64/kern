@@ -34,8 +34,6 @@
 
 // Font area 0x4000 - 0x4fff
 #define FONT_LOC                0x4000
-#define FONT_WIDTH              (FONT_LOC)
-#define FONT_HEIGHT             (FONT_LOC + 1)
 
 // VBE Info Area 0x6000 - 0x6fff
 #define MODE_INFO_BLOCK_LOC     0x6000 // 512 Bytes

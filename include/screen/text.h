@@ -7,12 +7,20 @@
 #include <stdint.h>
 #include <string.h>
 
+typedef union {
+    struct {
+        uint8_t width;
+        uint8_t height
+    } __attribute__ ((packed)) info;
+    uint8_t data[4096];
+} __attribute__ ((packed)) font_t;
+
 // TODO: Reimplement larger text
 void drawChar(char c, uint32_t x, uint32_t y, uint32_t fgColor, uint32_t bgColor) {
     // Font info
-    char* font = (char*)FONT_LOC;
-    uint8_t charWidth = *(uint8_t*)FONT_WIDTH;
-    uint8_t charHeight = *(uint8_t*)FONT_HEIGHT;
+    font_t* font = (font_t*)FONT_LOC;
+    uint8_t charWidth = font->info.width;
+    uint8_t charHeight = font->info.height;
     // uint8_t bitmapRowLen = (charWidth - 1) / 8 + 1; // TODO: Larger font support
     
     // Video stuff
@@ -20,7 +28,7 @@ void drawChar(char c, uint32_t x, uint32_t y, uint32_t fgColor, uint32_t bgColor
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint32_t offset = (gfxMode->xRes * y * charHeight + x * charWidth) * bytesPerPx;
 
-    char* bitmap = &font[((c % 128) - 1) * charHeight];
+    char* bitmap = &font.data[(c - 1) * charHeight];
     for (uint8_t i = 0; i < charHeight; i++) { // Rows
         char bitmapRow = bitmap[i];
         uint32_t color = convertColor((bitmapRow & 0x80) ? fgColor : bgColor);

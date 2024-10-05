@@ -93,7 +93,8 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf("\e[6M\x7f\x80\n");
+        for (size_t i = 0; i < 0x20; i++) drawChar(0x70+i, i, 0, FG_COLOR, BG_COLOR);
+        printf("\e[6M\x80");
         printf("\e[6M\e[8N%s \e[2M%s \e[8M", cwd, PROMPT);
         char input[256];
         char* inputPtr = input;
