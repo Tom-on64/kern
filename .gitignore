@@ -1,5 +1,8 @@
 .DS_Store
 
+# Config
+make.config
+
 # Binaries
 bin/
 *.bin
@@ -7,9 +10,14 @@ makedisk
 
 # Object files
 *.o
+*.out
 *.obj
 *.elf
 
+# Font source files
+src/fonts/**.asm
+
 # Vim swap files
 *.swp
+*.swo
 

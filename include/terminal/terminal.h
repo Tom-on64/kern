@@ -24,8 +24,8 @@ terminal_t* terminal = (terminal_t*)TERMINAL_INFO_LOC;
 #include <screen/text.h> // This needs to be here because it uses 'terminal' and otherwise it would be undeclared
 
 int32_t terminalWrite(const void* buf, uint32_t len) {
-    terminal->width = gfxMode->xRes / *(uint8_t*)FONT_WIDTH;
-    terminal->height = gfxMode->yRes / *(uint8_t*)FONT_HEIGHT;
+    terminal->width = gfxMode->xRes / *(uint8_t*)(FONT_LOC);
+    terminal->height = gfxMode->yRes / *(uint8_t*)(FONT_LOC+1);
 
     char* str = (char*)buf;
     uint32_t i;
