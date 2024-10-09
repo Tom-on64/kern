@@ -7,7 +7,7 @@
  * 0x1000-0x17ff - Free
  * 0x1800-0x1fff - Global Variables
  * 0x2000-0x2fff - Larger structs
- * 0x3000-0x3fff - Free
+ * 0x3000-0x3fff - Filesystem Info
  * 0x4000-0x4fff - Font area
  * 0x6000-0x6fff - VBE info area
  * 0x7000-0x7bff - SMAP Area
@@ -30,7 +30,7 @@
 #define DATETIME_LOC            0x2200
 
 // Filesystem Area 0x3000 - 0x3fff
-#define OPEN_FILE_TABLE_LOC     0x3000
+#define FS_INFO_LOC             0x3000
 
 // Font area 0x4000 - 0x4fff
 #define FONT_LOC                0x4000

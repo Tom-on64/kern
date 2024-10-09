@@ -30,8 +30,8 @@ fileInfo_t files[] = { // TODO: Not have to list all of the files, loop through 
     { BIN_DIR"testfont.fnt" },
     /* Userspace files */
     { "./src/fs/test.txt" },
-    { BIN_DIR"calc.bin" },
-    { BIN_DIR"edit.bin" },
+    //{ BIN_DIR"calc.bin" },
+    //{ BIN_DIR"edit.bin" },
 };
 
 superblock_t superblock = { 0 };

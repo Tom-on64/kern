@@ -1,14 +1,13 @@
 #include <memory/physical.h>
 #include <memory/virtual.h>
 #include <memory/addresses.h>
+#include <screen/gfxmode.h>
+#include <screen/text.h>
+#include <error/bigerr.h>
 #include <disk/disk.h>
 #include <fs/impl.h>
 #include <fs/fs.h>
-#include <screen/gfxmode.h>
-#include <error/bigerr.h>
 #include <stdio.h>
-
-void bigError();
 
 __attribute__ ((section("entry")))
 void main() {
@@ -34,7 +33,7 @@ void main() {
     superblock_t* sb = (superblock_t*)SUPERBLOCK_LOC;
     sb->rootInodePtr = BOOT_FIRST_INODE_LOC + sizeof(inode_t);
     inode_t* root = (inode_t*)sb->rootInodePtr;
-    diskRead(root->extent[0].block * 8, root->extent[0].length * 8, (void*)SCRATCH_BLOCK_LOC);
+    loadFile(root, (void*)SCRATCH_BLOCK_LOC);
 
     inode_t* inode;
     if ((inode = getInode("kernel.bin", (dirEntry_t*)SCRATCH_BLOCK_LOC)) == NULL) {
@@ -42,10 +41,11 @@ void main() {
         bigError(0xDEAD);
     } else { loadFile(inode, (void*)KERNEL_LOC); }
 
+    font_t* font = (font_t*)FONT_LOC;
     if ((inode = getInode("term16n.fnt", (dirEntry_t*)SCRATCH_BLOCK_LOC)) != NULL) {
-        loadFile(inode, (void*)FONT_LOC);
+        loadFile(inode, font);
     } else if ((inode = getInode("testfont.fnt", (dirEntry_t*)SCRATCH_BLOCK_LOC)) != NULL) {
-        loadFile(inode, (void*)FONT_LOC);
+        loadFile(inode, font);
     } else {
         // No font found, bad.
         bigError(0xBeef);

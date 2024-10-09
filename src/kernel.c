@@ -5,19 +5,20 @@
 #include <interrupt/pit.h>
 #include <interrupt/rtc.h>
 #include <keyboard/keyboard.h>
-
 #include <memory/physical.h>
 #include <memory/virtual.h>
 #include <memory/addresses.h>
 #include <memory/malloc.h>
 #include <fs/fs.h>
 #include <fs/impl.h>
+#include <disk/disk.h>
 #include <screen/text.h>
 #include <screen/graphics.h>
+#include <screen/gfxmode.h>
+#include <terminal/terminal.h>
 #include <sound/pcspk.h>
 #include <sound/notes.h>
 #include <ports/io.h>
-
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -28,9 +29,6 @@
 
 // FS things
 char* cwd;
-
-FILE* openFileTable = (FILE*)OPEN_FILE_TABLE_LOC;
-uint32_t openFiles;
 
 // Function declarations
 void listFiles();
@@ -87,6 +85,7 @@ void main() {
     // Terminal setup
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
+
     clear();
     printf("kern.\n\n");
 
@@ -239,7 +238,7 @@ void main() {
                 printf("Command not found: %s\n", fileName);
                 continue;
             }
-            FILE* fp = openFileTable + _f->_file;
+            FILE* fp = fsInfo->openFileTable + _f->_file;
 
             printf("%d: 0x%x Bytes\n", fp->_file, fp->_size);
             for (size_t i = 0; i < fp->_size; i++) {
@@ -366,26 +365,5 @@ void printPhysicalMemmap() {
     printf("Total 4kB Blocks: %d\n", maxBlocks);
     printf("Used or reserved blocks: %d\n", usedBlocks);
     printf("Free blocks: %d\n\n", maxBlocks - usedBlocks);
-}
-
-void initOpenFileTable() {
-    openFileTable = malloc(sizeof(FILE) * MAX_OPEN_FILES);
-    if (openFileTable == NULL) { printf("\e[1MFailed to init file table! Malloc() error.\e[8M"); }
-    memset(openFileTable, 0, sizeof(FILE) * MAX_OPEN_FILES);
-
-    // offset and ptr are unused in these
-    stdin = openFileTable + 0;
-    stdin->_file = 0;
-    stdin->_flag = O_RDONLY;
-
-    stdout = openFileTable + 1;
-    stdout->_file = 1;
-    stdout->_flag = O_WRONLY | O_APPEND;
-
-    stderr = openFileTable + 2;
-    stderr->_file = 2;
-    stderr->_flag = O_WRONLY | O_APPEND;
-
-    openFiles = 3;
 }
 
