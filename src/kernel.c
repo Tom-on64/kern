@@ -19,6 +19,7 @@
 #include <sound/pcspk.h>
 #include <sound/notes.h>
 #include <ports/io.h>
+#include <ports/serial.h>
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -56,6 +57,11 @@ void main() {
     setupTimer();
     setupRtc();
     setupKeyboard();
+    if (setupSerial(PORT_COM1) != 0) { printf("\e[1MFailed to initialize serial interface\e[8M\n"); }
+    else {
+        serialPrint(PORT_COM1, "\x1b[H\x1b[J");
+        serialPrint(PORT_COM1, "kern. \x1b[36m(Serial console)\x1b[0m\n\n");
+    }
 
     // Setup kernel malloc variables
     mallocNode_t* kernelMallocListHead = 0;

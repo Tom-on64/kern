@@ -15,12 +15,12 @@ Legend:
         - [ ] system root
         - [ ] arch/
         - [ ] lib/
-        - [ ] include/
+        - [x] include/
         - [ ] cross compiler setup
-    - [ ] libc - User space
-    - [ ] libk - Kernel libc
+    - [x] libc - User space
+    - [x] libk - Kernel libc
     - [ ] kernel
-        - [ ] use libk
+        - [x] use libk
         - [ ] makefile
         - [ ] probably a full rewrite
     - [ ] userspace
