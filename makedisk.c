@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/fs/fs.h"
+#include "libk/include/fs/fs.h"
 
 #define IMAGE_NAME "kern.iso"
 #define BIN_DIR "./bin/"
