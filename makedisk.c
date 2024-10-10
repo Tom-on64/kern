@@ -29,7 +29,7 @@ fileInfo_t files[] = { // TODO: Not have to list all of the files, loop through 
     { BIN_DIR"term16n.fnt" },
     { BIN_DIR"testfont.fnt" },
     /* Userspace files */
-    { "./src/fs/test.txt" },
+    { "./usr/test.txt" },
     //{ BIN_DIR"calc.bin" },
     //{ BIN_DIR"edit.bin" },
 };

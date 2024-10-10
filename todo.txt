@@ -14,7 +14,7 @@ Legend:
     - [ ] project structure
         - [ ] system root
         - [ ] arch/
-        - [ ] lib/
+        - [x] lib/
         - [x] include/
         - [ ] cross compiler setup
     - [x] libc - User space

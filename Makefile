@@ -10,12 +10,14 @@ ASFLAGS :=
 
 include make.config
 
+BOOT := ./boot
 SRC := ./src
 BIN := ./bin
 LIBK_INC := ./libk/include
 LIBC_INC := ./libc/include
 LIBC_DIR := ./libc
 LIBK_DIR := ./libk
+FONT_DIR := ./usr/fonts
 LIBK_SRC := $(shell find $(LIBK_DIR) -type f -name "**.c")
 
 FONTS := testfont term16n
@@ -40,14 +42,14 @@ $(BIN):
 	rm -rf $(BIN)/*
 
 # Bootloader: This target is responsible for creating stage?.bin (1,2,3)
-$(BOOTLOADER): $(SRC)/stage1.asm $(SRC)/stage2.asm $(SRC)/stage3.c $(LIBC) $(LIBK)
-	@echo "Assembling $(SRC)/stage1.asm..."
-	$(AS) -fbin -o $(BIN)/stage1.bin $(SRC)/stage1.asm $(ASFLAGS) 
-	@echo "Assembling $(SRC)/stage2.asm..."
-	$(AS) -fbin -o $(BIN)/stage2.bin $(SRC)/stage2.asm $(ASFLAGS) 
-	@echo "Compiling $(SRC)/stage3.c..."
-	$(CC) $(CCFLAGS) -I$(LIBK_INC) -I$(LIBC_INC) -o $(BIN)/stage3.o -c $(SRC)/stage3.c
-	$(LD) $(LDFLAGS) -T$(SRC)/stage3.ld --oformat binary -o $(BIN)/stage3.bin $(BIN)/stage3.o $(LIBC) $(LIBK)
+$(BOOTLOADER): $(BOOT)/stage1.asm $(BOOT)/stage2.asm $(BOOT)/stage3.c $(LIBC) $(LIBK)
+	@echo "Assembling $(BOOT)/stage1.asm..."
+	$(AS) -fbin -o $(BIN)/stage1.bin $(BOOT)/stage1.asm $(ASFLAGS) 
+	@echo "Assembling $(BOOT)/stage2.asm..."
+	$(AS) -fbin -o $(BIN)/stage2.bin $(BOOT)/stage2.asm $(ASFLAGS) 
+	@echo "Compiling $(BOOT)/stage3.c..."
+	$(CC) $(CCFLAGS) -I$(LIBK_INC) -I$(LIBC_INC) -o $(BIN)/stage3.o -c $(BOOT)/stage3.c
+	$(LD) $(LDFLAGS) -T$(BOOT)/stage3.ld --oformat binary -o $(BIN)/stage3.bin $(BIN)/stage3.o $(LIBC) $(LIBK)
 	rm $(BIN)/stage3.o
 
 # Kernel: This target is responsible for creating kernel.bin
@@ -80,7 +82,7 @@ $(LIBK): $(LIBK_SRC)
 
 # This target retrieves all fonts inside src/fonts
 $(FONTS):
-	cp $(SRC)/fonts/$@.fnt $(BIN)/$@.fnt
+	cp $(FONT_DIR)/$@.fnt $(BIN)/$@.fnt
 
 # Run QEMU
 run:
