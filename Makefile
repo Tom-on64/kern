@@ -12,8 +12,8 @@ include make.config
 
 SRC := ./src
 BIN := ./bin
-LIBK_INC := ./include
-LIBC_INC := ./include/libc
+LIBK_INC := ./libk/include
+LIBC_INC := ./libc/include
 LIBC_DIR := ./libc
 LIBK_DIR := ./libk
 LIBK_SRC := $(shell find $(LIBK_DIR) -type f -name "**.c")
@@ -92,6 +92,7 @@ run:
 
 # Clean all build files
 clean:
+	rm -f kern.iso
 	rm -rf $(BIN)
 	rm -f makedisk
 
