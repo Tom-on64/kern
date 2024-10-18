@@ -2,11 +2,15 @@
 
 Root contains the Makefile that is used to build kern and some documents.
 It also contains these directories:
-    src/ - The source code of kern
-    include/ - C header files that can be included by the OS. include/c/ can be used by any programs, but other headers shall only be included in the kernel
-    build/ - This directory is created by the Makefile and contains intermediary built obj file and binaries
-    other/ - Things that are not nescessarly part of the OS
-    docs/ - Some basic documentation. Mostly for me so that i don't forget stuff
+    src/    - Kernel source code
+    boot/   - Bootloader code
+    libc/   - C Standard library
+    libk/   - Kernel library
+    docs/   - Some documentation (mainly for me)
+    other/  - Things like screenshot, etc.
+    usr/    - Userspace files like fonts and programs
+    bin/    - Intermediary binaries
 
-After running the Makefile and succesfully building the OS a 'kern.iso' file will be created in the root directory
+After running the Makefile and succesfully building the OS 
+a 'kern.iso' file will be created in the root directory
 

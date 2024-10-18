@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libk/include/fs/fs.h"
+#include <fs.h>
 
-#define IMAGE_NAME "kern.iso"
+#define IMAGE_NAME "kern.img"
 #define BIN_DIR "./bin/"
 #define DISK_SIZE  (2880 * 512) // 1.44MB
 

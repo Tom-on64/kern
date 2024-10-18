@@ -8,9 +8,9 @@ Legend:
 - [?] Optional
 
 - [!] The Big Refactor
-    - [?] Use GRUB
-        - [ ] Multiboot
-        - [ ] boot.s
+    - [?] Use UEFI
+        - [ ] 32-bit (probably)
+        - [ ] Partitioned disk
     - [ ] project structure
         - [ ] system root
         - [ ] arch/
@@ -19,17 +19,17 @@ Legend:
         - [ ] cross compiler setup
     - [x] libc - User space
     - [x] libk - Kernel libc
-    - [ ] kernel
+    - [x] kernel
         - [x] use libk
-        - [ ] makefile
-        - [ ] probably a full rewrite
+        - [x] makefile
+        - [?] probably a full rewrite
     - [ ] userspace
         - [ ] shell
         - [ ] calc
         - [ ] editor
     - [ ] filesystem
         - [ ] proper file organization
-    - [_] Makefile refactorin'
+    - [X] Makefile refactorin' (finally done!!!)
 
 - [x] Multistage Bootloader
 - [x] Bootloader reads filesystem to find files

@@ -1,0 +1,51 @@
+#
+# Makfile variables
+#
+
+# Tools
+HOSTCC = cc
+CC = i686-elf-gcc
+LD = i686-elf-ld
+AS = nasm
+MAKE = make
+
+# Flags
+CFLAGS =    -Wall -Wextra -Wpedantic -Wno-pointer-sign -Wno-pointer-arith\
+            -Os -std=c17 -nostdinc -g\
+            -ffreestanding -fno-stack-protector -fno-builtin -fno-pie\
+            -m32 -mgeneral-regs-only -march=i386
+LDFLAGS =   -z notext -melf_i386 -nostdlib
+ASFLAGS =   
+
+# Directories
+# Outputs
+BIN = ./bin
+BOOTLOADER = $(BIN)/stage1.bin $(BIN)/stage2.bin $(BIN)/stage3.bin
+KERNEL = $(BIN)/kernel.bin
+LIBC = $(BIN)/libc.o
+LIBK = $(BIN)/libk.o
+IMG = kern.img
+
+# Kernel
+KERNEL_DIR = ./kernel
+KERNEL_SRC = $(KERNEL_DIR)/kernel.c
+
+# Bootloader
+BOOT_DIR = ./boot
+
+# Libc
+LIBC_DIR = ./libc
+LIBC_SRC = $(shell find $(LIBC_DIR) -type f -name "**.c")
+
+# Libk
+LIBK_DIR = ./libk
+LIBK_SRC = $(shell find $(LIBK_DIR) -type f -name "**.c")
+
+# Userspace
+FONT_DIR = ./usr/fonts
+FONTS = testfont term16n
+
+# Include directories
+LIBC_INC = $(LIBC_DIR)/include
+LIBK_INC = $(LIBK_DIR)/include
+

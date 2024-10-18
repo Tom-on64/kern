@@ -57,7 +57,7 @@ void main() {
     setupTimer();
     setupRtc();
     setupKeyboard();
-    if (setupSerial(PORT_COM1) != 0) { printf("\e[1MFailed to initialize serial interface\e[8M\n"); }
+    if (setupSerial(PORT_COM1) != 0) { printf("\x1b[1MFailed to initialize serial interface\x1b[8M\n"); }
     else {
         serialPrint(PORT_COM1, "\x1b[H\x1b[J");
         serialPrint(PORT_COM1, "kern. \x1b[36m(Serial console)\x1b[0m\n\n");
@@ -98,7 +98,7 @@ void main() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf("\e[6M\e[8N%s \e[2M%s \e[8M", cwd, PROMPT);
+        printf("\x1b[6M\x1b[8N%s \x1b[2M%s \x1b[8M", cwd, PROMPT);
         char input[256];
         char* inputPtr = input;
 

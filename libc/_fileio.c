@@ -30,7 +30,7 @@ size_t fread(void* ptr, size_t size, size_t count, FILE* stream) {
     int fd = stream->_file;
 
     while (readEl != count) {
-        if (read(fd, (void*)(ptr + offset), size) != size) break;
+        if (read(fd, (void*)(ptr + offset), size) != (int)size) break;
         offset += size;
         readEl++;
     }
@@ -44,7 +44,7 @@ size_t fwrite(const void* ptr, size_t size, size_t count, FILE* stream) {
     int fd = stream->_file;
 
     while (writtenEl != count) {
-        if (write(fd, (void*)(ptr + offset), size) != size) break;
+        if (write(fd, (void*)(ptr + offset), size) != (int)size) break;
         offset += size;
         writtenEl++;
     }
