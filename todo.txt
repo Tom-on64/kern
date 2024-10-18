@@ -12,29 +12,62 @@ Legend:
         - [ ] 32-bit (probably)
         - [ ] Partitioned disk
     - [ ] project structure
-        - [ ] system root
         - [ ] arch/
         - [x] lib/
         - [x] include/
-        - [ ] cross compiler setup
     - [x] libc - User space
     - [x] libk - Kernel libc
     - [x] kernel
         - [x] use libk
         - [x] makefile
         - [?] probably a full rewrite
-    - [ ] userspace
-        - [ ] shell
-        - [ ] calc
-        - [ ] editor
     - [ ] filesystem
+        - [ ] sysroot
+        - [ ] good buildutil
         - [ ] proper file organization
     - [X] Makefile refactorin' (finally done!!!)
+
+- [ ] LIBC
+    - [ ] assert.h
+    - [ ] ctype.h
+    - [ ] errno.h
+    - [ ] fcntl.h
+    - [ ] float.h
+    - [ ] limits.h
+    - [ ] locale.h
+    - [ ] math.h
+    - [ ] setjmp.h
+    - [ ] signal.h (we would need signals first)
+    - [ ] stdarg.h
+    - [ ] stddef.h
+    - [ ] stdint.h
+    - [ ] stdio.h
+    - [ ] time.h
+    - [ ] unistd.h (do we do POSIX?)
+    - [ ] wchar.h (we would need text support for wide chars ig?)
+    - [ ] wctype.h (same as above)
+    - [ ] sys/
+        - [ ] types.h (syscall types)
+        - [ ] gfx.h (basic graphics lib)
+
+- [ ] LIBK
+    - [x] disk - disk r/w
+    - [ ] error - error handling (bigerr is not enough :( )
+    - [ ] fs - filesystem 
+    - [x] interrupt - handling and registering interupts
+    - [ ] input - handle ALL input devices (currently implemented as the keyboard dir)
+    - [x] memory - memory managing (physical and virtual)
+    - [x] ports - handles IO ports (eg. serial console)
+    - [x] screen - everything that displays on the screen
+    - [x] sound - handles everything related to sound
+    - [ ] syscall - system calls
+    - [x] tty - handles terminal output 
 
 - [x] Multistage Bootloader
 - [x] Bootloader reads filesystem to find files
 - [x] The almighty 'printf()'
 - [x] Write down where stuff is in memory (in notes.txt)
+
 - [ ] "Text" mode (not actually)
     - [x] Scrolling
     - [ ] Scroll-back
@@ -52,6 +85,7 @@ Legend:
     - [x] Multi vbe mode support
     - [x] Setup on boot
     - [ ] Different font size support
+
 - [x] Graphics
     - [?] Enter/exit a "graphics" mode (idk if we need this)
     - [x] Pixel drawing
@@ -60,6 +94,7 @@ Legend:
     - [x] Rectange :)
     - [x] Circle!
     - [x] Filled verisons
+
 - [x] Interrupts
     - [x] IDT Setup (idt.h)
     - [x] Exception handling
@@ -69,11 +104,13 @@ Legend:
     - [x] IRQ 1 - Keyboard
     - [x] IRQ 8 - CMOS Real time clock
     - [?] Other IRQs (idk which ones)
+
 - [ ] Sound
     - [x] Pc Speaker
     - [x] Notes (in hertz)
     - [ ] Sound Blaster 16
     - [x] MEGALOVANIA
+
 - [ ] Math
     - [ ] Trigonometry
         - [ ] Sine
@@ -98,6 +135,7 @@ Legend:
     - [x] E (eulers number)
     - [x] PI
     - [ ] Floating point macros/functions
+
 - [ ] Filesystem
     - [x] Utility for filesystem building (not just an assembly file)
     - [_] Better header for file i/o (disk/filesys.h)
@@ -114,6 +152,7 @@ Legend:
     - [ ] Links??
         - [ ] Symbolic
         - [ ] Hard
+
 - [ ] System Calls
     - [x] Sleep()
     - [x] Write()
@@ -125,6 +164,7 @@ Legend:
     - [ ] Seek()
     - [ ] Tell()
     - [ ] Exit()
+
 - [ ] Shell
     - [ ] Separate file/program
     - [ ] ';' separated commands
@@ -145,16 +185,19 @@ Legend:
         - [ ] mkdir (add dirs first)
         - [x] reboot
         - [ ] cd
+
 - [ ] Standard I/O stuff
     - [ ] stdin
     - [x] stdout
     - [ ] stderr
+
 - [x] Memory manager
     - [x] Memory map
     - [x] Print mem map
     - [x] Physical
     - [x] Virtual
     - [x] Paging
+
 - [ ] User (or system) programs
     - [x] Loading them
     - [x] Running them
@@ -162,19 +205,23 @@ Legend:
     - [x] Let them use libs
     - [ ] Proper include files (LibC?)
     - [x] argc, argv[]
+
 - [ ] Standalone shell program
 - [ ] Userspace programs
     - [x] Calculator
     - [ ] Calendar
+
 - [ ] Code Editor
     - [ ] Text editor
     - [ ] Syntax highlighting
     - [ ] Saving/Loading
     - [ ] Hex editor
+
 - [ ] Assembler/Compiler
     - [ ] Assembler
     - [ ] Compiler (probably C)
-    - [ ] Standard libs
+    - [ ] Standard lib
+
 - [ ] Finish all todos
 - [ ] Refactoring!!!
 - [ ] Can it run DOOM?
@@ -182,4 +229,6 @@ Legend:
     - [ ] Minesweeper
     - [ ] Solitaire
     - [ ] Tetris
+
+- [ ] Write an OS in kern (The FINAL Todo)
 
