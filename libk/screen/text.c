@@ -1,5 +1,5 @@
 #include <screen/text.h>
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <memory/addresses.h>
 #include <screen/gfxmode.h>
 #include <stdint.h>

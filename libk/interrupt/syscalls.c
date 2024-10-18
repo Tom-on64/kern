@@ -1,6 +1,6 @@
 #include <interrupt/syscalls.h>
 #include <interrupt/idt.h>
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <keyboard/keyboard.h>
 #include <memory/malloc.h>
 #include <memory/addresses.h>

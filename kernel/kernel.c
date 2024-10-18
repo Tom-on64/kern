@@ -15,7 +15,7 @@
 #include <screen/text.h>
 #include <screen/graphics.h>
 #include <screen/gfxmode.h>
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <sound/pcspk.h>
 #include <sound/notes.h>
 #include <ports/io.h>

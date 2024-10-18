@@ -3,7 +3,7 @@
 #include <interrupt/idt.h>
 #include <screen/text.h>
 #include <screen/gfxmode.h>
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <ports/io.h>
 #include <stdbool.h>
 #include <string.h>

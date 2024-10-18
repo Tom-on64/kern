@@ -1,4 +1,4 @@
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <screen/gfxmode.h>
 #include <screen/text.h>
 #include <memory/addresses.h>

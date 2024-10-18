@@ -1,7 +1,7 @@
 #include <interrupt/pit.h>
 #include <interrupt/idt.h>
 #include <interrupt/pic.h>
-#include <terminal/terminal.h>
+#include <tty/tty.h>
 #include <memory/addresses.h>
 #include <ports/io.h>
 #include <stdint.h>
