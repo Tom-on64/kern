@@ -38,8 +38,7 @@ Legend:
     - [x] errno.h
     - [ ] float.h
     - [x] limits.h
-    - [ ] math.h
-    - [ ] tgmath.h (if we want type generic)
+    - [x] math.h (maybe a separate libm?) TODO: add errno errors in there
     - [x] setjmp.h (this plagues my mind)
     - [ ] signal.h (we would need signals first)
     - [x] stdarg.h
