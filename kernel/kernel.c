@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <color.h>
+#include <sys/gfx.h>
 
 #define PROMPT "#>"
 
