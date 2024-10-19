@@ -1,8 +1,8 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef _TIME_H
+#define _TIME_H
 
-#include <stdint.h>
+#include <stddef.h>
 
-void sleep(uint32_t ms);
+void sleep(size_t ms);
 
 #endif

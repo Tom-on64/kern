@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <color.h>
+#include <sys/gfx.h>
 
 terminal_t* terminal = (terminal_t*)TERMINAL_INFO_LOC;
 

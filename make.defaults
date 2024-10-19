@@ -10,8 +10,8 @@ AS = nasm
 MAKE = make
 
 # Flags
-CFLAGS =    -Wall -Wextra -Wpedantic -Wno-pointer-sign -Wno-pointer-arith\
-            -Os -std=c17 -nostdinc -g\
+CFLAGS =    -Wall -Wextra -Wno-pointer-sign -Wno-pointer-arith -Wno-unused-parameter\
+            -Os -std=c17 -nostdinc -g -Werror\
             -ffreestanding -fno-stack-protector -fno-builtin -fno-pie\
             -m32 -mgeneral-regs-only -march=i386
 LDFLAGS =   -z notext -melf_i386 -nostdlib

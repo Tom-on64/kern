@@ -1,5 +1,5 @@
-#ifndef STDDEF_H
-#define STDDEF_H
+#ifndef _STDDEF_H
+#define _STDDEF_H
 
 #define NULL ((void*)0)
 

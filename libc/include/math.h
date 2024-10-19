@@ -1,5 +1,5 @@
-#ifndef MATH_H
-#define MATH_H
+#ifndef _MATH_H
+#define _MATH_H
 
 // Constants
 #define PI 3.141592653589 // Should be good enough

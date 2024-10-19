@@ -1,9 +1,9 @@
-#include <stdio.h>
 #include <syscall.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 // Warning: returns an allocated buffer, must be freed!
 char* _format(const char* fmt, va_list args) {
@@ -121,5 +121,9 @@ int printf(const char* fmt, ...) {
     free(buffer);
     va_end(args);
     return len;
+}
+
+void print(const char* s) {
+    write(1, s, strlen(s));
 }
 

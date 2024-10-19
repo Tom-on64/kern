@@ -92,7 +92,7 @@ void main() {
     terminal->fg = FG_COLOR;
     terminal->bg = BG_COLOR;
 
-    clear();
+    printf("\x1b[J"); // Clear
     printf("kern.\n\n");
 
     // Run Interactive Shell Program
@@ -123,7 +123,7 @@ void main() {
         }
 
         if (strcmp(argv[0], "clear") == 0) {
-            clear();
+            printf("\x1b[J");
         } else if (strcmp(argv[0], "echo") == 0) {
             if (argc < 2) continue;
 
@@ -151,7 +151,7 @@ void main() {
         } else if (strcmp(argv[0], "exit") == 0) {
             break;
         } else if (strcmp(argv[0], "gfx") == 0) {
-            clear();
+            printf("\x1b[J");
 
             // Draw some stuff :)
             for (size_t i = 0; i < 120; i++) {
@@ -182,7 +182,7 @@ void main() {
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
             getc(); // Wait until we get a keystroke
-            clear();
+            printf("\x1b[J");
         } else if (strcmp(argv[0], "help") == 0) {
             printf("Available Commands:\n");
             printf(" clear      | Clears the screen\n");

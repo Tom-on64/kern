@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
+
 FILE* fopen(const char* filename, const char* mode) {
     int oflag = O_RDWR | O_CREAT | O_BIN; // TODO!
 

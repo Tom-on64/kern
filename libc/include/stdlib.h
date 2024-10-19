@@ -1,10 +1,9 @@
-#ifndef STDLIB_H
-#define STDLIB_H
+#ifndef _STDLIB_H
+#define _STDLIB_H
 
-#include <stdint.h>
-#include <syscall.h>
+#include <stddef.h>
 
-void* malloc(const uint32_t size);
+void* malloc(const size_t size);
 void free(const void* ptr);
 
 #endif

@@ -25,6 +25,7 @@ Legend:
         - [x] makefile
         - [?] probably a full rewrite
     - [ ] filesystem
+        - [ ] use Ext1
         - [ ] sysroot
         - [ ] good buildutil
         - [ ] proper file organization
@@ -32,8 +33,9 @@ Legend:
 
 - [ ] LIBC
     - [ ] assert.h
-    - [ ] ctype.h
-    - [ ] errno.h
+    - [ ] complex.h (idk why we would need this)
+    - [x] ctype.h
+    - [x] errno.h
     - [ ] fcntl.h
     - [ ] float.h
     - [ ] limits.h
@@ -45,6 +47,7 @@ Legend:
     - [ ] stddef.h
     - [ ] stdint.h
     - [ ] stdio.h
+    - [ ] syscall.h
     - [ ] time.h
     - [ ] unistd.h (do we do POSIX?)
     - [ ] wchar.h (we would need text support for wide chars ig?)

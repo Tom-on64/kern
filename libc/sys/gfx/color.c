@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <color.h>
+#include <sys/gfx.h>
 
 uint32_t codeToColor(uint8_t code) {
     switch (code) {
