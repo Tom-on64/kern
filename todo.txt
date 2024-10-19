@@ -11,6 +11,9 @@ Legend:
     - [?] Use UEFI
         - [ ] 32-bit (probably)
         - [ ] Partitioned disk
+    - [ ] Use an existing bootloader
+        - [ ] Limine
+        - [ ] Grub :/
     - [ ] project structure
         - [ ] arch/
         - [x] lib/

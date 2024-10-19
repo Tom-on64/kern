@@ -44,13 +44,13 @@ _I personally wouldn't recommend running this on real hardware, because it's unt
 ## Some images
 
 Interactive Shell: \
-![Example shell output](other/shell.png)
+![Example shell output](docs/img/shell.png)
 
 Filesystem: \
-![Ls command output and some file reading](other/filesystem.png)
+![Ls command output and some file reading](docs/img/filesystem.png)
 
 Graphics test: \
-![Some colorfull shapes :)](other/graphics.png)
+![Some colorfull shapes :)](docs/img/graphics.png)
 
 _These images may be outdated, Idk_
 
