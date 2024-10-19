@@ -21,10 +21,13 @@ enum {
     EEXIST,     // File exists
     ENOTDIR,    // Not a directory
     EISDIR,     // Is a directory
+    EIMPL,      // TODO: Implementation defined
+    ENOMSG,     // No message of desired type
     EINVAL,     // Invalid argument
     ENFILE,     // File table overflow
     EMFILE,     // Too many open files
     ENOTTY,     // Not a typewriter
+    ETXTBSY,    // Text file busy
     EFBIG,      // File too large
     ENOSPC,     // No space left on device
     ESPIPE,     // Illegal seek
@@ -32,6 +35,10 @@ enum {
     EMLINK,     // Too many links
     EPIPE,      // Broken pipe
     EDQUOT,     // Disk quota exceeded
+    EDOM,       // Function arg domain error
+    ERANGE,     // Out of range
+    // TODO: more
+    EILSEQ = 42,// Invalid byte seqence
 };
 
 extern int errno;

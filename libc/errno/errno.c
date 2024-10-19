@@ -1,4 +1,4 @@
 #include <errno.h>
 
-_errno_t errno = 0;
+int errno = 0;
 
