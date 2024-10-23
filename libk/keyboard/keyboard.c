@@ -1,6 +1,5 @@
 #include <keyboard/keyboard.h>
-#include <interrupt/idt.h>
-#include <interrupt/pic.h>
+#include <interrupt/isr.h>
 #include <keyboard/keys.h>
 #include <memory/addresses.h>
 #include <ports/io.h>
@@ -10,8 +9,7 @@
 static const uint8_t US_Keyboard[2][128] = US_KEYBOARD;
 keyboardState_t* keyboard = (keyboardState_t*)KEYBOARD_STATE_LOC;
 
-__attribute__ ((interrupt))
-void keyboardHandler(intFrame_t* iframe) { // TODO: Make this better and be able to read multi-byte scancode
+void keyboardHandler(intFrame_t*) { // TODO: Make this better and be able to read multi-byte scancode
     uint8_t scancode = inb(0x60);
     char c = US_Keyboard[keyboard->shift][scancode];
 
@@ -25,12 +23,5 @@ void keyboardHandler(intFrame_t* iframe) { // TODO: Make this better and be able
     } else if (c != '\0') {
         keyboard->character = c;
     }
-
-    sendPicEOI(1);
-}
-
-void setupKeyboard() {
-    idtSetGate(0x21, keyboardHandler, INT_GATE_FLAGS);
-    unsetIrqMask(1);
 }
 

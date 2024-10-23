@@ -47,15 +47,15 @@ void initOpenFileTable() {
 
     // offset and ptr are unused in these
     stdin = fsInfo->openFileTable + 0;
-    stdin->_file = 0;
+    stdin->_file = STDIN_FILENO;
     stdin->_flag = O_RDONLY;
 
     stdout = fsInfo->openFileTable + 1;
-    stdout->_file = 1;
+    stdout->_file = STDOUT_FILENO;
     stdout->_flag = O_WRONLY | O_APPEND;
 
     stderr = fsInfo->openFileTable + 2;
-    stderr->_file = 2;
+    stderr->_file = STDERR_FILENO;
     stderr->_flag = O_WRONLY | O_APPEND;
 
     fsInfo->openFiles = 3;

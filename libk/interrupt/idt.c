@@ -1,8 +1,10 @@
 #include <interrupt/idt.h>
 #include <stdint.h>
 
+#define IDT_ENTRIES 256
+
 __attribute__ ((aligned(0x10))) // For performance
-idtEntry_t idt[256] = { 0 };
+idtEntry_t idt[IDT_ENTRIES] = { 0 };
 idtp_t idtp;
 
 void idtSetGate(uint8_t i, void* handler, uint8_t flags) {

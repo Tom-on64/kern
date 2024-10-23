@@ -13,11 +13,11 @@ typedef struct {
     uint32_t height;    // Height in characters
     char cursorChar;    // Character to use as a cursor
     bool hideCursor;    // Should we display the cursor
-} terminal_t;
+} console_t;
 
-extern terminal_t* terminal;
+extern console_t* console;
 
-int32_t terminalWrite(const void* buf, uint32_t len);
+int32_t consoleWrite(const void* buf, uint32_t len);
 void toggleCursor();
 
 #endif

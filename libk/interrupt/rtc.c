@@ -1,6 +1,5 @@
 #include <interrupt/rtc.h>
-#include <interrupt/pic.h>
-#include <interrupt/idt.h>
+#include <interrupt/isr.h>
 #include <screen/text.h>
 #include <screen/gfxmode.h>
 #include <tty/tty.h>
@@ -36,7 +35,7 @@ void disableRtc() {
     __asm__ volatile ("sti");
 }
 
-__attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
+void rtcHandler(intFrame_t* iframe) {
     datetime_t newDatetime, oldDatetime;
     static uint16_t rtcTicks = 0;
     
@@ -121,20 +120,13 @@ __attribute__ ((interrupt)) void rtcHandler(intFrame_t* iframe) {
             uint32_t x = gfxMode->xRes - len - 1;
             char* str = &buf[0];
             for (uint8_t i = 0; i != len; i++, x++) {
-                drawChar(str[i], x, 0, terminal->fg, terminal->bg);
+                drawChar(str[i], x, 0, console->fg, console->bg);
             }
         }
     }
 
     getRtcRegister(0x0c);
-    sendPicEOI(8); 
     
     __asm__ volatile ("sti");
-}
-
-void setupRtc() { // IRQ 8 - Real Time Clock
-    idtSetGate(0x28, rtcHandler, INT_GATE_FLAGS);
-    unsetIrqMask(8);
-    enableRtc();
 }
 

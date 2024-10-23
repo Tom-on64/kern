@@ -39,10 +39,10 @@ void drawChar(char c, uint32_t x, uint32_t y, uint32_t fgColor, uint32_t bgColor
 
 void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() helped alot)
     uint8_t charHeight = ((font_t*)FONT_LOC)->height;
-    if (terminal->y+1 < terminal->height) { return; } // Check if we should scroll
+    if (console->y+1 < console->height) { return; } // Check if we should scroll
 
     uint32_t bytesPerLine = charHeight * gfxMode->bytesPerScanline;
-    uint32_t lines = terminal->height;
+    uint32_t lines = console->height;
     uint32_t vidmem = gfxMode->physicalBasePtr;
 
     for (uint32_t i = 1; i < lines; i++) {
@@ -50,7 +50,7 @@ void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() help
         memcpy32((char*)address, (char*)(address - bytesPerLine), bytesPerLine);
     }
     
-    uint32_t color = convertColor(terminal->bg);
+    uint32_t color = convertColor(console->bg);
     uint8_t* lastLine = (uint8_t*)(vidmem + (lines-1) * bytesPerLine);
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
     
@@ -61,16 +61,16 @@ void scroll() { // TODO: Make this faster (still kinda slow, but memcpy32() help
         lastLine += bytesPerPx;
     }
 
-    terminal->y--;
+    console->y--;
 }
 
-// TODO: Make this comply with the new terminal.h thing!
+// TODO: Make this comply with the new console.h thing!
 void clearScreen(uint32_t bgColor) {
     uint8_t* vidmem = (uint8_t*)gfxMode->physicalBasePtr;
     uint8_t bytesPerPx = (gfxMode->bpp+1) / 8;
 
-    terminal->x = 0;
-    terminal->y = 0;
+    console->x = 0;
+    console->y = 0;
 
     uint32_t color = convertColor(bgColor);
    

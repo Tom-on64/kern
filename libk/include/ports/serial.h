@@ -18,7 +18,7 @@ int serialTransmitEmpty(uint32_t port);
 int serialRecieved(uint32_t port);
 
 void serialWrite(uint32_t port, char c);
-void serialPrint(uint32_t port, char* s);
+void serialPrint(uint32_t port, const char* s);
 char serialRead(uint32_t port);
 
 #endif

@@ -1,23 +1,19 @@
 #include <interrupt/pit.h>
-#include <interrupt/idt.h>
-#include <interrupt/pic.h>
+#include <interrupt/isr.h>
 #include <tty/tty.h>
 #include <memory/addresses.h>
 #include <ports/io.h>
 #include <stdint.h>
 
-__attribute__ ((interrupt))
-void timerHandler(intFrame_t* iframe) {
+void timerHandler(intFrame_t*) {
     static uint32_t cursorTicks = 0;
     cursorTicks++;
     
-    if (!terminal->hideCursor) { // TODO: Make a better cursor drawing thing
+    if (!console->hideCursor) { // TODO: Make a better cursor drawing thing
         if (cursorTicks % 500 == 0) toggleCursor();
     }
 
     if (*(uint32_t*)SLEEP_TIMER > 0) { --(*(uint32_t*)SLEEP_TIMER); }
-
-    sendPicEOI(0);
 }
 
 void setPitPhase(uint8_t channel, uint8_t opMode, uint16_t hz) {
@@ -33,11 +29,5 @@ void setPitPhase(uint8_t channel, uint8_t opMode, uint16_t hz) {
     outb(CHANNEL_0 + channel, (uint8_t)(freq >> 8));
     
     __asm__ volatile ("sti");
-}
-
-void setupTimer() { // Sets up IRQ 0 - PIT
-    idtSetGate(0x20, timerHandler, INT_GATE_FLAGS);
-    unsetIrqMask(0);
-    setPitPhase(0, 2, 1000); // Default setup: 1000Hz - 1 tick per 1ms
 }
 

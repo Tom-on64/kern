@@ -32,7 +32,7 @@ void serialWrite(uint32_t port, char c) {
     outb(port, c);
 }
 
-void serialPrint(uint32_t port, char* s) {
+void serialPrint(uint32_t port, const char* s) {
     while (*s != '\0') {
         if (*s == '\n') serialWrite(port, '\r');
         serialWrite(port, *s++);

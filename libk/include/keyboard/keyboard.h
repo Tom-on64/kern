@@ -1,6 +1,7 @@
 #ifndef KEYBOARD_KEYBOARD_H
 #define KEYBOARD_KEYBOARD_H
 
+#include <interrupt/isr.h>
 #include <stdbool.h>
 
 typedef struct {
@@ -8,6 +9,6 @@ typedef struct {
     bool shift;
 } keyboardState_t;
 
-void setupKeyboard();
+void keyboardHandler(intFrame_t*);
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef INTERRUPT_RTC_H
 #define INTERRUPT_RTC_H
 
+#include <interrupt/isr.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -16,10 +17,10 @@ typedef struct {
     uint16_t year;
 } __attribute__ ((packed)) datetime_t;
 
+void rtcHandler(intFrame_t*);
 bool cmosUpdateProgress();
 uint8_t getRtcRegister(uint8_t reg);
 void enableRtc();
 void disableRtc();
-void setupRtc();
 
 #endif
