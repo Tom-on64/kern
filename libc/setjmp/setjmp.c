@@ -5,6 +5,7 @@ int setjmp(jmp_buf env) {
         "mov %%ebp, %0\n"   // Save BP
         "mov %%esp, %1\n"   // Save SP
         "call 1f\n"         // Call label to push PC to the stack
+        "1:\n"              // Label
         "pop %2\n"          // Save PC
         : "=m"(env._bp), "=m"(env._sp), "=m"(env._pc)  // Locations
     );
@@ -12,7 +13,7 @@ int setjmp(jmp_buf env) {
 }
 
 void longjmp(jmp_buf env, int value) {
-    if (val == 0) return;
+    if (value == 0) return;
 
     __asm__ volatile (
         "mov %0, %%ebp\n"   // Restore BP
