@@ -5,7 +5,7 @@ int setjmp(jmp_buf env) {
         "mov %%ebp, %0\n"   // Save BP
         "mov %%esp, %1\n"   // Save SP
         "call 1f\n"         // Call label to push PC to the stack
-        "1:\n"              // Label to jump
+        "1:\n"              // Label
         "pop %2\n"          // Save PC
         : "=m"(env._bp), "=m"(env._sp), "=m"(env._pc)  // Locations
     );
