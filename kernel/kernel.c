@@ -1,9 +1,7 @@
-#include <interrupt/idt.h>
-#include <interrupt/exceptions.h>
-#include <interrupt/syscalls.h>
-#include <interrupt/pic.h>
+#include <interrupt/isr.h>
 #include <interrupt/pit.h>
 #include <interrupt/rtc.h>
+#include <syscalls/syscalls.h>
 #include <keyboard/keyboard.h>
 #include <memory/physical.h>
 #include <memory/virtual.h>
@@ -24,7 +22,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <syscall.h>
 #include <sys/gfx.h>
+
+/* Little teaser
+#include <math.h>
+void mathTest() {
+    printf("|-4| = %d\n", abs(-4));
+    printf("|-3.14| = %f\n", fabs(-3.14));
+    printf("e^3 = %f\n", exp(3));
+    printf("e^5 = %f\n", exp2(5));
+    printf("ln(2) = %f\n", log(2));
+    printf("log2(69) = %f\n", log2(69));
+    printf("log10(100) = %f\n", log10(100));
+    printf("sqrt(2) = %f\n", sqrt(2));
+    printf("cbrt(27) = %f\n", cbrt(27));
+    printf("hyp(8, 6) = %f\n", hypot(8, 6));
+    printf("3^4 = %f\n", pow(3, 4));
+}
+*/
 
 #define PROMPT "#>"
 
@@ -45,23 +61,26 @@ void main() {
     maxBlocks = *(uint32_t*)PHYS_MEM_MAX_BLOCKS;
     usedBlocks = *(uint32_t*)PHYS_MEM_USED_BLOCKS;
 
-    // Interrupt setup
-    setupIdt();
-    setupExceptions();
-    idtSetGate(0x80, syscallHandler, USR_INT_GAME_FLAGS); // Setup Syscall handler in IDT for int 0x80
-    disableIrqs();
-    remapPic();
-    unsetIrqMask(2); // Enable PIC 2 line
-    __asm__ volatile ("sti");
-
-    setupTimer();
-    setupRtc();
-    setupKeyboard();
+    // Setup serial output for debugf()
     if (setupSerial(PORT_COM1) != 0) { printf("\x1b[1MFailed to initialize serial interface\x1b[8M\n"); }
     else {
-        serialPrint(PORT_COM1, "\x1b[H\x1b[J");
+        serialPrint(PORT_COM1, "\x1b[H\x1b[J"); // Clear
         serialPrint(PORT_COM1, "kern. \x1b[36m(Serial console)\x1b[0m\n\n");
     }
+
+    // Interrupt setup
+    setupIsrs();
+    
+    // Programmable Interval Timer
+    registerIrq(0, timerHandler);   
+    setPitPhase(0, 2, 1000);        // 1000Hz
+    
+    // Real Time Clock
+    registerIrq(8, rtcHandler);     
+    enableRtc();
+
+    // Keyboard
+    registerIrq(1, keyboardHandler);
 
     // Setup kernel malloc variables
     mallocNode_t* kernelMallocListHead = 0;
@@ -89,16 +108,26 @@ void main() {
     strcpy(cwd, "/");
 
     // Terminal setup
-    terminal->fg = FG_COLOR;
-    terminal->bg = BG_COLOR;
+    console->fg = FG_COLOR;
+    console->bg = BG_COLOR;
 
     printf("\x1b[J"); // Clear
     printf("kern.\n\n");
 
+    while (1) {
+        printf("\x1b[6M%s \x1b[2M%s \x1b[8M", cwd, PROMPT);
+        char input[256];
+        char* inPtr = &input[0];
+
+        reads(inPtr);
+    }
+}
+
+int _m() {
     // Run Interactive Shell Program
     // TODO: Make it in another file
     while (1) {
-        printf("\x1b[6M\x1b[8N%s \x1b[2M%s \x1b[8M", cwd, PROMPT);
+        printf("\x1b[6M%s \x1b[2M%s ", cwd, PROMPT);
         char input[256];
         char* inputPtr = input;
 

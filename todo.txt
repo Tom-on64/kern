@@ -128,20 +128,18 @@ Legend:
         - [ ] Hyperbolic versions
     - [x] Absolute value
     - [ ] isOdd() 🗿
-    - [ ] Exponential fn (e^x)
-    - [ ] Logarithm
-    - [ ] Power
-    - [ ] Square Root
-    - [ ] Nth Root
-    - [x] Floor
-    - [x] Round
-    - [x] Ceiling
+    - [x] Exponential fn (e^x)
+    - [x] Logarithm
+    - [x] Power
+    - [x] Square Root
+    - [ ] Floor
+    - [ ] Round
+    - [ ] Ceiling
     - [x] Sign
-    - [ ] INFINITY
-    - [ ] NAN
+    - [x] INFINITY
+    - [x] NAN
     - [x] E (eulers number)
     - [x] PI
-    - [ ] Floating point macros/functions
 
 - [ ] Filesystem
     - [x] Utility for filesystem building (not just an assembly file)

@@ -6,15 +6,15 @@
 #define MAX_SYSCALLS 9
 
 typedef enum {
-    SYS_RESERVED,
-    SYS_SLEEP, 
+    SYS_EXIT,
     SYS_READ,
     SYS_WRITE,
     SYS_OPEN,
     SYS_CLOSE,
+    SYS_SEEK,
     SYS_MALLOC,
     SYS_FREE,
-    SYS_SEEK,
+    SYS_SLEEP,
 } SYSCALL_NUMBERS;
 
 typedef enum {
