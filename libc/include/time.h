@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
-void sleep(size_t ms);
+void sleep(size_t s);
+void msleep(size_t ms);
+void usleep(size_t us);
 
 #endif
