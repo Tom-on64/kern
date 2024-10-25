@@ -11,6 +11,6 @@ double cosh(double x) {
 double tanh(double x) {
     double ex = exp(x);
     double emx = exp(-x);
-    return (ex - exp) / (ex + exp);
+    return (ex - emx) / (ex + emx);
 }
 
