@@ -239,7 +239,7 @@ int _m() {
             uint32_t ms = atoi(argv[1]) * 1000; // Convert seconds to miliseconds
             if (ms == 0) continue;
 
-            sleep(ms);
+            msleep(ms);
         } else if (strcmp(argv[0], "soundtest") == 0) {
             printf("Playing...\n");
             enableSpeaker();
