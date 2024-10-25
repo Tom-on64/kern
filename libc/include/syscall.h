@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define MAX_SYSCALLS 9
+#define SYSCALL_COUNT 9
 
 typedef enum {
     SYS_EXIT,

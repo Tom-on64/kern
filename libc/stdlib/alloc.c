@@ -3,9 +3,7 @@
 #include <string.h>
 #include <syscall.h>
 
-void* malloc(size_t size) {
-    return (void*)syscall(SYS_MALLOC, size, 0, 0);
-}
+void* malloc(size_t size) { return (void*)_malloc(size); }
 
 void* calloc(size_t count, size_t size) {
     size_t total = count * size;
@@ -35,7 +33,5 @@ void* realloc(void* ptr, size_t size) {
     return newptr;
 }
 
-void free(void* ptr) {
-    syscall(SYS_FREE, (int)ptr, 0, 0);
-}
+void free(void* ptr) { _free(ptr); }
 
