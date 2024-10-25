@@ -36,7 +36,8 @@ Legend:
     - [ ] complex.h (idk why we would need this)
     - [x] ctype.h
     - [x] errno.h
-    - [ ] float.h
+    - [x] fcntl.h
+    - [x] float.h
     - [x] limits.h
     - [x] math.h (maybe a separate libm?) TODO: add errno errors in there
     - [x] setjmp.h (this plagues my mind)
@@ -45,11 +46,11 @@ Legend:
     - [x] stdbool.h
     - [x] stddef.h
     - [x] stdint.h
-    - [ ] stdio.h
-    - [ ] stdlib.h
+    - [x] stdio.h
+    - [x] stdlib.h
     - [x] string.h
     - [x] syscall.h
-    - [ ] time.h
+    - [x] time.h
     - [ ] unistd.h (do we do POSIX?)
     - [ ] wchar.h (we would need text support for wide chars ig?)
     - [ ] wctype.h (same as above)
@@ -67,7 +68,7 @@ Legend:
     - [x] ports - handles IO ports (eg. serial console)
     - [x] screen - everything that displays on the screen
     - [x] sound - handles everything related to sound
-    - [ ] syscall - system calls
+    - [x] syscall - system calls
     - [x] tty - handles terminal output 
 
 - [x] Multistage Bootloader
