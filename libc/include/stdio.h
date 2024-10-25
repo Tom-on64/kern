@@ -17,12 +17,7 @@
 #define SEEK_END    1
 #define SEEK_SET    2
 
-// Standard file pointers
-#define STDIN_FILENO    0
-#define STDOUT_FILENO   1
-#define STDERR_FILENO   2
-
-/* The ultimate FILE struct */
+/* The FILE struct */
 typedef struct _iobuf { // 24B
     unsigned char*  _ptr;       // File buffer base
     unsigned int    _size;      // Size of buffer
@@ -33,6 +28,7 @@ typedef struct _iobuf { // 24B
     char            __reserved[6];
 } FILE;
 
+// Standard file pointers
 extern FILE* stdin;
 extern FILE* stdout;
 extern FILE* stderr;
@@ -59,20 +55,23 @@ char* fgets(char* str, int n, FILE* stream);
 int fputs(const char* str, FILE* stream);
 int puts(const char* str);
 
-/* Error handling */
+/* TODO: Error handling
 void perror(const char* s);
 int feof(FILE* stream);
 int ferror(FILE* stream);
 void clearerr(FILE* stream);
+*/
 
 /* Formatted I/O */
 int printf(const char* fmt, ...);
 int vprintf(const char* fmt, va_list va);
 int fprintf(FILE* stream, const char* fmt, ...);
 int vfprintf(FILE* stream, const char* fmt, va_list va);
-// INFO: (v)sprinf() Has been depricated and removed as it is unsafe (potencial buffer overflow). Please use (v)snprintf()
+// NOTE: (v)sprinf() Has been depricated and removed as it is unsafe (potencial buffer overflow). Please use (v)snprintf()
 int snprintf(char* str, size_t size, const char* fmt, ...);
 int vsnprintf(char* str, size_t size, const char* fmt, va_list va);
+int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, ...)
+int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, va_list va)
 
 int scanf(const char* fmt, ...);
 int vscanf(const char* fmt, va_list va);
