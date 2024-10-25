@@ -2,6 +2,7 @@
 #include <syscall.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 FILE* fopen(const char* path, const char* mode) {
     FILE* fp = (FILE*)malloc(sizeof(FILE));
@@ -15,13 +16,13 @@ FILE* fopen(const char* path, const char* mode) {
     else if (strcmp(mode, "w+") == 0) { flags = O_RDWR | O_CREAT | O_TRUNC; }
     else if (strcmp(mode, "a+") == 0) { flags = O_RDWR | O_CREAT | O_APPEND; }
     else {  // Unsuppored mode
-        free(file);
+        free(fp);
         return NULL;
     }
 
     int fd = open(path, flags);
     if (fd == -1) {
-        free(FILE);
+        free(fp);
         return NULL;
     }
 
@@ -45,24 +46,24 @@ size_t fread(void* ptr, size_t size, size_t count, FILE* stream) {
     if (!stream || !ptr || size == 0 || count == 0) { return 0; }
 
     size_t total = size * count;
-    ssize_t read = read(stream->_file, ptr, total);
+    ssize_t readb = read(stream->_file, ptr, total);
 
-    if (read < 0) return 0;
+    if (readb < 0) return 0;
 
-    stream->offset += read;
-    return read / size;
+    stream->_offset += readb;
+    return readb / size;
 }
 
 size_t fwrite(void* ptr, size_t size, size_t count, FILE* stream) {
     if (!stream || !ptr || size == 0 || count == 0) { return 0; }
 
     size_t total = size * count;
-    ssize_t written = write(stream->_file, ptr, total);
+    ssize_t writtenb = write(stream->_file, ptr, total);
 
-    if (read < 0) return 0;
+    if (writtenb < 0) return 0;
 
-    stream->offset += written;
-    return written / size;
+    stream->_offset += writtenb;
+    return writtenb / size;
 }
 
 // TODO

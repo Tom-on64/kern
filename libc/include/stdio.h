@@ -70,8 +70,8 @@ int vfprintf(FILE* stream, const char* fmt, va_list va);
 // NOTE: (v)sprinf() Has been depricated and removed as it is unsafe (potencial buffer overflow). Please use (v)snprintf()
 int snprintf(char* str, size_t size, const char* fmt, ...);
 int vsnprintf(char* str, size_t size, const char* fmt, va_list va);
-int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, ...)
-int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, va_list va)
+int pprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, ...);
+int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, va_list va);
 
 int scanf(const char* fmt, ...);
 int vscanf(const char* fmt, va_list va);

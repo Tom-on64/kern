@@ -11,8 +11,9 @@ typedef struct {
 } printfEnv_t;
 
 /* Helpers */
-static void _dynamicPutc(char c, printfEnv_t* env) {
-    if (!env->buf) { return; }
+static void _dynamicPutc(char c, void* arg) {
+    printfEnv_t* env = (printfEnv_t*)arg;
+    if (!env->buf) { return; }
 
     if (env->offset < env->buflen) {
         env->buf[env->offset++] = c;
@@ -27,8 +28,9 @@ static void _dynamicPutc(char c, printfEnv_t* env) {
     }
 }
 
-static void _staticPutc(char c, printfEnv_t* env) {
-    if (!env->buf) { return; }
+static void _staticPutc(char c, void* arg) {
+    printfEnv_t* env = (printfEnv_t*)arg;
+    if (!env->buf) { return; }
 
     if (env->offset < env->buflen) {
         env->buf[env->offset] = c;
@@ -37,7 +39,10 @@ static void _staticPutc(char c, printfEnv_t* env) {
 }
 
 /* Impementation */
-int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, va_list va) { /* TODO */ }
+int vpprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, va_list va) {
+    // TODO
+    return -1;
+}
 
 int vsnprintf(char* str, size_t size, const char* fmt, va_list va) {
     printfEnv_t env;
@@ -71,10 +76,10 @@ int vfprintf(FILE* stream, const char* fmt, va_list va) {
 int vprintf(const char* fmt, va_list va) { return vfprintf(stdout, fmt, va); }
 
 // Print using an custom putc function
-int pprintf(void (*outfn)(char c), const char* fmt, ...) {
+int pprintf(void (*outfn)(char c, void* arg), void* arg, const char* fmt, ...) {
     va_list va;
     va_start(va, fmt);
-    int ret = vpprintf(outfn, fmt, va);
+    int ret = vpprintf(outfn, arg, fmt, va);
     va_end(va);
     return ret;
 }

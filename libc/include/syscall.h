@@ -30,7 +30,6 @@ inline int syscall(int nr, int a0, int a1, int a2, int a3, int a4) {
         "movl %%eax, %0"    // Return
         : "=r"(ret)         // Output
         : "r"(nr), "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4)  // Input
-        : "eax", "ebx", "ecx", "edx", "esi", "edi"  // Clobbered regs
     );
     return ret;
 }
@@ -39,9 +38,9 @@ inline int syscall(int nr, int a0, int a1, int a2, int a3, int a4) {
 inline int _exit(int status) { return syscall(SYS_EXIT, status, 0, 0, 0, 0); }
 inline int read(int fd, void* ptr, size_t count) { return syscall(SYS_READ, fd, (int)ptr, (int)count, 0, 0); }
 inline int write(int fd, const void* ptr, size_t count) { return syscall(SYS_WRITE, fd, (int)ptr, (int)count, 0, 0); }
-inline int open(const char* path, int oflag) { return syscall(SYS_OPEN, (int)path, oflag, 0, 0); }
-inline int close(int fd) { return syscall(SYS_CLOSE, fd, 0, 0, 0, 0); }
-inline int seek(int fd, size_t offset, int whence) { return syscall(SYS_SEEK, fd, offset, whence); }
+inline int open(const char* path, int oflag) { return syscall(SYS_OPEN, (int)path, oflag, 0, 0, 0); }
+inline int close(int fd) { return syscall(SYS_CLOSE, fd, 0, 0, 0, 0); }
+inline int seek(int fd, size_t offset, int whence) { return syscall(SYS_SEEK, fd, offset, whence, 0, 0); }
 inline int _malloc(int size) { return syscall(SYS_MALLOC, size, 0, 0, 0, 0); }
 inline int _free(void* ptr) { return syscall(SYS_FREE, (int)ptr, 0, 0, 0, 0); }
 inline int _sleep(int t) { return syscall(SYS_SLEEP, t, 0, 0, 0, 0); }

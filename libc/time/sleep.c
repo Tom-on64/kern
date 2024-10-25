@@ -6,7 +6,7 @@
 void sleep(size_t s) { _sleep(s*1000); }
 
 // Millisecond sleep
-void msleep(size_t ms) { _sleep(s); }
+void msleep(size_t ms) { _sleep(ms); }
 
 // Microsecond sleep
 void usleep(size_t us) { /* TODO */ }

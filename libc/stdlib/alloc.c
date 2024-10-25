@@ -33,5 +33,5 @@ void* realloc(void* ptr, size_t size) {
     return newptr;
 }
 
-void free(void* ptr) { _free(ptr); }
+void free(void* ptr) { _free(ptr); }
 
