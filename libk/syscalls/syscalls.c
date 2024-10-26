@@ -4,7 +4,7 @@
 #include <syscall.h>
 
 // System call table
-int (*syscalls[MAX_SYSCALLS])(intFrame_t*) = {
+int (*syscalls[SYSCALL_COUNT])(intFrame_t*) = {
     [SYS_EXIT]      = sys_exit,
     [SYS_READ]      = sys_read, 
     [SYS_WRITE]     = sys_write,
@@ -18,7 +18,7 @@ int (*syscalls[MAX_SYSCALLS])(intFrame_t*) = {
     
 // Syscall handler
 int syscallHandler(intFrame_t* iframe) {
-    if (iframe->eax > MAX_SYSCALLS-1) { // Syscall doesn't exist
+    if (iframe->eax > SYSCALL_COUNT-1) { // Syscall doesn't exist
         debugf("Error: Syscall(%d) does not exist!\n", iframe->eax);
         return -1;
     }

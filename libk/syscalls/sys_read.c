@@ -4,7 +4,7 @@
 
 int sys_read(intFrame_t* iframe) {
     char* s = (char*)iframe->ebx;
-    reads(s);
+    gets(s, 0xffffffff);
 
     return 0;
 }

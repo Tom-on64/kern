@@ -1,3 +1,5 @@
+OUTPUT_FORMAT("binary")
+
 SECTIONS {
     .text 0xC0000000 : {
         *(entry);

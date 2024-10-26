@@ -119,7 +119,7 @@ void main() {
         char input[256];
         char* inPtr = &input[0];
 
-        reads(inPtr);
+        gets(inPtr, 256);
     }
 }
 
@@ -131,7 +131,7 @@ int _m() {
         char input[256];
         char* inputPtr = input;
 
-        reads(input);
+        gets(input, 256);
 
         if (*input == '\0') continue;
 
@@ -210,7 +210,7 @@ int _m() {
             drawCircle(1500, 600, 300, WHITE);
             fillCircle(950, 750, 75, rgb(0xa2, 0xd6, 0xf9));
 
-            getc(); // Wait until we get a keystroke
+            getc(stdin); // Wait until we get a keystroke
             printf("\x1b[J");
         } else if (strcmp(argv[0], "help") == 0) {
             printf("Available Commands:\n");
@@ -286,7 +286,7 @@ int _m() {
                             char c = fp->_ptr[i++];
                             printf("%c", c < 32 ? '.' : c);
                         }
-                        putc('\n');
+                        putc('\n', stdout);
                     }
                     printf("%04x: ", i);
                 }
@@ -321,14 +321,14 @@ void listFiles() {
     uint32_t total = 0;
     while ((dentry + total)->name[0] != '\0') { total++; }
 
-    putc(' '); // TODO
+    putc(' ', stdout); // TODO
     printf("\bTotal %d\n", total);
 
     while (dentry->name[0] != '\0') {
         inode_t* inode = (inode_t*)BOOT_FIRST_INODE_LOC + dentry->id;
 
         printf("%s", dentry->name);
-        for (uint32_t pad = (16 - strlen(dentry->name)); pad > 0; pad--) { putc(' '); }
+        for (uint32_t pad = (16 - strlen(dentry->name)); pad > 0; pad--) { putc(' ', stdout); }
 
         switch (inode->type) {
             case FT_FILE: printf("%dB\n", inode->sizeBytes); break;

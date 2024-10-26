@@ -1,5 +1,5 @@
 #
-# Makfile variables
+# Makefile variables
 #
 
 # Tools
@@ -13,8 +13,8 @@ MAKE = make
 CFLAGS =    -Wall -Wextra -Wno-pointer-sign -Wno-pointer-arith -Wno-unused-parameter\
             -Os -std=c17 -nostdinc -g -Werror\
             -ffreestanding -fno-stack-protector -fno-builtin -fno-pie -fcommon\
-            -m32 -march=i386
-LDFLAGS =   -z notext -melf_i386 -nostdlib
+            -m32 -march=i386 
+LDFLAGS =   -z notext -nostdlib -melf_i386
 ASFLAGS =   
 
 # Directories

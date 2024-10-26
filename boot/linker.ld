@@ -1,4 +1,6 @@
 /* Third stage "prekernel" */
+OUTPUT_FORMAT("binary")
+
 SECTIONS {
     .text 0x50000 : {
         *(entry);

@@ -4,12 +4,26 @@
 
 include make.defaults
 
-bootloader: $(BOOT_DIR)/stage1.asm $(BOOT_DIR)/stage2.asm $(BOOT_DIR)/stage3.c $(LIBC) $(LIBK)
-	@echo "Assembling $(BOOT_DIR)/stage1.asm..."
-	$(AS) -fbin -o $(BIN)/stage1.bin $(BOOT_DIR)/stage1.asm $(ASFLAGS) 
-	@echo "Assembling $(BOOT_DIR)/stage2.asm..."
-	$(AS) -fbin -o $(BIN)/stage2.bin $(BOOT_DIR)/stage2.asm $(ASFLAGS) 
-	@echo "Compiling $(BOOT_DIR)/stage3.c..."
-	$(CC) $(CFLAGS) -I$(LIBK_INC) -I$(LIBC_INC) -o $(BIN)/boot/stage3.o -c $(BOOT_DIR)/stage3.c
-	$(LD) $(LDFLAGS) -T$(BOOT_DIR)/stage3.ld --oformat binary -o $(BIN)/stage3.bin $(BIN)/boot/stage3.o $(LIBC) $(LIBK)
+STAGE1 = $(BIN)/stage1.bin
+STAGE2 = $(BIN)/stage2.bin
+STAGE3 = $(BIN)/stage3.bin
+STAGE1_SRC = $(BOOT_DIR)/stage1.s
+STAGE2_SRC = $(BOOT_DIR)/stage2.s
+STAGE3_SRC = $(BOOT_DIR)/stage3.c
+STAGE3_OBJ = $(BIN)/boot/stage3.o
+
+bootloader: $(STAGE1) $(STAGE2) $(STAGE3)
+
+$(STAGE1): $(STAGE1_SRC)
+	@echo "Assembling $<..."
+	$(AS) -fbin -o $@ $< $(ASFLAGS)
+
+$(STAGE2): $(STAGE2_SRC)
+	@echo "Assembling $<..."
+	$(AS) -fbin -o $@ $< $(ASFLAGS)
+
+$(STAGE3): $(STAGE3_SRC)
+	@echo "Compiling $(STAGE3_SRC)..."
+	$(CC) $(CFLAGS) -I$(LIBK_INC) -I$(LIBC_INC) -o $(STAGE3_OBJ) -c $<
+	$(LD) $(LDFLAGS) -T$(BOOT_DIR)/linker.ld -o $@ $(STAGE3_OBJ) $(LIBK)
 

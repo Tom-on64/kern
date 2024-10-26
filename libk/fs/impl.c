@@ -2,10 +2,10 @@
 #include <fs/fs.h>
 #include <memory/addresses.h>
 #include <disk/disk.h>
-#include <syscall.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 superblock_t* impl_superblock = (superblock_t*)SUPERBLOCK_LOC;
 fsInfo_t* fsInfo = (fsInfo_t*)FS_INFO_LOC;

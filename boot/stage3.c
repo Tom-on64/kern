@@ -7,7 +7,6 @@
 #include <disk/disk.h>
 #include <fs/impl.h>
 #include <fs/fs.h>
-#include <stdio.h>
 
 __attribute__ ((section("entry")))
 void main() {
