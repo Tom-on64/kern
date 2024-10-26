@@ -7,7 +7,7 @@ int putchar(int c) { return putc(c, stdout); }
 int getc(FILE* stream) {
     if (!stream) { return EOF; }
 
-    unsigned char ch;
+    unsigned char ch = '\0';
     ssize_t res = read(stream->_file, &ch, 1);
     if (res <= 0) { return EOF; }
 

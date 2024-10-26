@@ -1,6 +1,11 @@
 #ifndef _FCNTL_H
 #define _FCNTL_H
 
+/* Standard file decriptors */
+#define STDIN_FILENO    0
+#define STDOUT_FILENO   1
+#define STDERR_FILENO   2
+
 /* File access modes */
 #define O_CREAT     0x0001  // Create if does not exist
 #define O_RDONLY    0x0002  // Read only

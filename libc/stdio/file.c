@@ -4,6 +4,10 @@
 #include <string.h>
 #include <fcntl.h>
 
+FILE* stdin;
+FILE* stdout;
+FILE* stderr;
+
 FILE* fopen(const char* path, const char* mode) {
     FILE* fp = (FILE*)malloc(sizeof(FILE));
     if (!fp) { return NULL; }

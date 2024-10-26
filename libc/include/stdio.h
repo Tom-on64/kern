@@ -53,6 +53,7 @@ int ungetc(int c, FILE* stream);
 /* Line I/O */
 char* fgets(char* str, int n, FILE* stream);
 int fputs(const char* str, FILE* stream);
+char* gets(char* str, int n);
 int puts(const char* str);
 
 /* TODO: Error handling
