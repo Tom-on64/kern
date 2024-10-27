@@ -1,6 +1,6 @@
 #include <syscalls/syscalls.h>
-#include <interrupt/isr.h>
-#include <error/debug.h>
+#include <drivers/serial.h>
+#include <cpu/isr.h>
 #include <syscall.h>
 
 // System call table

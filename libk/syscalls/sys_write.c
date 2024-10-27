@@ -1,6 +1,6 @@
 #include <syscalls/syscalls.h>
-#include <tty/tty.h>
-#include <interrupt/isr.h>
+#include <screen/tty.h>
+#include <cpu/isr.h>
 #include <stddef.h>
 
 int sys_write(intFrame_t* iframe) {

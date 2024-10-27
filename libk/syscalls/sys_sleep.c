@@ -1,6 +1,6 @@
 #include <syscalls/syscalls.h>
-#include <interrupt/isr.h>
 #include <memory/addresses.h>
+#include <cpu/isr.h>
 #include <stdint.h>
 
 int sys_sleep(intFrame_t* iframe) {

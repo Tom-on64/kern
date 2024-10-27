@@ -1,6 +1,6 @@
 #include <syscalls/syscalls.h>
-#include <interrupt/isr.h>
 #include <memory/malloc.h>
+#include <cpu/isr.h>
 #include <stddef.h>
 
 int sys_malloc(intFrame_t* iframe) {

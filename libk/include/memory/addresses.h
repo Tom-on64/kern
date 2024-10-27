@@ -1,5 +1,5 @@
-#ifndef MEMORY_ADDRESSES_H
-#define MEMORY_ADDRESSES_H
+#ifndef _MEMORY_ADDRESSES_H
+#define _MEMORY_ADDRESSES_H
 
 /*
  * Memory layout of addresses 0x0000 - 0x12000
@@ -25,7 +25,7 @@
 #define PHYS_MEM_USED_BLOCKS    0x180C
 
 // Some structs 0x2000-0x2fff
-#define TERMINAL_INFO_LOC       0x2000
+#define CONSOLE_INFO_LOC        0x2000
 #define KEYBOARD_STATE_LOC      0x2100
 #define DATETIME_LOC            0x2200
 

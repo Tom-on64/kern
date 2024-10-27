@@ -1,8 +1,8 @@
-#ifndef MEMORY_VIRTUAL_H
-#define MEMORY_VIRTUAL_H
+#ifndef _MEMORY_VIRTUAL_H
+#define _MEMORY_VIRTUAL_H
 
-#include <stdint.h>
 #include <memory/physical.h>
+#include <stdint.h>
 
 #define PAGES_PER_TABLE 1024
 #define TABLES_PER_DIRECTORY 1024

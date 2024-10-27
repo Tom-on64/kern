@@ -4,7 +4,7 @@
 
 include make.defaults
 
-LIBK_ASM=$(LIBK_DIR)/interrupt/isr.s
+LIBK_ASM=$(LIBK_DIR)/cpu/isr.s
 
 $(LIBK): $(LIBK_SRC) $(LIBK_ASM) $(LIBC)
 	@echo "Building $(LIBK)..."

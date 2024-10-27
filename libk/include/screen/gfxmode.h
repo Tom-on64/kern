@@ -1,5 +1,5 @@
-#ifndef SCREEN_GFXMODE_H
-#define SCREEN_GFXMODE_H
+#ifndef _SCREEN_GFXMODE_H
+#define _SCREEN_GFXMODE_H
 
 #include <memory/addresses.h>
 #include <stdint.h>

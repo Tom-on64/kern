@@ -58,18 +58,14 @@ Legend:
         - [ ] types.h (syscall types)
         - [ ] gfx.h (basic graphics lib)
 
-- [ ] LIBK
-    - [x] disk - disk r/w
-    - [ ] error - error handling (bigerr is not enough :( )
-    - [ ] fs - filesystem 
+- [x] LIBK
+    - [x] drivers - everything that works with hardware
+    - [x] error - error handling (bigerr is not enough :( )
+    - [x] fs - filesystem 
     - [x] interrupt - handling and registering interupts
-    - [ ] input - handle ALL input devices (currently implemented as the keyboard dir)
     - [x] memory - memory managing (physical and virtual)
-    - [x] ports - handles IO ports (eg. serial console)
     - [x] screen - everything that displays on the screen
-    - [x] sound - handles everything related to sound
     - [x] syscall - system calls
-    - [x] tty - handles terminal output 
 
 - [x] Multistage Bootloader
 - [x] Bootloader reads filesystem to find files

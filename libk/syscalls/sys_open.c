@@ -1,5 +1,5 @@
 #include <syscalls/syscalls.h>
-#include <interrupt/isr.h>
+#include <cpu/isr.h>
 #include <stdio.h>
 
 int sys_open(intFrame_t* iframe) {

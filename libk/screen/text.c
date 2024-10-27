@@ -1,7 +1,7 @@
 #include <screen/text.h>
-#include <tty/tty.h>
-#include <memory/addresses.h>
 #include <screen/gfxmode.h>
+#include <screen/tty.h>
+#include <memory/addresses.h>
 #include <stdint.h>
 #include <string.h>
 

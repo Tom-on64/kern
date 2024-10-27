@@ -1,7 +1,7 @@
-#ifndef INTERRUPT_SYSCALLS_H
-#define INTERRUPT_SYSCALLS_H
+#ifndef _SYSCALLS_SYSCALLS_H
+#define _SYSCALLS_SYSCALLS_H
 
-#include <interrupt/isr.h>
+#include <cpu/isr.h>
 
 int sys_exit    (intFrame_t* iframe);
 int sys_read    (intFrame_t* iframe);

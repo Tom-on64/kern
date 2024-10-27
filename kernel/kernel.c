@@ -1,29 +1,29 @@
-#include <interrupt/isr.h>
-#include <interrupt/pit.h>
-#include <interrupt/rtc.h>
 #include <syscalls/syscalls.h>
-#include <keyboard/keyboard.h>
+#include <memory/addresses.h>
 #include <memory/physical.h>
 #include <memory/virtual.h>
-#include <memory/addresses.h>
 #include <memory/malloc.h>
-#include <fs/fs.h>
-#include <fs/impl.h>
-#include <disk/disk.h>
-#include <screen/text.h>
+#include <drivers/keyboard.h>
+#include <drivers/serial.h>
+#include <drivers/timer.h>
+#include <drivers/pcspk.h>
+#include <drivers/disk.h>
+#include <drivers/rtc.h>
 #include <screen/graphics.h>
 #include <screen/gfxmode.h>
-#include <tty/tty.h>
-#include <sound/pcspk.h>
-#include <sound/notes.h>
-#include <ports/io.h>
-#include <ports/serial.h>
-#include <stdio.h> 
+#include <screen/text.h>
+#include <screen/tty.h>
+#include <cpu/system.h>
+#include <cpu/isr.h>
+#include <fs/kernfs.h>
+#include <fs/fs.h>
+#include <sys/notes.h>
+#include <sys/gfx.h>
+#include <syscall.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h> 
 #include <time.h>
-#include <syscall.h>
-#include <sys/gfx.h>
 
 /* Little teaser
 #include <math.h>
@@ -64,8 +64,8 @@ void main() {
     // Setup serial output for debugf()
     if (setupSerial(PORT_COM1) != 0) { printf("\x1b[1MFailed to initialize serial interface\x1b[8M\n"); }
     else {
-        serialPrint(PORT_COM1, "\x1b[H\x1b[J"); // Clear
-        serialPrint(PORT_COM1, "kern. \x1b[36m(Serial console)\x1b[0m\n\n");
+        debugf("\x1b[H\x1b[J"); // Clear
+        debugf("kern. \x1b[36m(Serial console)\x1b[0m\n\n");
     }
 
     // Interrupt setup

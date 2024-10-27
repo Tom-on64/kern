@@ -2,7 +2,7 @@
 # Main kern makefile
 #
 
-export VERSION = 0.2.1
+export VERSION = 0.2.2
 
 # Configurable variables (eg. CC, CFLAGS, ...)
 include make.defaults
