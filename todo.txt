@@ -7,29 +7,14 @@ Legend:
 - [!] Important todo
 - [?] Optional
 
-- [!] The Big Refactor
-    - [?] Use UEFI
-        - [ ] 32-bit (probably)
-        - [ ] Partitioned disk
+- [ ] Refactoring
+    - [ ] Use UEFI
     - [ ] Use an existing bootloader
-        - [ ] Limine
-        - [ ] Grub :/
-    - [ ] project structure
-        - [ ] arch/
-        - [x] lib/
-        - [x] include/
     - [x] libc - User space
     - [x] libk - Kernel libc
-    - [x] kernel
-        - [x] use libk
-        - [x] makefile
-        - [?] probably a full rewrite
-    - [ ] filesystem
-        - [ ] use Ext1
-        - [ ] sysroot
-        - [ ] good buildutil
-        - [ ] proper file organization
-    - [X] Makefile refactorin' (finally done!!!)
+    - [x] Kernel rewrite
+    - [ ] Better filesystem
+    - [x] Makefile refactorin' (finally done!!!)
 
 - [ ] LIBC
     - [ ] assert.h
@@ -90,48 +75,23 @@ Legend:
     - [x] Setup on boot
     - [ ] Different font size support
 
-- [x] Graphics
-    - [?] Enter/exit a "graphics" mode (idk if we need this)
-    - [x] Pixel drawing
-    - [x] Line drawing (Raycaster Alert??)
-    - [x] Triangles (3D?!!???)
-    - [x] Rectange :)
-    - [x] Circle!
-    - [x] Filled verisons
-
-- [x] Interrupts
-    - [x] IDT Setup (idt.h)
-    - [x] Exception handling
-    - [x] Hardware/software interrupts
-    - [x] Syscalls! (int 0x80)
-    - [x] IRQ 0 - PIT
-    - [x] IRQ 1 - Keyboard
-    - [x] IRQ 8 - CMOS Real time clock
-    - [?] Other IRQs (idk which ones)
-
-- [ ] Sound
-    - [x] Pc Speaker
-    - [x] Notes (in hertz)
-    - [ ] Sound Blaster 16
-    - [x] MEGALOVANIA
-
-- [ ] Math
-    - [ ] Trigonometry
-        - [ ] Sine
-        - [ ] Cosine
-        - [ ] Tangent
-        - [ ] Cotangent
-        - [ ] Arc (inverse) versions
-        - [ ] Hyperbolic versions
+- [x] Math
+    - [x] Trigonometry
+        - [x] Sine
+        - [x] Cosine
+        - [x] Tangent
+        - [x] Cotangent
+        - [x] Arc (inverse) versions
+        - [x] Hyperbolic versions
     - [x] Absolute value
-    - [ ] isOdd() 🗿
+    - [?] isOdd() 🗿
     - [x] Exponential fn (e^x)
     - [x] Logarithm
     - [x] Power
     - [x] Square Root
-    - [ ] Floor
-    - [ ] Round
-    - [ ] Ceiling
+    - [x] Floor
+    - [x] Round
+    - [x] Ceiling
     - [x] Sign
     - [x] INFINITY
     - [x] NAN
@@ -140,7 +100,7 @@ Legend:
 
 - [ ] Filesystem
     - [x] Utility for filesystem building (not just an assembly file)
-    - [_] Better header for file i/o (disk/filesys.h)
+    - [x] Better header for file i/o (disk/filesys.h)
     - [x] Filetable
     - [x] A better filesystem using INodes etc.
     - [x] Files
@@ -158,12 +118,12 @@ Legend:
 - [ ] System Calls
     - [x] Sleep()
     - [x] Write()
-    - [ ] Read() (temporarly gets())
-    - [ ] Open()
-    - [ ] Close()
+    - [x] Read() 
+    - [x] Open()
+    - [x] Close()
     - [x] Malloc()
     - [x] Free()
-    - [ ] Seek()
+    - [x] Seek()
     - [ ] Tell()
     - [ ] Exit()
 
@@ -193,23 +153,16 @@ Legend:
     - [x] stdout
     - [ ] stderr
 
-- [x] Memory manager
-    - [x] Memory map
-    - [x] Print mem map
-    - [x] Physical
-    - [x] Virtual
-    - [x] Paging
-
 - [ ] User (or system) programs
     - [x] Loading them
-    - [x] Running them
+    - [_] Running them
     - [x] Exit back to kernel/shell
     - [x] Let them use libs
-    - [ ] Proper include files (LibC?)
+    - [x] Proper include files (LibC?)
     - [x] argc, argv[]
 
-- [ ] Standalone shell program
 - [ ] Userspace programs
+    - [ ] Shell
     - [x] Calculator
     - [ ] Calendar
 
