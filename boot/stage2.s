@@ -163,7 +163,7 @@ vbeSetup:
     cmp ax, 0x4f
     jne error
 
-    jmp loadGDT
+    jmp checkA20
 
 .nextMode:
     mov ax, [_segment]
@@ -185,6 +185,51 @@ error:
     cli
     hlt
 
+;; Enables the A20 line
+enableA20:
+    in al, 0x92
+    or al, 2
+    out 0x92, al
+
+;; Check if the A20 line is enabled
+checkA20:
+    push ds
+    push es
+    push di
+    push si
+
+    cli
+    xor ax, ax  ; ax = 0
+    mov es, ax  ; es = 0
+    not ax      ; ax = 0xffff
+    mov ds, ax  ; ds = 0xffff
+    
+    mov di, 0x0500
+    mov si, 0x0510
+
+    mov al, byte [es:di]
+    push ax
+    mov al, byte [ds:si]
+    push ax
+
+    mov byte [es:di], 0x00
+    mov byte [ds:si], 0xff
+
+    cmp byte [es:di], 0xff
+
+    pop ax
+    mov byte [ds:si], al
+    pop ax
+    mov byte [es:di], al
+
+    mov ax, 0
+    jne enableA20
+
+    pop si
+    pop di
+    pop es
+    pop ds
+
 ;; Load the global descriptor table (GDT)
 loadGDT:
     cli
@@ -196,6 +241,7 @@ loadGDT:
 
     ; Far jump to 32 bit mode!!
     jmp CODE_SEG:protected_start
+
 
 ;;
 ;; Prints a hex byte
