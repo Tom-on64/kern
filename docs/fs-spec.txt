@@ -1,48 +1,57 @@
-= fsys =
+ Filesystem
+============
 
 Sector = 512 Bytes
 Block  = 4096 Bytes
 
-Reserved sectors:
- Sector 0..3 - Bootblock, will be loaded by the Bios into memory and executed   (512B)
- Sector 4..7 - Superblock, contains metadata about the filesystem itself        (4KiB)
+Reserved sectors
+----------------
+* Sector 0..7 - Bootblock, constains bootloader code that gets ran by the BIOS   (4KiB)
+* Sector 8..F - Superblock, contains metadata about the filesystem itself        (4KiB)
 
-Superblock structure: (4096B)
- Device ID
- Max File Size
- INode Count
- INode Bitmap Block
- INodes Start
- INode Block Count
- INodes per sector
- Data Bitmap Block
- Data Start
- Data Block Count
- Root INode Pointer
- First Unreserved INode
+Superblock structure (4096B)
+--------------------
+* Device ID
+* Max File Size
+* INode Count
+* INode Bitmap Block
+* INodes Start
+* INode Block Count
+* INodes per sector
+* Data Bitmap Block
+* Data Start
+* Data Block Count
+* Root INode Pointer
+* First Unreserved INode
 
-INode structure: (64B)
- Type
- Size (bytes)
- Sector Count (size in sectors)
- Mode
- Extent[4]
- Single Indirect
- Double Indirect?
+INode structure (64B)
+---------------
+* Type
+* Size (bytes)
+* Sector Count (size in sectors)
+* Mode
+* Extent[4]
+* Single Indirect
+* Double Indirect?
 
-Extent: (8B)
- Block
- Length
+Extent (8B)
+------
+* Block
+* Length
  
-Directory Entry: (64B)
- INode Number
- Name (max length 60 Bytes)
+Directory Entry (64B)
+---------------
+* INode Number
+* Name (max length 60 Bytes)
 
-Filetypes:
- File
- Directory
- #TODO
- Link
- Device
- Stream?
+Filetypes
+---------
+* File
+* Directory
+# TODO
+* Link
+* Device
+* Stream?
+
+These structs are defined in the libk header 'fs/fs.h'
 

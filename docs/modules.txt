@@ -1,0 +1,36 @@
+Kern Dev Struct
+===============
+
+Independant Modules
+-------------------
+* Each MUST have their own directory (eg. 'kernel/', 'boot/')
+* Each MAY have their own internal independant submodules (eg. userspace programs in 'usr/')
+* A module MAY be dependant on it's own submodules, but it's submodules MUST be independant of each other
+* Each MUST have a makefile in their directory (eg. 'libc/makefile')
+* Each module MUST be listed in the 'make.defaults' directory
+* Each module MUST be self-contained and independentally compilable
+
+kern (Root "module", is dependant on all of it's submodules)
+ |- boot
+ |   |- bootsect (stage1)
+ |   '- bootload (stage2)
+ |- kernel
+ |   '- libk
+ |- libc (C Standard Library)
+ '- user !EXCEPTION: Userspace programs are dependant upon libc!
+     |- coreutils
+     |- fdisk
+     |- init
+     |- mkfs
+     |- sh
+     ..
+
+TODO
+====
+[ ] boot
+[ ] kernel
+[x] libc
+[ ] user
+[ ] makefile
+[ ] make.defaults
+

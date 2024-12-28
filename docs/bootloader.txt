@@ -1,0 +1,17 @@
+ Bootloader
+============
+
+Kern uses a two stage bootloader. The first stage is the 512 byte bootsector. 
+This code loads the 2nd stage, which is in the next seven sectors.
+Together this whole bootloader takes up the first filesystem block (4kiB).
+
+Bootframe
+---------
+When the bootloader runs the kernel, it pushes a 32-bit address that points 
+to the bootframe It follows the following structure:
+* Memory map
+* Video memory
+* ...todo
+
+It is defined in the libk header 'boot.h'
+

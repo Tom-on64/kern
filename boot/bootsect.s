@@ -90,8 +90,8 @@ start:
     ; Far jump to protected mode
     jmp code_seg:vector
 
-%include "disk.s"   ; Disk I/O helper functions
-%include "gdt.s"    ; Global Descriptor Table
+%include "boot/disk.s"   ; Disk I/O helper functions
+%include "boot/gdt.s"    ; Global Descriptor Table
 
 ; Handles an error
 err:
@@ -130,8 +130,4 @@ vector:
 ; Padding and boot signature
 times 510-($-$$) db 0
 dw 0xaa55
-
-; === STAGE 2 ===
-align 16
-incbin 'stage2.bin'
 

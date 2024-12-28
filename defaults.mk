@@ -1,0 +1,3 @@
+#
+# kern. makefile defaults
+#

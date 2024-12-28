@@ -1,0 +1,188 @@
+Coding Style
+============
+
+Indentation
+-----------
+All indents must be a tab character ('\t'). It is recommended to display tabs
+as eight spaces to avoid extensive indentation. You shouldn't have more than 
+3 levels of indentation.
+
+Braces
+------
+All braces should be placed on the same line as the statement they belong to.
+```c
+int main(void) {
+	return 0;
+}
+```
+
+The closing brace should be on it's own line, unless it's being followed by
+a continuation of the statement (e.g. 'else' after an 'if').
+```c
+if (condition) {
+	doSomething();
+} else {
+	doSomethingElse();
+}
+```
+
+There may be a single statement without braces if it fits on a single line.
+```c
+// This is good
+if (condition) doSomething();
+
+// This is too long => bad
+if (condition) doSomethingButLong(someParameter, someNumber * otherNumber, "A literal string");
+```
+
+Spaces
+------
+Spaces should be after most statements like 'while', 'for', 'if', etc.
+Spaces should not be placed after 'sizeof' and 'alignof' statements.
+There should not be spaces around the inside of a parenthesized expression, e.g.:
+`int x = ( y * x ); // This is bad`
+
+The '*' in pointer declarations, it is prefered to be appended to the 
+type name, e.g.:
+```c
+char* string;	// Good
+char** strings;	// Good
+int *intptr; 	// Bad
+int *a, *b;	// Allowed, but should be split into multiple declarations
+```
+
+Spaces should also be placed between binary and ternary operators, but
+should not be placed after/before unary operators or member access operators.
+
+Naming
+------
+_The hardest thing in programming_
+Identifiers should use camelCase (starting with lowercase). In special
+cases (e.g. syscall handlers) a short prefix separated with an underscore
+may be used (e.g. 'sys_malloc').
+
+Global variables (that should be sparse) and global functions need good,
+descriptive names. A disk reading function shouldn't be called 'dskrd()'.
+
+Local variables and functions don't need descriptive names, a loop counter 
+should be named 'i' and not loopCounter. 
+
+Some good naming examples:
+```c
+// Random good function names
+int32_t findFreeBlock(uint32_t count);
+int32_t ttyWrite(const void* buf, size_t len);
+uint8_t	getRtcRegister(uint8_t reg);
+
+// Serial functions all start with 'serial'
+int serialSetup();
+void serialWrite(uint8_t byte);
+uint8_t serialRead();
+
+// Syscall handlers are prefixed with 'sys_'
+int sys_malloc(struct intFrame iframe);
+int sys_free(struct intFrame iframe);
+```
+
+Labels, for 'goto' statements or assembly, should be snake_case.
+
+Typedefs vs Structs
+-------------------
+Typedefs should only be used if:
+* It's a struct whose members shouldn't be accessed externally, e.g. FILE
+* It clears confusion, e.g. 'i32' or 'int32_t' is better than just 'int'
+There may be more, but it's better to not use them.
+
+Functions
+---------
+Functions should be short and do one thing. If a function does multiple things,
+see if you can split it up into multiple functions. Some indicators
+of a good function are:
+* It fits into 1-2 screenfulls (let those be 80x24)
+* There shouldn't be more than ~10 local variables
+
+In function prototypes, parameter names should be included. It can give more 
+insight into what it is supposed to be.
+
+Goto
+----
+Using the 'goto' statement is fair in these cases:
+* Exiting nested code
+* Easier to read code
+* Getting rid of redundant code
+* Exiting from multiple points
+
+Label names should be descriptive, should specify exactly what the goto 
+does (e.g. 'exit_free_buffer'). Avoid numbering these labels incase of having 
+to renumber the later.
+
+Comments
+--------
+Write comments telling What code does, not How. Comments shouldn't be inside 
+a function body. There may be small comments on some trick or ugly thing in
+a function, but avoid doing that too much. If you need to comment on how
+everything in a function works, it's probably a really bad function.
+
+Multiline comments should be over multiple lines. Don't write `/* Something */`.
+They should look like this:
+```c
+/* 
+ * This is a multiline comment
+ * The beggining and ending comment characters have their own lines.
+ * Each row also starts with an asterisk, making a nice column.
+ */
+```
+
+Also it is recommended to comment on data in structs, since members may have
+more abstract names.
+
+Macros & Enums
+--------------
+_Yeah, we do a little magic_
+
+Constant define macros must be UPPERCASE.
+`#define FUNNY_NUM 0x69`
+
+If there are multiple related constants, please use an enum.
+CAPITALIZED macro names are appreciated, but function-like macros may have
+lowercase names. Generally, inline functions are prefered over macros.
+If a macro uses more than one statement, enclose them in their own scope.
+```c
+#define MAGIC(_x)\
+	if (_x > 0) doSomething(_x);
+```
+
+Things to look out for:
+* Macros that affect controll flow. `#define FOO(_x) { if (_x < 0) return 1; }
+* Macros that depend on local variables
+* Macros used as l-values
+* Forgetting about precedence. Just wrap everything in parenthesis
+* Namespace collision, prefix everything in the macro with underscores
+
+Other Stuff
+----------
+Here are some rules/recommendations that don't deserve their own category.
+
+Inline Assembly
+***************
+If you don't need to, don't. But for architecture specific stuff, you may need
+to. So just don't jump between functions and don't break anything. Also if you
+think you can optimize better than the compiler, you're wrong.
+
+Conditional Compilation
+***********************
+Try to avoid preprocessor conditionals inside .c source files. Instead write 
+conditionals inside the header and give a NOP version for the #else case.
+These functions can be called uncoditionally. Empty inline functions work too.
+
+Using Bool
+**********
+You may use bool, but are not required to. It does improve readability
+
+Allocating Memory
+*****************
+The prefered way of allocating memory for a struct is:
+`ptr = kmalloc(sizeof(*ptr));`
+Casting the returned void pointer is redundant since C converts void pointers
+to any other pointers.
+

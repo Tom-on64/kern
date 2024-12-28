@@ -18,28 +18,25 @@ LDFLAGS =   -z notext -nostdlib -melf_i386
 ASFLAGS =   
 
 # Directories
-# Outputs
 BIN = ./bin
-BOOTLOADER = $(BIN)/stage1.bin $(BIN)/stage2.bin $(BIN)/stage3.bin
-KERNEL = $(BIN)/kernel.bin
-LIBC = $(BIN)/libc.o
-LIBK = $(BIN)/libk.o
 IMG = kern.img
 
 # Kernel
+KERNEL = $(BIN)/kernel.bin
 KERNEL_DIR = ./kernel
 KERNEL_SRC = $(KERNEL_DIR)/kernel.c
 
 # Bootloader
+BOOTSECT = $(BIN)/bootsect.bin
+BOOTLOAD = $(BIN)/bootload.bin
 BOOT_DIR = ./boot
+BOOT_SRC_ASM = $(shell find $(BOOT_DIR) -type f -name "**.s")
+BOOT_SRC_C = $(shell find $(BOOT_DIR) -type f -name "**.c")
 
 # Libc
+LIBC = $(BIN)/libc.o
 LIBC_DIR = ./libc
 LIBC_SRC = $(shell find $(LIBC_DIR) -type f -name "**.c")
-
-# Libk
-LIBK_DIR = ./libk
-LIBK_SRC = $(shell find $(LIBK_DIR) -type f -name "**.c")
 
 # Userspace
 FONT_DIR = ./usr/fonts
@@ -47,5 +44,5 @@ FONTS = testfont term16n
 
 # Include directories
 LIBC_INC = $(LIBC_DIR)/include
-LIBK_INC = $(LIBK_DIR)/include
+KERNEL_INC = $(KERNEL_DIR)/include
 

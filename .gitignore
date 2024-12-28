@@ -1,23 +1,29 @@
-.DS_Store
+# Don't ignore these
+!.gitattributes
+!.gitignore
 
-# Config
-make.config
-
-# Binaries
-bin/
-*.bin
-makedisk
-
-# Object files
+# Outputs 
+/bin
 *.o
-*.out
-*.obj
+*.d
+*.a
+*.exe
+*.EFI
+*.bin
+*.bin.gz
+*.tar*
 *.elf
+*.hdd
+*.iso
+*.sys
+*.dtb
+*~
 
-# Font source files
-src/fonts/**.asm
-
-# Vim swap files
+# Local
+DS_Store
+/.vscode
 *.swp
 *.swo
+/.clangd
+/.cache
 
