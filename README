@@ -3,6 +3,10 @@ kern.
 
 _Idk why i called it that it was 3am and i needed sleep._
 
+!! WARNING !!
+Kern is broken at the moment. The last working commit is: '11feab5'
+(https://github.com/Tom-on64/kern/tree/11feab5)
+
 About
 -----
 Kern is a 32-bit OS based on the x86 architecture written in NASM Assembly and C. 
