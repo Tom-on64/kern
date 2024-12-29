@@ -1,17 +1,19 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-/* Bitfield values
-     Property   | Bit 
-    ------------|-----
-     Digit      |  0
-     Letter     |  1
-     Lowercase  |  2
-     Punct      |  3
-     Space      |  4
-     Control    |  5
-     Printable  |  6
-     Hex digit  |  7
+/* 
+ * Bitfield values
+ *
+ *  Property   | Bit 
+ * ------------|-----
+ *  Digit      |  0
+ *  Letter     |  1
+ *  Lowercase  |  2
+ *  Punct      |  3
+ *  Space      |  4
+ *  Control    |  5
+ *  Printable  |  6
+ *  Hex digit  |  7
  */
 #define _DIGIT_MASK (1<<0)
 #define _ALPHA_MASK (1<<1)

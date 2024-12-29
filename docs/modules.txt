@@ -7,8 +7,10 @@ Independant Modules
 * Each MAY have their own internal independant submodules (eg. userspace programs in 'usr/')
 * A module MAY be dependant on it's own submodules, but it's submodules MUST be independant of each other
 * Each MUST have a makefile in their directory (eg. 'libc/makefile')
+* Each module makefile MUST implement the 'all' and 'clean' targets
 * Each module MUST be listed in the 'make.defaults' directory
 * Each module MUST be self-contained and independentally compilable
+* A module SHOULD output binaries into the 'bin/' directory
 
 kern (Root "module", is dependant on all of it's submodules)
  |- boot
