@@ -186,3 +186,13 @@ The prefered way of allocating memory for a struct is:
 Casting the returned void pointer is redundant since C converts void pointers
 to any other pointers.
 
+Include Order
+*************
+The prefered way of ordering '#include' directives is as so:
+* Include path includes (ones in <>)
+* Local path includes (ones in "")
+* Header implementation include, if you're implementing a header, include it last
+
+Directives should be ordered by lenght, descending. If two or more includes
+have the same length, order alphabetically.
+
