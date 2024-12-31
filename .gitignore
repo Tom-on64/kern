@@ -15,6 +15,7 @@
 *.elf
 *.hdd
 *.iso
+*.img
 *.sys
 *.dtb
 *~

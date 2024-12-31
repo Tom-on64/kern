@@ -1,14 +1,16 @@
 include ../defaults.mk
 
 INC = ./include
+SRC = ./src
 BIN = ./bin
 
-SRCS_C = $(shell find . -name '*.c')
-SRCS_S = $(shell find . -name '*.s')
-OBJS = $(patsubst %.c, $(BIN)/%.o, $(SRCS_C))	\
-       $(patsubst %.s, $(BIN)/%.s.o, $(SRCS_S))
+SRCS_C = $(shell find $(SRC) -name '*.c')
+SRCS_S = $(shell find $(SRC) -name '*.s')
+OBJS = $(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS_C))	\
+       $(patsubst $(SRC)/%.s, $(BIN)/%.s.o, $(SRCS_S))
+
 LINKER = ./linker.ld
-OUT = ./kernel.elf
+OUT = ./kern.bin
 
 .PHONY: all clean
 
@@ -16,11 +18,11 @@ all: $(OUT)
 $(OUT): $(OBJS)
 	$(LD) $(LDFLAGS) -T$(LINKER) -o $@ $^
 
-$(BIN)/%.o: %.c
+$(BIN)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -I$(INC) -c -o $@ $<
 
-$(BIN)/%.s.o: %.s
+$(BIN)/%.s.o: $(SRC)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -felf32 -o $@ $<
 

@@ -5,6 +5,7 @@ LD = i686-elf-ld
 AS = nasm
 AR = i686-elf-ar
 OBJCOPY = i686-elf-objcopy
+MAKE = make
 
 # Flags
 HOSTCFLAGS = -Wall -Wextra -Wpedantic -O2 -std=c17 -g

@@ -26,4 +26,3 @@ gdtp:
 ; Segments
 code_seg equ gdt.code_desc - gdt
 data_seg equ gdt.data_desc - gdt
-
