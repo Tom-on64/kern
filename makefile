@@ -11,10 +11,10 @@ MODULES = $(BOOT)\
 
 all: $(IMG)
 $(IMG): $(MODULES)
-	dd if=/dev/zero of=$(IMG) bs=512 count=131072
-	dd if=$(BOOT)/stage1.bin of=$(IMG) bs=512 seek=0 conv=notrunc
-	dd if=$(BOOT)/stage2.bin of=$(IMG) bs=512 seek=1 conv=notrunc
-	echo ',,b,*' | sfdisk $(IMG)
+	dd if=/dev/zero of=$(IMG) bs=512 count=131072 			
+	dd if=$(BOOT)/stage1.bin of=$(IMG) bs=512 seek=0 conv=notrunc	
+	dd if=$(BOOT)/stage2.bin of=$(IMG) bs=512 seek=1 conv=notrunc	
+	echo ',,b,*' | sfdisk $(IMG) >/dev/null
 	echo 'drive A:\n\tfile="$(IMG)"\n\tpartition=1' > ~/.mtoolsrc
 	mformat -F 'A:'
 	mcopy $(KERNEL)/kern.bin 'A:'
