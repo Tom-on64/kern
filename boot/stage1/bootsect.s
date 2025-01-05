@@ -11,6 +11,7 @@ jmp short .bpb_end
 nop
 
 ; FAT32 Bios Parameter Block
+; Some BIOSes mess with it so we just leave it blank
 .bpb:
 	.bpb_oem_id:		db "KERN    "
 	.bpb_sector_size:	dw 0
@@ -115,17 +116,17 @@ err:
 	[bits 32]
 	; Protected mode entry vector
 vector: 
-	mov eax, 0x10
+	mov ax, 0x10
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
 
-	and edx, 0xff
+	and edx, 0xff	; Still should be boot drive number
 
 	; Call stage 2 bootloader
-	call 0x70000
+	call code_seg:0x70000
 
 ; Padding and boot signature
 times 510-($-$$) db 0

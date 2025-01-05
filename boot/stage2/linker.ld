@@ -1,27 +1,24 @@
 OUTPUT_FORMAT(binary)
-ENTRY(entry)
+OUTPUT_ARCH(i386)
 
 SECTIONS {
-	/* Will be loaded at 0x70000 */
 	. = 0x70000;
 
 	.text : {
+		*(entry)
 		*(.text)
-		*(.text.*)
+	}
+
+	.rodata : {
 		*(.rodata)
-		*(.rodata.*)
 	}
 
 	.data : {
 		*(.data)
-		*(.data.*)
 	}
 
 	.bss : {
 		*(COMMON)
 		*(.bss)
-		*(.bss.*)
 	}
-
-	_end = .;
 }

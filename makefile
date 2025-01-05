@@ -29,7 +29,7 @@ clean:
 qemu:
 	qemu-system-x86_64\
 		-drive format=raw,file=$(IMG),index=0,media=disk\
-		-m 256M -accel tcg -monitor stdio\
+		-m 256M -accel tcg -monitor stdio -net none\
 		-rtc base=localtime,clock=host,driftfix=slew\
 		-audiodev coreaudio,id=audio0 -machine pcspk-audiodev=audio0
 

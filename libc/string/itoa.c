@@ -8,6 +8,7 @@ char* itoa(size_t val, int base) {
 
     if (val == 0) {
         buf[0] = '0';
+	buf[1] = '\0';
         return buf;
     }
  

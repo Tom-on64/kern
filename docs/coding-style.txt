@@ -196,3 +196,19 @@ The prefered way of ordering '#include' directives is as so:
 Directives should be ordered by lenght, descending. If two or more includes
 have the same length, order alphabetically.
 
+Header Guards
+*************
+`#ifndef X #define X` header guards are preffered. To avoid conflicts they 
+should follow this format:
+`#define _PATH_TO_HEADER_H`
+
+For example `drivers/fat32.h would have this guard:
+```
+#ifndef _DRIVERS_FAT32_H
+#define _DRIVERS_FAT32_H
+
+/* Header stuff */
+
+#endif
+```
+
