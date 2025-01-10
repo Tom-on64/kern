@@ -2,7 +2,7 @@
 #define DISK_H
 
 #include "stdint.h"
-#include "attr.h"
+#include "defs.h"
 
 #define SECTOR_SIZE	512
 #define PIO_PORT	0x1f0
@@ -13,6 +13,8 @@
 #define PIO_CMD_FLUSH	0	// TODO
 
 #define BOOTABLE	0x80
+
+#define LBA_TO_OFFSET(_a)	((_a) * SECTOR_SIZE)
 
 struct partition {
 	uint8_t bootable;

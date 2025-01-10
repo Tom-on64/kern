@@ -8,9 +8,7 @@ static uint32_t xpos;
 static uint32_t ypos;
 static uint8_t attr;
 
-void setAttr(uint8_t newattr) {
-	attr = newattr;
-}
+void setAttr(uint8_t newattr) { attr = newattr; }
 
 void setCursor(uint32_t row, uint32_t col) {
 	xpos = col;
@@ -98,7 +96,6 @@ int vsnprintf(void* buf, size_t len, char* fmt, va_list args) {
 		char pad = ' ';
 		int width = 0;
 
-		// TODO: padding
 		if (*fmt == '0') pad = '0';
 		while (*fmt >= '0' && *fmt <= '9') {
 			width *= 10;
@@ -110,13 +107,18 @@ int vsnprintf(void* buf, size_t len, char* fmt, va_list args) {
 		switch (*fmt++) {
 		case 'd': s = itoa(va_arg(args, int), 10); goto string;
 		case 'x': s = itoa(va_arg(args, int), 16); goto string;
-		case 's': s = va_arg(args, char*);
-		string: while (*s != '\0' && pos < len - 1) str[pos++] = *s++; break;
+		case 's': s = va_arg(args, char*); goto string;
 		case 'c': if (pos < len - 1) str[pos++] = va_arg(args, char); break;
 		case '%': if (pos < len - 1) str[pos++] = '%'; break;
 		default:
 			if (pos < len - 1) str[pos++] = '%';
 			if (pos < len - 1) str[pos++] = *(fmt - 1);
+			break;
+		string: 
+			width -= strlen(s) - 1;
+			if (width < 0) width = 0;
+			while (width-- && pos < len - 1) str[pos++] = pad;
+			while (*s && pos < len - 1) str[pos++] = *s++;
 			break;
 		}
 	}

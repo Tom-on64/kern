@@ -1,24 +1,46 @@
 #include "stdint.h"
+#include "fat32.h"
 #include "stdio.h"
-#include "attr.h"
+#include "defs.h"
 #include "disk.h"
 #include "menu.h"
 #include "kbd.h"
 
+noreturn void panic() { 
+	setAttr(0x04);
+	text(COLS/2, ROWS/2, "[ PANIC ]");
+	while (1) __asm__ volatile ("cli; hlt");
+}
+
 void drawPartitions(struct MBR* mbr, uint8_t sel);
 void partitonInfo(struct partition* part);
+struct partition* menu(struct MBR* mbr);
 
 __section("entry")
 noreturn void main() {
 	keyboardInit();
-
 	struct MBR mbr;
 	readSectors(0, 1, &mbr);
+	struct partition* bootpart = menu(&mbr);
 
+	setAttr(0x0f);
+	cls();
+	showCursor();
+
+	if (fat32_init(bootpart) != 0) {
+		setAttr(0x0c);
+		printf("Failed to initialize FAT32.");
+		panic();
+	}
+	
+	while (1);
+}
+
+struct partition* menu(struct MBR* mbr) {
 	// Select bootable partition by default
 	uint8_t selected = 0;
 	for (size_t i = 0; i < 4; i++) {
-		if (mbr.partitions[i].bootable != BOOTABLE) continue;
+		if (mbr->partitions[i].bootable != BOOTABLE) continue;
 		selected = i;
 		break;
 	}
@@ -31,14 +53,14 @@ noreturn void main() {
 	hline(0, 2, COLS);
 	setAttr(0x02);
 	text(COLS / 2, 1, "KBOOT");
-	drawPartitions(&mbr, selected);
-	partitonInfo(&mbr.partitions[selected]);
+	drawPartitions(mbr, selected);
+	partitonInfo(&mbr->partitions[selected]);
 
 	while (1) {
 		// Check for up/down arrow keys or enter
 		uint8_t scancode = getScancode();
 		if (scancode == SC_ENTER) { // Boot selected
-			if (mbr.partitions[selected].type != 0) break;
+			if (mbr->partitions[selected].type != 0) break;
 
 			// Don't allow booting an unused partition
 			setAttr(0x4f);
@@ -54,16 +76,11 @@ noreturn void main() {
 		else if (selected == 4) selected = 0;
 
 		// Redraw
-		drawPartitions(&mbr, selected);
-		partitonInfo(&mbr.partitions[selected]);
+		drawPartitions(mbr, selected);
+		partitonInfo(&mbr->partitions[selected]);
 	}
-
-	setAttr(0x0f);
-	cls();
-	showCursor();
-	printf("Booting from Partition %d...", selected);
-
-	while (1);
+	
+	return &mbr->partitions[selected];
 }
 
 void drawPartitions(struct MBR* mbr, uint8_t sel) {

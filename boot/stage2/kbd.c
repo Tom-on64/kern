@@ -6,7 +6,7 @@
 int keyboardInit() { return 0; }
 
 uint8_t getScancode() {
-	while (inb(PS2_STAT_PORT) & 0x01 == 0);
+	while ((inb(PS2_STAT_PORT) & 0x01) == 0);
 	return inb(PS2_DATA_PORT);
 }
 
