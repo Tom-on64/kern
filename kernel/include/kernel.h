@@ -18,7 +18,20 @@
 #define __naked		__attribute__((naked))
 
 /*
- * Utility macros
+ * Standard int types
  */
-#define sizeof_array(_a) ()
+// Unsigned
+typedef unsigned char	uint8_t;
+typedef unsigned short	uint16_t;
+typedef unsigned int	uint32_t;
+typedef unsigned long	uint64_t;
+// Signed
+typedef signed char	int8_t;
+typedef signed short	int16_t;
+typedef signed int	int32_t;
+typedef signed long	int64_t;
+// Size
+typedef uint32_t	size_t;
+typedef int32_t		ssize_t;
+
 #endif
