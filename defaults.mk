@@ -1,17 +1,17 @@
 # Tools
 HOSTCC = cc
-CC = i686-elf-gcc
-LD = i686-elf-ld
+CC = cc
+LD = ld
 AS = nasm
-AR = i686-elf-ar
-OBJCOPY = i686-elf-objcopy
+AR = ar
+OBJCOPY = objcopy
 MAKE = make
 
 # Flags
-HOSTCFLAGS = -Wall -Wextra -Wpedantic -Os -std=c17 -g
-CFLAGS = -Wall -Wextra -Wpedantic -Wno-pointer-arith\
+HOSTCCFLAGS = -Wall -Wextra -Wpedantic -Os -std=c17
+CCFLAGS = -Wall -Wextra -Wpedantic -Wno-pointer-arith\
 	 -ffreestanding -fno-stack-protector -fno-builtin -fno-pie -fcommon\
-	 -O2 -std=c17 -nostdinc -nostdlib -z notext -march=i386 -g
+	 -O2 -std=c17 -nostdinc -nostdlib -z notext -march=i386 -m32
 LDFLAGS = -melf_i386
 ASFLAGS = 
 ARFLAGS =
