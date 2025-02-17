@@ -14,7 +14,7 @@ clean:
 
 qemu:
 	qemu-system-x86_64\
-		-kernel ./kernel/kernel.elf
+		-kernel ./kernel/kernel.elf\
 		-m 256M -accel tcg -monitor stdio -net none\
 		-rtc base=localtime,clock=host,driftfix=slew\
 		-audiodev pipewire,id=audio0 -machine pcspk-audiodev=audio0

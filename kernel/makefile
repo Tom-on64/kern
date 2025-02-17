@@ -5,8 +5,8 @@ BIN = ./bin
 INC = ./include
 SRCS_C = $(wildcard $(SRC)/*.c)
 SRCS_S = $(wildcard $(SRC)/*.s)
-OBJS_C = $(patsubst $(SRC)/%.c, $(BIN)/%.o, $(SRCS_C))
-OBJS_S = $(patsubst $(SRC)/%.s, $(BIN)/%.o, $(SRCS_S))
+OBJS_C = $(patsubst $(SRC)/%.c, $(BIN)/%.c.o, $(SRCS_C))
+OBJS_S = $(patsubst $(SRC)/%.s, $(BIN)/%.s.o, $(SRCS_S))
 OUT = ./kernel.elf
 LINKER = ./linker.ld
 
@@ -15,11 +15,11 @@ all: $(OUT)
 $(OUT): $(OBJS_C) $(OBJS_S)
 	$(LD) $(LDFLAGS) -T$(LINKER) -o $@ $^
 
-$(BIN)/%.o: $(SRC)/%.c
+$(BIN)/%.c.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CCFLAGS) -I$(INC) -c -o $@ $^
 
-$(BIN)/%.o: $(SRC)/%.s
+$(BIN)/%.s.o: $(SRC)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) -felf32 -o $@ $^
 
