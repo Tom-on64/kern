@@ -14,6 +14,6 @@ void serial_send(int dev, char data);
 int  serial_rcvd(int dev);
 char serial_recv(int dev);
 void serial_write(int dev, char* buf, size_t len);
-void serial_print(int dev, char* s);
+void serial_puts(int dev, char* s);
 
 #endif

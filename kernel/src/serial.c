@@ -44,7 +44,7 @@ void serial_write(int dev, char* buf, size_t len) {
 	}
 }
 
-void serial_print(int dev, char* s) {
+void serial_puts(int dev, char* s) {
 	size_t len = 0;
 	char* p = s;
 	while (*p++ != '\0') len++;

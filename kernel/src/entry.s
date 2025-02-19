@@ -22,7 +22,7 @@ align 16
 
 ; Initialize stack
 stack_bottom:
-	resb 16384	; 16kB
+	resb 16384
 stack_top:
 
 ; Entry point
@@ -31,6 +31,7 @@ global _start
 extern kmain
 _start:
 	mov esp, stack_top	; Setup stack
+	push ebx
 	call kmain		; Call kernel main
 
 	; Hang if kernel returns

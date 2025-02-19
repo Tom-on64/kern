@@ -61,6 +61,13 @@ typedef uint32_t	uintptr_t;
 typedef int32_t		intptr_t;
 
 /*
+ * Boolean
+ */
+#define bool _Bool
+#define true 1
+#define false 0
+
+/*
  * Logging and errors
  */
 // TODO: Logging with printk()
@@ -69,7 +76,11 @@ typedef int32_t		intptr_t;
 #define WARN()		NULL
 #define BUG_ON(_e)	((_e) ? BUG() : NULL)
 #define WARN_ON(_e)	((_e) ? WARN() : NULL)
-// TODO: Write a panic()
-#define panic(_s)	while(1);
+#include <serial.h>
+__noreturn static inline void panic(char* s) { 
+	serial_puts(COM1, s);
+	__asm__ volatile("cli");
+	while (1) __asm__ volatile ("hlt");
+}
 
 #endif
