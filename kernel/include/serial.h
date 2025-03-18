@@ -8,6 +8,9 @@
 #define COM3	0x3e8
 #define COM4	0x2e8
 
+// Buffer for (v)debugf()
+#define DF_BUF_LEN	2048
+
 int  serial_init(int dev);
 int  serial_txem(int dev);
 void serial_send(int dev, char data);
@@ -15,5 +18,8 @@ int  serial_rcvd(int dev);
 char serial_recv(int dev);
 void serial_write(int dev, char* buf, size_t len);
 void serial_puts(int dev, char* s);
+
+int debugf(char* fmt, ...);
+int vdebugf(char* fmt, va_list args);
 
 #endif

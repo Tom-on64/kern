@@ -1,189 +1,106 @@
-=== Todo ===
+TODO
+====
 
-Legend:
+Legend
+------
 - [ ] Not done
 - [x] Done
 - [_] Was done at some point, but isn't now
 - [!] Important todo
 - [?] Optional
 
-- [ ] Refactoring
-    - [ ] Use UEFI
-    - [ ] Use an existing bootloader
-    - [x] libc - User space
-    - [x] libk - Kernel libc
-    - [x] Kernel rewrite
-    - [ ] Better filesystem
-    - [x] Makefile refactorin' (finally done!!!)
+Todos
+-----
+- [ ] Kernel
+  - [ ] Syscalls
+    - [ ] exit()
+    - [ ] fork()
+    - [ ] read()
+    - [ ] write()
+    - [ ] open()
+    - [ ] close()
+    - [ ] waitpid()
+    - [ ] creat()
+    - [ ] link()
+    - [ ] unlink()
+    - [ ] execve()
+    - [ ] chdir()
+    - [ ] time()
+    - [ ] mknod()
+    - [ ] chmod()
+    - [ ] chown()
+    - [ ] break()
+    - [ ] stat()
+    - [ ] mount()
+    - [ ] umount()
+    - [ ] alarm()
+    - [ ] pause()
+    - [ ] access()
+    - [ ] nice()
+    - [ ] sync()
+    - [ ] kill()
+    - [ ] rename()
+    - [ ] mkdir()
+    - [ ] rmdir()
+    - [ ] dup()
+    - [ ] pipe()
+  - [ ] Memory
+    - [ ] Physical MM
+    - [ ] Virtual MM
+    - [ ] Paging
+    - [ ] Kernel Heap
+  - [ ] Drivers
+    - [x] tty
+    - [x] serial
+    - [ ] Timer
+    - [ ] VFS
+    - [ ] RAMFS
+    - [ ] FAT32
+    - [ ] DevFS
+    - [ ] SysFS
+    - [ ] ProcFS
 
-- [ ] LIBC
-    - [ ] assert.h
-    - [ ] complex.h (idk why we would need this)
-    - [x] ctype.h
-    - [x] errno.h
-    - [x] fcntl.h
-    - [x] float.h
-    - [x] limits.h
-    - [x] math.h (maybe a separate libm?) TODO: add errno errors in there
-    - [x] setjmp.h (this plagues my mind)
-    - [ ] signal.h (we would need signals first)
-    - [x] stdarg.h
-    - [x] stdbool.h
-    - [x] stddef.h
-    - [x] stdint.h
-    - [x] stdio.h
-    - [x] stdlib.h
-    - [x] string.h
-    - [x] syscall.h
-    - [x] time.h
-    - [ ] unistd.h (do we do POSIX?)
-    - [ ] wchar.h (we would need text support for wide chars ig?)
-    - [ ] wctype.h (same as above)
-    - [ ] sys/
-        - [ ] types.h (syscall types)
-        - [ ] gfx.h (basic graphics lib)
+- [ ] Bootloader
+  - [ ] MBR
+  - [ ] EFI
 
-- [x] LIBK
-    - [x] drivers - everything that works with hardware
-    - [x] error - error handling (bigerr is not enough :( )
-    - [x] fs - filesystem 
-    - [x] interrupt - handling and registering interupts
-    - [x] memory - memory managing (physical and virtual)
-    - [x] screen - everything that displays on the screen
-    - [x] syscall - system calls
+- [ ] Libc
+  - [ ] assert.h
+  - [ ] complex.h (idk why we would need this)
+  - [ ] ctype.h
+  - [ ] errno.h
+  - [ ] fcntl.h
+  - [ ] float.h
+  - [ ] limits.h
+  - [ ] math.h 
+  - [ ] setjmp.h (this plagues my mind)
+  - [ ] signal.h (we would need signals first)
+  - [ ] stdarg.h
+  - [ ] stdbool.h
+  - [ ] stddef.h
+  - [ ] stdint.h
+  - [ ] stdio.h
+  - [ ] stdlib.h
+  - [ ] string.h
+  - [ ] syscall.h
+  - [ ] time.h
+  - [ ] unistd.h (does POSIX need us?)
+  - [ ] wchar.h (we would need text support for wide chars ig?)
+  - [ ] wctype.h (same as above)
 
-- [x] Multistage Bootloader
-- [x] Bootloader reads filesystem to find files
-- [x] The almighty 'printf()'
-- [x] Write down where stuff is in memory (in notes.txt)
+- [ ] Userspace
+  - [ ] sh
+  - [ ] as
+  - [ ] cc
+  - [ ] ld
+  - [ ] editor
+  - [ ] binutils
+  - [ ] coreutils
+  - [ ] minesweeper
+  - [ ] solitaire
+  - [ ] tetris
+  - [ ] doom
 
-- [ ] "Text" mode (not actually)
-    - [x] Scrolling
-    - [ ] Scroll-back
-    - [x] Color codes (and just multicolor text in general)
-    - [x] Controll sequences!
-    - [x] VESA BIOS Extensions
-    - [x] Better resolution
-    - [x] Graphics mode
-    - [x] Custom font
-    - [_] Larger text size
-    - [ ] Variable text size :)
-    - [x] Make output overflow go to next line
-    - [x] More fonts
-    - [x] Generic screen.h stuff (don't assume 1920x1080 32bpp)
-    - [x] Multi vbe mode support
-    - [x] Setup on boot
-    - [ ] Different font size support
-
-- [x] Math
-    - [x] Trigonometry
-        - [x] Sine
-        - [x] Cosine
-        - [x] Tangent
-        - [x] Cotangent
-        - [x] Arc (inverse) versions
-        - [x] Hyperbolic versions
-    - [x] Absolute value
-    - [?] isOdd() 🗿
-    - [x] Exponential fn (e^x)
-    - [x] Logarithm
-    - [x] Power
-    - [x] Square Root
-    - [x] Floor
-    - [x] Round
-    - [x] Ceiling
-    - [x] Sign
-    - [x] INFINITY
-    - [x] NAN
-    - [x] E (eulers number)
-    - [x] PI
-
-- [ ] Filesystem
-    - [x] Utility for filesystem building (not just an assembly file)
-    - [x] Better header for file i/o (disk/filesys.h)
-    - [x] Filetable
-    - [x] A better filesystem using INodes etc.
-    - [x] Files
-        - [x] Larger than one sector (512B)
-        - [x] Any file size (Not multiples of 512B)
-        - [x] Filetypes
-    - [ ] Directories
-        - [x] File tree
-        - [x] Dir Entries
-        - [ ] cd command
-    - [ ] Links??
-        - [ ] Symbolic
-        - [ ] Hard
-
-- [ ] System Calls
-    - [x] Sleep()
-    - [x] Write()
-    - [x] Read() 
-    - [x] Open()
-    - [x] Close()
-    - [x] Malloc()
-    - [x] Free()
-    - [x] Seek()
-    - [ ] Tell()
-    - [ ] Exit()
-
-- [ ] Shell
-    - [ ] Separate file/program
-    - [ ] ';' separated commands
-    - [ ] I/O Redirection with '<' '>'
-    - [x] Display directory in prompt
-    - [ ] Custom prompts
-    - [ ] Variables
-        - [ ] Enviromental/Global
-        - [ ] Normal
-    - [ ] Commands
-        - [x] echo
-        - [x] clear
-        - [x] help
-        - [x] ls
-        - [x] exit
-        - [ ] touch (make file)
-        - [ ] rm
-        - [ ] mkdir (add dirs first)
-        - [x] reboot
-        - [ ] cd
-
-- [ ] Standard I/O stuff
-    - [ ] stdin
-    - [x] stdout
-    - [ ] stderr
-
-- [ ] User (or system) programs
-    - [x] Loading them
-    - [_] Running them
-    - [x] Exit back to kernel/shell
-    - [x] Let them use libs
-    - [x] Proper include files (LibC?)
-    - [x] argc, argv[]
-
-- [ ] Userspace programs
-    - [ ] Shell
-    - [x] Calculator
-    - [ ] Calendar
-
-- [ ] Code Editor
-    - [ ] Text editor
-    - [ ] Syntax highlighting
-    - [ ] Saving/Loading
-    - [ ] Hex editor
-
-- [ ] Assembler/Compiler
-    - [ ] Assembler
-    - [ ] Compiler (probably C)
-    - [ ] Standard lib
-
-- [ ] Finish all todos
-- [ ] Refactoring!!!
-- [ ] Can it run DOOM?
-- [ ] Games
-    - [ ] Minesweeper
-    - [ ] Solitaire
-    - [ ] Tetris
-
-- [ ] Write an OS in kern (The FINAL Todo)
+- [ ] Write an OS in kern.
+- [ ] Finish all the TODOs
 

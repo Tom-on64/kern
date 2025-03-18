@@ -1,19 +1,17 @@
 #include <bootloader.h>
 #include <kernel.h>
 #include <serial.h>
-#include <pmm.h>
 #include <tty.h>
 
-#define _hlt()	while (1) __asm__ volatile ("cli; hlt");
+/* TODO: Commented out stuff */
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
-	// Init with MultiBoot 1, this populates the global bootloader struct
-	//if (boot_init(BOOT_MB1, ptr, magic) != 0) panic("Unsupporred bootloader.");
+	if (boot_init(BOOT_MB1, ptr, magic) != 0) panic("Unsupporred bootloader.");
 
 	// Serial console for debugging
 	serial_init(COM1);
-	serial_puts(COM1, "\x1b[0H\x1b[Jkern.\n");
+	debugf("\x1b[H\x1b[J\x1b[0mkern. \x1b[35m(serial console)\x1b[0m\n\n");
 
 	// VGA tty thingy
 	tty_init();
@@ -29,8 +27,9 @@ void kmain(void* ptr, uint32_t magic) {
 
 	debugf("Basic initialization complete!\n");
 	
-	/* TODO: Commented out stuff */
-
 	panic("kmain() reached end.");
+
+	// Temporary loop since panic() does not halt
+	while (1);
 }
 

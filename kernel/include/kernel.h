@@ -76,17 +76,15 @@ extern uint32_t __kernel_start, __kernel_end;
 /*
  * Logging and errors
  */
-// TODO: Logging with printk()
-// TODO: Log levels & pr_*() wrappers for printk()
-#define BUG()		(panic("BUG()"))
+// TODO
+#define printk(_s)	NULL
+#define pr_dbg(_s)	NULL
+#define pr_wrn(_s)	NULL
+#define pr_err(_s)	NULL
+#define panic(_s)	NULL
+#define BUG()		NULL
 #define WARN()		NULL
 #define BUG_ON(_e)	((_e) ? BUG() : NULL)
 #define WARN_ON(_e)	((_e) ? WARN() : NULL)
-#include <serial.h>
-__noreturn static inline void panic(char* s) { 
-	serial_puts(COM1, s);
-	__asm__ volatile("cli");
-	while (1) __asm__ volatile ("hlt");
-}
 
 #endif
