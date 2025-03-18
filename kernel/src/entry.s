@@ -31,6 +31,7 @@ global _start
 extern kmain
 _start:
 	mov esp, stack_top	; Setup stack
+	push eax
 	push ebx
 	call kmain		; Call kernel main
 

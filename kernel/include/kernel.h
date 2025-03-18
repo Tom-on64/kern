@@ -2,15 +2,16 @@
 #define _KERNEL_H
 
 // Null definition
-#define NULL	((void*)0)
+#define NULL ((void*)0)
 
 /*
  * Variable arguments
  */
 typedef void* va_list;
-#define va_start(ap, param) (void)((ap) = (char*)(&(param) + 1))
-#define va_end(ap) (void)((ap) = 0)
-#define va_arg(ap, type) (((type*)((ap) = ((ap) + sizeof(type))))[-1])
+#define __va_align(size)	((size + sizeof(int) - 1) & ~(sizeof(int) - 1))
+#define va_start(ap, param)	(void)((ap) = (char*)(&(param) + 1))
+#define va_end(ap)		(void)((ap) = 0)
+#define va_arg(ap, type)	(*(type*)(((ap) += __va_align(sizeof(type))) - sizeof(type)))
 
 /*
  * Utility macros
@@ -66,6 +67,11 @@ typedef int32_t		intptr_t;
 #define bool _Bool
 #define true 1
 #define false 0
+
+/*
+ * Linker defined values
+ */
+extern uint32_t __kernel_start, __kernel_end;
 
 /*
  * Logging and errors

@@ -89,7 +89,7 @@ scroll_check:
 
 void tty_write(char* buf, size_t len) {
 	ctx.updateWait = len - 1;
-	for (int i = 0; i < len; i++) tty_putc(buf[i]);
+	for (size_t i = 0; i < len; i++) tty_putc(buf[i]);
 }
 
 void tty_puts(char* s) {

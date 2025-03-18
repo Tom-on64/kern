@@ -1,3 +1,4 @@
+#include <vsnprintf.h>
 #include <kernel.h>
 #include <system.h>
 #include <serial.h>
@@ -49,5 +50,20 @@ void serial_puts(int dev, char* s) {
 	char* p = s;
 	while (*p++ != '\0') len++;
 	serial_write(dev, s, len);
+}
+
+int debugf(char* fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	int ret = vdebugf(fmt, args);
+	va_end(args);
+	return ret;
+}
+
+int vdebugf(char* fmt, va_list args) {
+	static char buf[DF_BUF_LEN];
+	int ret = vsnprintf(buf, DF_BUF_LEN, fmt, args);
+	serial_puts(COM1, buf);
+	return ret;
 }
 
