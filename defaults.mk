@@ -16,3 +16,6 @@ LDFLAGS = -melf_i386
 ASFLAGS = 
 ARFLAGS =
 
+# Qemu
+AUDIODEV = pipewire
+

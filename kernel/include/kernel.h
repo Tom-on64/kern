@@ -7,11 +7,12 @@
 /*
  * Variable arguments
  */
-typedef void* va_list;
-#define __va_align(size)	((size + sizeof(int) - 1) & ~(sizeof(int) - 1))
-#define va_start(ap, param)	(void)((ap) = (char*)(&(param) + 1))
-#define va_end(ap)		(void)((ap) = 0)
-#define va_arg(ap, type)	(*(type*)(((ap) += __va_align(sizeof(type))) - sizeof(type)))
+typedef char* va_list;
+#define __VA_ALIGN		4
+#define __va_align(_t)		(((sizeof(_t) + __VA_ALIGN - 1) / __VA_ALIGN) * __VA_ALIGN)
+#define va_start(_ap, _arg)	((_ap) = (char*)(&(_arg) + 1))
+#define va_arg(_ap, _type)	(*(_type*)((_ap += __va_align(_type)) - __va_align(_type)))
+#define va_end(_ap)		(void)((_ap) = 0)
 
 /*
  * Utility macros

@@ -1,3 +1,5 @@
+include defaults.mk
+
 KERNEL = ./kernel
 
 MODULES = $(KERNEL)
@@ -17,5 +19,5 @@ qemu:
 		-kernel ./kernel/kernel.elf\
 		-m 256M -accel tcg -monitor stdio -net none\
 		-rtc base=localtime,clock=host,driftfix=slew\
-		-audiodev pipewire,id=audio0 -machine pcspk-audiodev=audio0
+		-audiodev $(AUDIODEV),id=audio0 -machine pcspk-audiodev=audio0
 

@@ -2,45 +2,58 @@
 #include <multiboot.h>
 #include <kernel.h>
 
-struct boot_info bootloader = { 0 };
+struct boot_info bootloader;
 
+// TODO:
 int boot_init(int type, ...) {
-	va_list args;
-	va_start(args, type);
-
-	switch (type) {
-	case BOOT_UNKNOWN: 	return 1;
-	case BOOT_MB1:		return boot_init_mb1(va_arg(args, void*), va_arg(args, uint32_t));
-	case BOOT_MB2:		return 1;
-	case BOOT_LIMINE:	return 1;
-	}
-
-	// We got an invalid boot protocol
 	return 1;
 }
 
-int boot_init_mb1(void* ptr, uint32_t magic) {
+int boot_initMB1(void* ptr, uint32_t magic) {
 	multiboot_info_t* mbi = ptr;
 
-	if (magic != 0xBADB002) return 1;
+	if (magic != MULTIBOOT_BOOTLOADER_MAGIC) return 1;
 
-	// Memory info
+	// mem_* fields are valid
 	if (mbi->flags & MULTIBOOT_INFO_MEMORY) {
 		bootloader.memLower = mbi->mem_lower;
 		bootloader.memUpper = mbi->mem_upper;
 	}
 
-	// Memory map
-	if (mbi->flags & MULTIBOOT_INFO_MEM_MAP) {
-		uint32_t memmap = mbi->mmap_addr;
-		uint32_t offset = 0;
-		while (offset < mbi->mmap_length) {
-			multiboot_memory_map_t* entry = (multiboot_memory_map_t*)(memmap + offset);
-			offset += entry->size;
-
-			
-		}
+	// boot_device is valid
+	if (mbi->flags & MULTIBOOT_INFO_BOOTDEV) {
+		bootloader.bootDrive = (mbi->boot_device & 0xff000000) >> 24;
+		bootloader.bootPart1 = (mbi->boot_device & 0x00ff0000) >> 16;
+		bootloader.bootPart2 = (mbi->boot_device & 0x0000ff00) >> 8;
+		bootloader.bootPart3 = (mbi->boot_device & 0x000000ff);
 	}
+
+	// cmdline is valid
+	if (mbi->flags & MULTIBOOT_INFO_CMDLINE) {
+		bootloader.cmdline = (char*)mbi->cmdline;
+	}
+
+	// TODO: mods
+	// TODO: a.out symbol table
+	// TODO: ELF symbol table
+	
+	// mmap_* fields are valid
+	if (mbi->flags & MULTIBOOT_INFO_MEM_MAP) {
+		bootloader.memmap = mbi->mmap_addr;
+		bootloader.memmapLen = mbi->mmap_length;
+	}
+
+	// TODO: drives_*
+	// TODO: config_table
+
+	// boot_loader_name is valid
+	if (mbi->flags & MULTIBOOT_INFO_BOOT_LOADER_NAME) {
+		bootloader.bootname = (char*)mbi->boot_loader_name;
+	}
+
+	// TODO: APM table
+	// TODO: VBE table
+	// TODO: Framebuffer
 
 	return 0;
 }
