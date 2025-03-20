@@ -77,14 +77,14 @@ extern uint32_t __kernel_start, __kernel_end;
 /*
  * Logging and errors
  */
-// TODO
-#define printk(_s)	NULL
-#define pr_dbg(_s)	NULL
-#define pr_wrn(_s)	NULL
-#define pr_err(_s)	NULL
-#define panic(_s)	NULL
-#define BUG()		NULL
-#define WARN()		NULL
+#include <serial.h>
+#define printk		debugf
+#define pr_dbg(_s)	printk("[debug] %s\n", (_s))
+#define pr_wrn(_s)	printk("[warning] %s\n", (_s))
+#define pr_err(_s)	printk("[error] %s\n", (_s))
+#define panic(_s)	printk("[panic] %s\n", (_s))
+#define BUG()		panic("BUG()")
+#define WARN()		pr_wrn("WARN()")
 #define BUG_ON(_e)	((_e) ? BUG() : NULL)
 #define WARN_ON(_e)	((_e) ? WARN() : NULL)
 

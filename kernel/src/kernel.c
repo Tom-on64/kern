@@ -1,9 +1,10 @@
 #include <bootloader.h>
 #include <kernel.h>
 #include <serial.h>
+#include <gdt.h>
 #include <tty.h>
 
-/* TODO: Commented out stuff */
+// TODO: Commented out stuff
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
@@ -23,9 +24,10 @@ void kmain(void* ptr, uint32_t magic) {
 	// pmm_init();
 	// vmm_init();
 
-	// gdt_init();
+	gdt_init();
 	// isr_init();
 	// pag_init();
+	while (1);
 
 	debugf("Basic initialization complete!\n");
 
