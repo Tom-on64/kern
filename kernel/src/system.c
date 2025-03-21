@@ -1,10 +1,15 @@
 #include <kernel.h>
+#include <system.h>
 
 void cpuid(uint32_t* eax, uint32_t* ebx, uint32_t* ecx, uint32_t* edx) {
 	__asm__ volatile ("cpuid"
 		: "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
 		: "a"(*eax)
 		: "memory");
+}
+
+void iowait(void) {
+	outb(0x80, 0);
 }
 
 uint8_t inb(uint16_t port) {

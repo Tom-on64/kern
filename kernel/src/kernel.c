@@ -2,6 +2,7 @@
 #include <kernel.h>
 #include <serial.h>
 #include <gdt.h>
+#include <isr.h>
 #include <tty.h>
 
 // TODO: Commented out stuff
@@ -25,7 +26,7 @@ void kmain(void* ptr, uint32_t magic) {
 	// vmm_init();
 
 	gdt_init();
-	// isr_init();
+	isr_init();
 	// pag_init();
 
 	debugf("Basic initialization complete!\n");
