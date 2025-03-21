@@ -17,20 +17,22 @@ multiboot:
 	dd FLAGS
 	dd CHECK
 
-section .bss
-align 16
 
 ; Initialize stack
-stack_bottom:
+section .bss
+align 16
+global __kernel_stack_top
+global __kernel_stack_bottom
+__kernel_stack_bottom:
 	resb 16384
-stack_top:
+__kernel_stack_top:
 
 ; Entry point
 section .text
 global _start
 extern kmain
 _start:
-	mov esp, stack_top	; Setup stack
+	mov esp, __kernel_stack_top
 	push eax
 	push ebx
 	call kmain		; Call kernel main

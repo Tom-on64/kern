@@ -27,7 +27,6 @@ void kmain(void* ptr, uint32_t magic) {
 	gdt_init();
 	// isr_init();
 	// pag_init();
-	while (1);
 
 	debugf("Basic initialization complete!\n");
 

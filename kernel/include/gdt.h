@@ -4,24 +4,6 @@
 #include <kernel.h>
 
 /*
- * Entries:
- * 0 Null desc.
- * 1 Kernel code desc.
- * 2 Kernel data desc.
- * 3 SYSENTER
- * 4 SYSEXIT
- * 5 User code desc.
- * 6 User data desc.
- * 7 Task State Segment
- */
-#define GDT_ENTRIES	8
-#define GDT_KERNEL_CODE	0x28
-#define GDT_KERNEL_DATA	0x30
-#define GDT_USER_CODE	0x50
-#define GDT_USER_DATA	0x48
-#define GDT_TSS		0x50
-
-/*
  * Segment selector explanation (why kcode is 0x08?)
  *
  * Each segment selector must be 16 bits. These bits
@@ -47,27 +29,44 @@
 #define SEGMENT_SEL(_priv, _tab, _i)\
 	(uint16_t)(((_i) << 3) | ((_tab) << 2) | (_priv))
 
+/*
+ * Entries:
+ * 0 Null desc.
+ * 1 Kernel code desc.
+ * 2 Kernel data desc.
+ * 3 User code desc.
+ * 4 User data desc.
+ * 5 Task State Segment
+ */
+#define GDT_ENTRIES	6
+#define GDT_NULL	SEGMENT_SEL(0, 0, 0)
+#define GDT_KERNEL_CODE	SEGMENT_SEL(0, 0, 1)
+#define GDT_KERNEL_DATA	SEGMENT_SEL(0, 0, 2)
+#define GDT_USER_CODE	SEGMENT_SEL(3, 0, 3)
+#define GDT_USER_DATA	SEGMENT_SEL(3, 0, 4)
+#define GDT_TSS		SEGMENT_SEL(0, 0, 5)
+
+#define GDT_DESC(_lim, _base, _acc, _flag) (struct gdt_entry){\
+	.limit 		= (_lim) & 0xffff,\
+	.baseLow	= (uint16_t)(_base),\
+	.baseMid	= (uint8_t)((_base) >> 16),\
+	.access		= (_acc),\
+	.flags		= (_flag << 4) | (((_lim) >> 16) & 0x0f),\
+	.baseHigh	= (uint8_t)((_base) >> 24),\
+}
+
 struct gdt_entry {
 	uint16_t limit;
 	uint16_t baseLow;
-	uint8_t baseMid;
-	uint8_t access;
-	uint8_t granulatiry;
-	uint8_t baseHigh;
+	uint8_t	 baseMid;
+	uint8_t  access;
+	uint8_t  flags;		// low 4 bits are 4 msbs of limit, high 4 bits are flags
+	uint8_t  baseHigh;
 } __packed;
 
 struct gdt_pointer {
 	uint16_t limit;
 	uint32_t base;
-} __packed;
-
-struct tss_entry {
-	uint16_t length;
-	uint16_t baseLow;
-	uint8_t baseMid;
-	uint8_t flags1;
-	uint8_t flags2;
-	uint8_t baseHigh;
 } __packed;
 
 struct tss_pointer {
@@ -90,7 +89,6 @@ struct tss_pointer {
 	uint32_t edx;
 	uint32_t ebx;
 	uint32_t esp;
-	uint32_t ebs;
 	uint32_t ebp;
 	uint32_t esi;
 	uint32_t edi;
@@ -111,11 +109,6 @@ struct tss_pointer {
 	uint16_t iopb;
 	uint32_t ssp;
 } __packed;
-
-struct gdt_entries {
-	struct gdt_entry descriptors[GDT_ENTRIES - 1]; // Subtract one for TSS
-	struct tss_entry tss;
-};
 
 int gdt_init(void);
 

@@ -32,6 +32,13 @@ SECTIONS {
 		*(COMMON)
 		*(.bss)
 	} : data
+
+	/* Stack */
+	. = ALIGN(16);
+	__kernel_stack_bottom = .;
+	. += 16K;
+	__kernel_stack_top = .;
+
 	__kernel_end = .;
 
 	/DISCARD/ : {

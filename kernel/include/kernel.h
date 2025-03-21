@@ -73,6 +73,7 @@ typedef int32_t		intptr_t;
  * Linker defined values
  */
 extern uint32_t __kernel_start, __kernel_end;
+extern uint32_t __kernel_stack_top, __kernel_stack_bottom;
 
 /*
  * Logging and errors
@@ -82,7 +83,10 @@ extern uint32_t __kernel_start, __kernel_end;
 #define pr_dbg(_s)	printk("[debug] %s\n", (_s))
 #define pr_wrn(_s)	printk("[warning] %s\n", (_s))
 #define pr_err(_s)	printk("[error] %s\n", (_s))
-#define panic(_s)	printk("[panic] %s\n", (_s))
+#define panic(_s)	do {\
+		printk("[panic] %s\n", (_s));\
+		while (1) __asm__ volatile ("cli; hlt");\
+	} while (0)
 #define BUG()		panic("BUG()")
 #define WARN()		pr_wrn("WARN()")
 #define BUG_ON(_e)	((_e) ? BUG() : NULL)
