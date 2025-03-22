@@ -110,6 +110,7 @@ struct tss_pointer {
 	uint32_t ssp;
 } __packed;
 
+void tss_esp0(uint32_t esp0);
 int gdt_init(void);
 
 #endif

@@ -29,6 +29,8 @@ void tss_reload(void) {
 	gdt[5].access |= 0x02;
 }
 
+void tss_esp0(uint32_t esp0) { tss.esp0 = esp0; }
+
 int gdt_init(void) {
 	// Null descriptor (0)
 	gdt[0] = GDT_DESC(0, 0, 0, 0);
@@ -47,7 +49,7 @@ int gdt_init(void) {
 
 	// TSS (40)
 	memset(&tss, 0, sizeof(tss));
-	gdt[5] = GDT_DESC(sizeof(tss) - 1, (uint32_t)&tss, 0x89, 0x00);
+	gdt[5] = GDT_DESC(sizeof(tss) - 1, (uint32_t)&tss, 0x89, 0x40);
 	tss.iopb = sizeof(struct tss_pointer);
 	tss.esp0 = __kernel_stack_top;
 	tss.ss0 = GDT_KERNEL_DATA;

@@ -2,47 +2,34 @@ OUTPUT_FORMAT("elf32-i386")
 OUTPUT_ARCH("i386");
 ENTRY(_start)
 
-/* Define correct program headers */
-PHDRS {
-	text	PT_LOAD		FLAGS((1 << 0) | (1 << 2));	/* Read, Execute */
-	rodata	PT_LOAD		FLAGS((1 << 0));		/* Read */
-	data	PT_LOAD		FLAGS((1 << 0) | (1 << 1));	/* Read, Write */
-}
-
 /* Define sections */
 SECTIONS {
-	/* 1MB is a conventional place for kernels */
-	. = 1M;
+	. = 0x00100000;
+	kernel_start = .;
 
-	__kernel_start = .;
-	.text BLOCK(4K) : ALIGN(4K) {
+	.boot ALIGN(4K) : {
 		*(.multiboot)
+		*(.boot)
+	}
+
+	. += 0xC0000000;
+
+	.text ALIGN(4K) : AT(ADDR(.text) - 0xC0000000) {
 		*(.text)
-	} : text
+	}
 
-	.rodata BLOCK(4K) : ALIGN(4K) {
+	.rodata ALIGN(4K) : AT(ADDR(.rodata) - 0xC0000000) {
 		*(.rodata)
-	} : rodata
+	}
 
-	.data BLOCK(4K) : ALIGN(4K) {
+	.data ALIGN(4K) : AT(ADDR(.data) - 0xC0000000) {
 		*(.data)
-	} : data
+	}
 
-	.bss BLOCK(4K) : ALIGN(4K) {
+	.bss ALIGN(4K) : AT(ADDR(.bss) - 0xC0000000) {
 		*(COMMON)
 		*(.bss)
-	} : data
-
-	/* Stack */
-	. = ALIGN(16);
-	__kernel_stack_bottom = .;
-	. += 16K;
-	__kernel_stack_top = .;
-
-	__kernel_end = .;
-
-	/DISCARD/ : {
-		*(.eh_frame)
-		*(.note*)
 	}
+
+	kernel_end = .;
 }
