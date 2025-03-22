@@ -17,7 +17,6 @@ multiboot:
 	dd FLAGS
 	dd CHECK
 
-
 ; Initialize stack
 section .bss
 align 16
@@ -30,21 +29,23 @@ __kernel_stack_top:
 ; Entry point
 section .boot
 global _start
-extern kmain
 _start:	
-	; Temporary paging
-	mov edx, (init_pagedir - 0xC0000000)
-	mov cr3, edx
+    ; init temporary paging
+    mov ecx, (init_pagedir - 0xC0000000)
+    mov cr3, ecx
 
-	mov ecx, cr0
-	or ecx, 0x80000000
-	mov cr0, ecx
+    mov ecx, cr4
+    or ecx, 0x10
+    mov cr4, ecx
 
-	jmp $
+    mov ecx, cr0
+    or ecx, 0x80000000
+    mov cr0, ecx
 
-	jmp higher_half
+    jmp higher_half
 
 section .text
+extern kmain
 higher_half:
 	mov esp, __kernel_stack_top
 	add ebx, 0xC0000000	; Make it a virtual address
@@ -61,15 +62,11 @@ section .data
 align 4096
 global init_pagedir 
 init_pagedir:
-	dd 0b10000011 ; initial 4mb identity map, unmapped later
-	
-	times 768-1 dd 0 ; padding
-	
-	; hh kernel start, map 16 mb
-	dd (0 << 22) | 0b10000011 ; 0xC0000000
+	dd 0b10000011
+	times 768-1 dd 0	
+	dd (0 << 22) | 0b10000011
 	dd (1 << 22) | 0b10000011
 	dd (2 << 22) | 0b10000011
 	dd (3 << 22) | 0b10000011
-	times 256-4 dd 0 ; padding
+	times 256-4 dd 0
 
-    ; dd initial_page_dir | 11b

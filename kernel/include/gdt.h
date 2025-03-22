@@ -51,7 +51,7 @@
 	.baseLow	= (uint16_t)(_base),\
 	.baseMid	= (uint8_t)((_base) >> 16),\
 	.access		= (_acc),\
-	.flags		= (_flag << 4) | (((_lim) >> 16) & 0x0f),\
+	.flags		= ((_flag & 0x0f) << 4) | (((_lim) >> 16) & 0x0f),\
 	.baseHigh	= (uint8_t)((_base) >> 24),\
 }
 
