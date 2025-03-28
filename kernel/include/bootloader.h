@@ -16,12 +16,13 @@
 #define BOOT_MMAP_NVS		4
 #define BOOT_MMAP_BADRAM	5
 
+#define BOOT_MAX_MMAP_ENTRIES	128
+
 // A memory map entry
 struct boot_memmap {
-	uint32_t skip;	// Used for skipping (may be padded for alignment)
 	uint64_t base;	// Memory region address
 	uint64_t size;	// Memory region length
-	uint32_t type;	// Memory region type
+	uint8_t  type;	// Memory region type
 } __packed;
 
 /*
@@ -39,7 +40,7 @@ struct boot_info {
 	uint8_t bootPart2;
 	uint8_t bootPart3;
 	char* cmdline;
-	uint32_t memmap;
+	struct boot_memmap* memmap;
 	size_t memmapLen;
 	char* bootname;
 } __packed;

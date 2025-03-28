@@ -1,22 +1,27 @@
-#include <multiboot.h>
+#include <bootloader.h>
 #include <kernel.h>
+#include <string.h>
 #include <pmm.h>
 
-// Helpers
-#define SET_BLOCK(_b)	memmap[(_b) / 32] |= (1 << ((_b) % 32))
-#define USET_BLOCK(_b)	memmap[(_b) / 32] &= ~(1 << ((_b) % 32))
-#define TEST_BLOCK(_b)	((memmap[(_b) % 32] & (1 << ((_b) % 32))) ? 1 : 0)
+// Bitmap & helpers
+uint32_t* bitmap = NULL;
+#define SET_BLOCK(_b)	bitmap[(_b) / 32] |= (1 << ((_b) % 32))
+#define USET_BLOCK(_b)	bitmap[(_b) / 32] &= ~(1 << ((_b) % 32))
+#define TEST_BLOCK(_b)	((bitmap[(_b) % 32] & (1 << ((_b) % 32))) ? 1 : 0)
 
-// Memory manager bitmap
-uint32_t* memmap = NULL;
+// Status
 size_t usedBlocks = 0;
 size_t maxBlocks = 0;
 
-// TODO: improve these hardcoded values
 int pmm_init(void) {
-	memmap = NULL;	// Memory map location
-	usedBlocks = 0;
-	maxBlocks = 0; // TODO
+	size_t totalmem = (bootloader.memLower + bootloader.memUpper) * 1024;
+	maxBlocks = totalmem / PMM_BS;
+	usedBlocks = maxBlocks;
+
+	// TODO:
+	bitmap = (uint32_t*)NULL;
+	memset(bitmap, 0, maxBlocks / PMM_BPB);
+
 	return 0;
 }
 
@@ -27,7 +32,7 @@ int findFreeBlocks(size_t blockCount) {
 	uint32_t freeCount = 0;
 	for (size_t i = 0; i < max; i++) {
 		// We don't have to check, cause it's all reserved
-		if (memmap[i] == 0xffffffff) continue;
+		if (bitmap[i] == 0xffffffff) continue;
 
 		for (uint8_t j = 0; j < 32; j++) {
 			if (TEST_BLOCK(i * PMM_BPB + j)) freeCount++;

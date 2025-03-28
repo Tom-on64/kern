@@ -1,8 +1,10 @@
 #include <bootloader.h>
 #include <kernel.h>
+#include <paging.h>
 #include <serial.h>
 #include <gdt.h>
 #include <isr.h>
+#include <pmm.h>
 #include <tty.h>
 
 // TODO: Commented out stuff
@@ -27,27 +29,9 @@ void kmain(void* ptr, uint32_t magic) {
 
 	gdt_init();
 	isr_init();
-	// pag_init();
+	pag_init();
 
 	debugf("Basic initialization complete!\n");
-
-	struct boot_memmap* entry;
-	for (
-		entry = (struct boot_memmap*)bootloader.memmap;
-		(uint64_t)entry < bootloader.memmap + bootloader.memmapLen;
-		entry = (struct boot_memmap*)((uint64_t)entry + entry->skip + sizeof(entry))
-	) {
-
-		debugf("[Region] base: %x size: %x b type: ", entry->base, entry->size);
-		switch (entry->type) {
-		case BOOT_MMAP_AVAILABLE:	debugf("Available\n"); break;
-		case BOOT_MMAP_RESERVED:	debugf("Reserved\n"); break;
-		case BOOT_MMAP_ACPI_RECLAIM:	debugf("ACPI Reclaim\n"); break;
-		case BOOT_MMAP_NVS:		debugf("NVS\n"); break;
-		case BOOT_MMAP_BADRAM:		debugf("Bad RAM\n"); break;
-		default:			debugf("Invalid type\n"); break;
-		}
-	}
 	
 	panic("kmain() reached end.");
 

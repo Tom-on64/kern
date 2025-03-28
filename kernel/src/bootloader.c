@@ -1,7 +1,9 @@
 #include <bootloader.h>
 #include <multiboot.h>
 #include <kernel.h>
+#include <string.h>
 
+struct boot_memmap memmap[BOOT_MAX_MMAP_ENTRIES];
 struct boot_info bootloader;
 
 // TODO:
@@ -39,8 +41,21 @@ int boot_initMB1(void* ptr, uint32_t magic) {
 	
 	// mmap_* fields are valid
 	if (mbi->flags & MULTIBOOT_INFO_MEM_MAP) {
-		bootloader.memmap = mbi->mmap_addr;
-		bootloader.memmapLen = mbi->mmap_length;
+		bootloader.memmap = &memmap[0];
+
+		size_t i = 0;
+		multiboot_memory_map_t* entry = (multiboot_memory_map_t*)mbi->mmap_addr;
+		uint32_t mapLim = mbi->mmap_addr + mbi->mmap_length;
+
+		while ((uint32_t)entry < mapLim) {
+			bootloader.memmap[i].base = entry->addr;
+			bootloader.memmap[i].size = entry->len;
+			bootloader.memmap[i].type = (uint8_t)entry->type;
+
+			entry++;
+			i++;
+		}
+		bootloader.memmapLen = i;
 	}
 
 	// TODO: drives_*
