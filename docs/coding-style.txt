@@ -57,9 +57,8 @@ should not be placed after/before unary operators or member access operators.
 Naming
 ------
 _The hardest thing in programming_
-Identifiers should use camelCase (starting with lowercase). In special
-cases (e.g. syscall handlers) a short prefix separated with an underscore
-may be used (e.g. 'sys_malloc').
+Identifiers should use camelCase (starting with lowercase). And may have a
+short prefix separated with an underscore (e.g. 'sys_malloc').
 
 Global variables (that should be sparse) and global functions need good,
 descriptive names. A disk reading function shouldn't be called 'dskrd()'.
@@ -70,18 +69,15 @@ should be named 'i' and not loopCounter.
 Some good naming examples:
 ```c
 // Random good function names
-int32_t findFreeBlock(uint32_t count);
-int32_t ttyWrite(const void* buf, size_t len);
+int32_t disk_findFreeBlock(uint32_t count);
+int32_t tty_write(const void* buf, size_t len);
 uint8_t	getRtcRegister(uint8_t reg);
 
-// Serial functions all start with 'serial'
-int serialSetup();
-void serialWrite(uint8_t byte);
-uint8_t serialRead();
+// Serial functions all start with 'serial_'
+int serial_init();
+void serial_write(uint8_t byte);
+uint8_t serial_read();
 
-// Syscall handlers are prefixed with 'sys_'
-int sys_malloc(struct intFrame iframe);
-int sys_free(struct intFrame iframe);
 ```
 
 Labels, for 'goto' statements or assembly, should be snake_case.
@@ -149,7 +145,7 @@ lowercase names. Generally, inline functions are prefered over macros.
 If a macro uses more than one statement, enclose them in their own scope.
 ```c
 #define MAGIC(_x)\
-	if (_x > 0) doSomething(_x);
+	if ((_x) > 0) doSomething(_x);
 ```
 
 Things to look out for:
@@ -177,7 +173,8 @@ These functions can be called uncoditionally. Empty inline functions work too.
 
 Using Bool
 **********
-You may use bool, but are not required to. It does improve readability
+You may use bool, but are not required to. It does improve readability, but i
+personally prefer int.
 
 Allocating Memory
 *****************
@@ -211,4 +208,9 @@ For example `drivers/fat32.h would have this guard:
 
 #endif
 ```
+
+Hex literals
+************
+Hexadecimal literals are preffered over binary and should be written in uppercase.
+Example: 0xA1B2
 
