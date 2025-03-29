@@ -62,8 +62,9 @@ section .data
 align 4096
 global init_pagedir 
 init_pagedir:
-	dd 0b10000011
-	times 768-1 dd 0	
+	dd 0b10000011	; Identity map first 4MB
+	times 768-1 dd 0
+	; Map first 16MB of kernel to 0xC0000000
 	dd (0 << 22) | 0b10000011
 	dd (1 << 22) | 0b10000011
 	dd (2 << 22) | 0b10000011

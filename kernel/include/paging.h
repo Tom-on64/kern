@@ -3,9 +3,13 @@
 
 #include <kernel.h>
 
-#define PAGE_SIZE	4096
+#define PHYS_ADDR(_a)	((_a) & ~0xFFF)
 
-#define PHYS_ADDR(_a)	((_a) & ~0xfff)
+// The kernels pagedir
+#define PAGEDIR		((uint32_t*)(0xFFFFF000))
+#define PAGETAB(_i)	((uint32_t*)(0xFFC00000 + ((_i) << 12)))
+
+#define PAGE_SIZE	4096
 
 #define PAGE_FLAG_PRESENT	(1 << 0)
 #define PAGE_FLAG_WRITE		(1 << 1)
@@ -13,13 +17,23 @@
 #define PAGE_FLAG_PWT		(1 << 3)
 #define PAGE_FLAG_NOCACHE	(1 << 4)
 #define PAGE_FLAG_ACCESSED	(1 << 5)
-#define PAGE_FLAG_DIRTY		(1 << 6)
-#define PAGE_FLAG_4MB		(1 << 7)
+#define PAGE_FLAG_DIRTY		(1 << 6) // AVL in PDE where PS = 0
+#define PAGE_FLAG_PS		(1 << 7) // If PS = 1 then directly maps a 4MB page
 #define PAGE_FLAG_GLOBAL	(1 << 8)
+// bits 9-11 are AVL - OS is free to use these as its own flags
+#define PAGE_FLAG_OWNER		(1 << 9)
 
-// Defined in entry.s for initial paging
-extern uint32_t init_pagedir[1024];
+extern uint32_t	init_pagedir[1024]; // Defined in entry.s for initial paging
+extern size_t	pag_pageCount;
 
 int pag_init(void);
+void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags);
+uint32_t pag_umapPage(uint32_t vaddr);
+void* pag_virtToPhys(uint32_t vaddr);
+uint32_t* pag_getPagedir();
+void pag_setPagedir(uint32_t* pagedir);
+void pag_syncPagedir();
+uint32_t* pag_allocPagedir();
+void pag_freePagedir(uint32_t* pagedir);
 
 #endif

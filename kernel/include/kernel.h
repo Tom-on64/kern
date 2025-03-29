@@ -5,6 +5,17 @@
 #define NULL ((void*)0)
 
 /*
+ * Virtual memory addresses
+ */
+#define USER_HEAP	0x10000000
+#define USER_STACK	0xBF000000
+#define USER_SHARED	0xA0000000
+#define KERNEL_BASE	0xC0000000
+#define KERNEL_HEAP	0xD0000000
+#define KERNEL_SHARED	0xF0000000
+#define KERNEL_FRAMEBUF	0xC8000000
+
+/*
  * Variable arguments
  */
 typedef char* va_list;
