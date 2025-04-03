@@ -4,7 +4,7 @@
 #include <pmm.h>
 
 // Bitmap & helpers
-uint32_t* bitmap = NULL;
+uint32_t* bitmap;
 #define SET_BLOCK(_b)	bitmap[(_b) / 32] |= (1 << ((_b) % 32))
 #define USET_BLOCK(_b)	bitmap[(_b) / 32] &= ~(1 << ((_b) % 32))
 #define TEST_BLOCK(_b)	((bitmap[(_b) % 32] & (1 << ((_b) % 32))) ? 1 : 0)
@@ -17,10 +17,24 @@ int pmm_init(void) {
 	size_t totalmem = (bootloader.memLower + bootloader.memUpper) * 1024;
 	maxBlocks = totalmem / PMM_BS;
 	usedBlocks = maxBlocks;
+	bitmap = NULL;
 
-	// TODO:
-	bitmap = (uint32_t*)NULL;
-	memset(bitmap, 0, maxBlocks / PMM_BPB);
+	// Find enough space for the bitmap
+	struct boot_memmap* mmap;
+	for (size_t i = 0; i < bootloader.memmapLen; i++) {
+		mmap = &bootloader.memmap[i];
+
+		if (mmap->type != BOOT_MMAP_AVAILABLE ||
+		    mmap->size < maxBlocks / PMM_BPB) continue;
+
+		bitmap = (uint32_t*)mmap->base;
+		break;
+	}
+
+	if (bitmap == NULL) return 1;
+
+	// Set all blocks as used
+	memset(bitmap, 1, maxBlocks / PMM_BPB);
 
 	return 0;
 }

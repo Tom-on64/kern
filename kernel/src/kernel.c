@@ -22,7 +22,7 @@ void kmain(void* ptr, uint32_t magic) {
 	tty_puts("kern.\n\n");
 
 	// Memory manager init
-	//pmm_init();
+	pmm_init();
 	//vmm_init();
 
 	gdt_init();
