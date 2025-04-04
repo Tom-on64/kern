@@ -16,6 +16,15 @@ static inline void invalidate(uint32_t vaddr) {
 	__asm__ volatile ("invlpg %0" : : "m"(vaddr));
 }
 
+// Temp paging thing
+uint32_t tempFrameStart;
+void pag_registerTempFrame(uint32_t target) { tempFrameStart = target; }
+uint32_t pag_tempFrame(void) {
+	uint32_t fin = tempFrameStart;
+	tempFrameStart += PAGE_SIZE;
+	return fin;
+}
+
 int pag_init(void) {
 	// Unmap first MB
 	init_pagedir[0] = 0;
@@ -44,7 +53,6 @@ void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags) {
 	// Switch to the init pagedir if in kernel memory
 	if (vaddr >= KERNEL_BASE) {
 		prevpd = pag_getPagedir();
-
 		if (prevpd != init_pagedir) pag_setPagedir(init_pagedir);
 	}
 
@@ -57,14 +65,17 @@ void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags) {
 
 	// Allocate a pagetab if it didn't exist
 	if (!(pagedir[pdi] & PAGE_FLAG_PRESENT)) {
-		uint32_t tabaddr = (uint32_t)pmm_alloc(1);
+		uint32_t tabaddr = pmm_ready ? (uint32_t)pmm_alloc(1) : pag_tempFrame();
+
 		pagedir[pdi] = tabaddr |
 			PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_OWNER | flags;
 		invalidate(vaddr);
 
+
 		for (size_t i = 0; i < 1024; i++) {
 			pagetab[i] = 0;
 		}
+
 	}
 
 	// The actuall mapping
@@ -85,7 +96,6 @@ uint32_t pag_umapPage(uint32_t vaddr) {
 
 	if (vaddr >= KERNEL_BASE) {
 		prevpd = pag_getPagedir();
-
 		if (prevpd != init_pagedir) pag_setPagedir(init_pagedir);
 	}
 

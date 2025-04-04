@@ -27,6 +27,8 @@ extern uint32_t	init_pagedir[1024]; // Defined in entry.s for initial paging
 extern size_t	pag_pageCount;
 
 int pag_init(void);
+void pag_registerTempFrame(uint32_t target);
+uint32_t pag_tempFrame(void);
 void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags);
 uint32_t pag_umapPage(uint32_t vaddr);
 void* pag_virtToPhys(uint32_t vaddr);

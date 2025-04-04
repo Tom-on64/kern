@@ -40,6 +40,7 @@ typedef char* va_list;
 #define max(_x, _y)	({ typeof(_x) __x = (_x); typeof(_y) __y = (_y); __x > __y ? __x : __y; })
 #define ceil(_x, _y)	((((_x) + (_y)) (_y)) * (_y))
 #define floor(_x, _y)	((_x) - ((_x) % (_y)))
+#define dceil(_x, _y)	(((_x) + (_y) - 1) / (_y))
 
 /*
  * Attribute definitions
