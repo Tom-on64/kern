@@ -65,7 +65,7 @@ void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags) {
 
 	// Allocate a pagetab if it didn't exist
 	if (!(pagedir[pdi] & PAGE_FLAG_PRESENT)) {
-		uint32_t tabaddr = pmm_ready ? (uint32_t)pmm_alloc(1) : pag_tempFrame();
+		uint32_t tabaddr = pmm_bitmap.ready ? (uint32_t)pmm_alloc(1) : pag_tempFrame();
 
 		pagedir[pdi] = tabaddr |
 			PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_OWNER | flags;
