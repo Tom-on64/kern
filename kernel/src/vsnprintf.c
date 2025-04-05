@@ -1,4 +1,6 @@
 #include <kernel.h>
+#include <string.h>
+
 #include <vsnprintf.h>
 
 int pf_isdigit(char c) {
@@ -23,10 +25,6 @@ char* pf_itoa(uint32_t num, uint8_t base) {
 	}
 	
 	return &buf[i + 1];
-}
-
-char* pf_ftoa(float f) {
-	return NULL;
 }
 
 int vsnprintf(char* buf, size_t len, char* fmt, va_list args) {
@@ -68,13 +66,13 @@ int vsnprintf(char* buf, size_t len, char* fmt, va_list args) {
 		case 'x': // Unsigned hex int
 			s = pf_itoa(va_arg(args, unsigned int), 16);
 			goto string;
-		case 'f': // Float
-			s = pf_ftoa(va_arg(args, double));
-			goto string;
+		// TODO: %f for float
 		case 's': // String
 			s = va_arg(args, char*);
 		string: // Prints the string in s
 			if (s == NULL) s = "(null)";
+			width -= strlen(s);
+			while (width-- >= 0 && i < len) buf[i++] = pad;
 			while (*s != '\0' && i < len) buf[i++] = *s++;
 			break;
 		default: // Something else

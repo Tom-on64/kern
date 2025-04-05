@@ -6,7 +6,6 @@
 #include <isr.h>
 #include <pmm.h>
 #include <tty.h>
-#include <vmm.h>
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
