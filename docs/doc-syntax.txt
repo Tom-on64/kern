@@ -1,0 +1,57 @@
+Documentation Syntax
+====================
+
+Headers
+-------
+You may utilize three levels of headers. The highest headers are underlined with
+equal signs (see the top of this document). The second header level is
+underlined with dashes (see the header of this section). The lowest level of
+headings are underlined with asterisks. The number of underline characters shall
+be the same length as the header.
+
+Lists
+-----
+There are two types of lists: ordered and unordered lists. Ordered lists are
+written with hashes separated by a space at the start of lines like this:
+# First entry
+# Another entry
+# The last entry
+
+Unordered lists are written with a asterisk separated by a space instead:
+* No numbers here
+* Not even here
+
+Lists may also be indented with a tab.
+
+Ephasizing
+----------
+If you want to emphasize some text you have these options:
+* **Bold**
+* __Italics__
+* ~~Strikethrough~~
+
+If you don't want some text to be formatted, you can escape it with a backslash.
+
+Code blocks
+-----------
+One can write code blocks either as inline by wrapping the code in backticks
+like this: `malloc()`. Multiline code blocks can be written by indenting the
+code as so:
+	#include <stdio.h>
+
+	int main(int argc, char** argv) {
+		printf("Args for %s:\n", argv[0]);
+		for (size_t i = 1; i < argc; i++) {
+			printf("\t%s\n", argv[i]);
+		}
+		return 0;
+	}
+Code blocks ignore all documentation formatting.
+
+References
+----------
+References to other pieces of documentation may be inserted using this syntax:
+* `[[doc-syntax]]` displays as [[doc-syntax]] and links to `doc-syntax.txt`
+* `[[Documentation syntax|doc-syntax]]` displays as [[Documentation syntax|doc-syntax]] and links to `doc-syntax.txt`
+* `[[doc-syntax]]-document` displays as [[doc-syntax]]-document and links to `doc-syntax.txt`
+

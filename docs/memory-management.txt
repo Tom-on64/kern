@@ -1,0 +1,20 @@
+Memory Management
+=================
+
+Memory management is split into three layers: physical, virtual & the heap.
+
+The **physical memory manager** (PMM) is responsible for allocating physical
+memory. It gives `pmm_*` functions. The `pmm_allocPage()` function allocates a
+4kB page frame and retuns its **physical address**.
+
+The **virtual memory manager** (VMM) is responsible for allocating virtual
+memory. It provides `vmm_*` functions. The `vmm_alloc()` function takes in a
+number of 4kB pages to allocate and returns the **virtual address** of the
+first page. Userspace can interface with the VMM using the `mmap()` and
+`munmap()` syscalls.
+
+**The heap** is an area of memory that both kernel and user space have. 
+Kernel space uses the `kalloc()` and it's derivative functions for the heap.
+User space may use the `brk()` and `sbrk()` syscalls to grow and shrink the
+heap.
+
