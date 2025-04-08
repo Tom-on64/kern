@@ -6,10 +6,11 @@
 #include <isr.h>
 #include <pmm.h>
 #include <tty.h>
+#include <vmm.h>
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
-	if (boot_initMB1(ptr, magic) != 0) panic("Unsupporred bootloader.");
+	if (boot_initMB1(ptr, magic) != 0) panic("Unsupported bootloader.");
 
 	// Serial console for debugging
 	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
@@ -26,7 +27,7 @@ void kmain(void* ptr, uint32_t magic) {
 
 	// Memory manager init
 	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
-	//if (vmm_init() != 0) panic("Failed to initalize Virtual Memory Manager.");
+	if (vmm_init() != 0) panic("Failed to initalize Virtual Memory Manager.");
 
 	debugf("Basic initialization complete!\n");
 	

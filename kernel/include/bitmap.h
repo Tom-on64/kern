@@ -11,9 +11,11 @@ typedef struct bitmap_t {
 	size_t blocks;	// Eqiv. to # of bits
 	size_t bytes;	// ceil(blocks / 8)
 	size_t used;	// # of bits set to 0
+	size_t membase;	// Used with allocators
 	int ready;
 } bitmap_t;
 
+void*	bmap_ptr(bitmap_t* map, size_t bit);
 void	bmap_set(bitmap_t* map, size_t bit, int val);
 int	bmap_get(bitmap_t* map, size_t bit);
 void	bmap_setarea(bitmap_t* map, size_t base, size_t len, int val);

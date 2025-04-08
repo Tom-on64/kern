@@ -3,10 +3,15 @@
 
 #include <bitmap.h>
 
+void* bmap_ptr(bitmap_t* map, size_t bit) {
+	return (void*)(map->membase + bit * BLOCK_SIZE);
+}
+
 void bmap_set(bitmap_t* map, size_t bit, int val) {
 	uint32_t* p = (uint32_t*)map->map;
 	if (val) p[bit / 32] |= (1 << (bit % 32));
 	else p[bit / 32] &= ~(1 << (bit % 32));
+	map->used += (val) ? 1 : -1;
 }
 
 int bmap_get(bitmap_t* map, size_t bit) {
@@ -15,13 +20,10 @@ int bmap_get(bitmap_t* map, size_t bit) {
 }
 
 void bmap_setarea(bitmap_t* map, size_t base, size_t len, int val) {
-	uint32_t align = base / BLOCK_SIZE;
-	uint32_t count = len / BLOCK_SIZE;
+	uint32_t align = dceil(base, BLOCK_SIZE);
+	uint32_t count = dceil(len, BLOCK_SIZE);
 
-	while (count-- > 0) {
-		bmap_set(map, align++, val);
-		map->used += (val) ? 1 : -1;
-	}
+	while (count-- > 0) bmap_set(map, align++, val);
 }
 
 void bmap_setall(bitmap_t* map, int val) {
@@ -39,7 +41,7 @@ size_t bmap_findarea(bitmap_t* map, size_t len, int val) {
 		if (bmap_get(map, i) == val) found++;
 		else found = 0;
 
-		if (found >= len) return i - found;
+		if (found >= len) return i - found + 1;
 	}
 
 	return BMAP_NOT_FOUND;

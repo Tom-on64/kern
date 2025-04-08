@@ -8,10 +8,10 @@
 bitmap_t pmm_bitmap;
 
 int pmm_init(void) {
-	size_t totalmem = (bootloader.memLower + bootloader.memUpper) * 1024;
-
-	pmm_bitmap.blocks = dceil(totalmem, BLOCK_SIZE);
-	pmm_bitmap.bytes = dceil(pmm_bitmap.blocks, 8);
+	// Full 32-bit address space
+	pmm_bitmap.membase = 0x00000000;
+	pmm_bitmap.blocks = 0x100000;	// 0xFFFFFFFF / BLOCK_SIZE
+	pmm_bitmap.bytes = 0x20000;	// blocks / 8
 	pmm_bitmap.map = NULL;
 
 	// # of pagetabs required to map the bitmap 
@@ -34,7 +34,7 @@ int pmm_init(void) {
 	pag_registerTempFrame(pageFrameStart);
 	mmap->base += ptcount * PAGE_SIZE;
 	
-	uint32_t bitmapStart = KERNEL_MEM_BASE - dceil(pmm_bitmap.bytes, PAGE_SIZE) * PAGE_SIZE;
+	uint32_t bitmapStart = KERNEL_HEAP_BASE - dceil(pmm_bitmap.bytes, PAGE_SIZE) * PAGE_SIZE;
 	uint32_t bitmapStartPhys = mmap->base;
 	pmm_bitmap.map = (void*)bitmapStart;
 
@@ -53,7 +53,9 @@ int pmm_init(void) {
 		mmap = &bootloader.memmap[i];
 		if (mmap->size == 0) continue; // Ignore dummy entries
 
-		if (mmap->type == BOOT_MMAP_AVAILABLE) pmm_initRegion(mmap->base, mmap->size);
+		if (mmap->type == BOOT_MMAP_AVAILABLE) {
+			bmap_setarea(&pmm_bitmap, mmap->base, mmap->size, 0);
+		}
 
 		// Print entry
 		debugf("\tRegion %2d: 0x%08x - 0x%08x (%d bytes) %s\n",
@@ -61,8 +63,9 @@ int pmm_init(void) {
 			(mmap->type == BOOT_MMAP_AVAILABLE) ? "AVAILABLE" : "RESERVED");
 	}
 
-	pmm_deinitRegion(bitmapStartPhys, pmm_bitmap.bytes);
-	pmm_deinitRegion(pageFrameStart, ptcount * PAGE_SIZE);
+	bmap_setarea(&pmm_bitmap, bitmapStartPhys, pmm_bitmap.bytes, 1);
+	bmap_setarea(&pmm_bitmap, pageFrameStart, ptcount * PAGE_SIZE, 1);
+	bmap_set(&pmm_bitmap, 0, 1); // Reserve block 0 - NULL page
 
 	// Beatifull print statement :)
 	debugf(
@@ -79,31 +82,20 @@ int pmm_init(void) {
 	return 0;
 }
 
+void* pmm_allocPage(void) {
+	if (pmm_bitmap.blocks - pmm_bitmap.used == 0) return NULL;
 
-void pmm_initRegion(size_t base, size_t len) {
-	bmap_setarea(&pmm_bitmap, base, len, 0);
-	bmap_set(&pmm_bitmap, 0, 1);
-}
-
-void pmm_deinitRegion(size_t base, size_t len) {
-	bmap_setarea(&pmm_bitmap, base, len, 1);
-	bmap_set(&pmm_bitmap, 0, 1);
-}
-
-void* pmm_alloc(size_t len) {
-	if (pmm_bitmap.blocks - pmm_bitmap.used < len) return NULL;
-
-	size_t base = bmap_findarea(&pmm_bitmap, len, 0);
+	size_t base = bmap_findarea(&pmm_bitmap, 1, 0);
 	if (base == BMAP_NOT_FOUND) return NULL;
 	
-	bmap_setarea(&pmm_bitmap, base, len, 1);
+	bmap_set(&pmm_bitmap, base, 1);
 
-	return (void*)(base * BLOCK_SIZE);
+	return bmap_ptr(&pmm_bitmap, base);
 }
 
-void pmm_free(void* ptr, size_t len) {
-	size_t base = (size_t)ptr / BLOCK_SIZE;
-	bmap_setarea(&pmm_bitmap, base, len, 0);
+void pmm_freePage(void* page) {
+	size_t base = (size_t)page / BLOCK_SIZE;
+	bmap_setarea(&pmm_bitmap, base, 1, 0);
 	bmap_set(&pmm_bitmap, 0, 1);
 }
 

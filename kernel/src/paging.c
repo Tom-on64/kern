@@ -65,7 +65,7 @@ void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags) {
 
 	// Allocate a pagetab if it didn't exist
 	if (!(pagedir[pdi] & PAGE_FLAG_PRESENT)) {
-		uint32_t tabaddr = pmm_bitmap.ready ? (uint32_t)pmm_alloc(1) : pag_tempFrame();
+		uint32_t tabaddr = pmm_bitmap.ready ? (uint32_t)pmm_allocPage() : pag_tempFrame();
 
 		pagedir[pdi] = tabaddr |
 			PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_OWNER | flags;
@@ -122,14 +122,14 @@ uint32_t pag_umapPage(uint32_t vaddr) {
 	uint32_t pde = pagedir[pdi];
 	if (remove && pde & PAGE_FLAG_OWNER) {
 		uint32_t tabaddr = PHYS_ADDR(pde);
-		pmm_free((void*)tabaddr, 1);
+		pmm_freePage((void*)tabaddr);
 		pagedir[pdi] = 0;
 	}
 
 	invalidate(vaddr);
 
 	// Free the page frame
-	if (pte & PAGE_FLAG_OWNER) pmm_free((void*)PHYS_ADDR(pte), 1);
+	if (pte & PAGE_FLAG_OWNER) pmm_freePage((void*)PHYS_ADDR(pte));
 
 	if (prevpd != NULL) {
 		pag_syncPagedir(); // Sync it to other pagedirs
@@ -221,11 +221,11 @@ void pag_freePagedir(uint32_t* pagedir) {
 		for (size_t j = 0; j < 1024; j++) {
 			uint32_t pte = pagetab[j];
 
-			if (pte & PAGE_FLAG_OWNER) pmm_free((void*)PHYS_ADDR(pte), 1);
+			if (pte & PAGE_FLAG_OWNER) pmm_freePage((void*)PHYS_ADDR(pte));
 		}
 		memset(pagetab, 0, PAGE_SIZE);
 
-		if (pde & PAGE_FLAG_OWNER) pmm_free((void*)PHYS_ADDR(pde), 1);
+		if (pde & PAGE_FLAG_OWNER) pmm_freePage((void*)PHYS_ADDR(pde));
 		pd[i] = 0;
 	}
 
