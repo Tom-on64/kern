@@ -5,7 +5,7 @@ ENTRY(_start)
 /* Define sections */
 SECTIONS {
 	. = 0x00100000;
-	kernel_start = .;
+	__kernel_start = .;
 
 	.boot ALIGN(4K) : {
 		*(.multiboot)
@@ -31,5 +31,5 @@ SECTIONS {
 		*(.bss)
 	}
 
-	kernel_end = .;
+	__kernel_end = .;
 }

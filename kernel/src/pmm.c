@@ -65,6 +65,7 @@ int pmm_init(void) {
 
 	bmap_setarea(&pmm_bitmap, bitmapStartPhys, pmm_bitmap.bytes, 1);
 	bmap_setarea(&pmm_bitmap, pageFrameStart, ptcount * PAGE_SIZE, 1);
+
 	bmap_set(&pmm_bitmap, 0, 1); // Reserve block 0 - NULL page
 
 	// Beatifull print statement :)

@@ -16,9 +16,6 @@ void kmain(void* ptr, uint32_t magic) {
 	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
 	debugf("\x1b[H\x1b[J\x1b[0mkern. \x1b[36m(serial console)\x1b[0m\n\n");
 
-	// VGA tty thingy
-	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
-	tty_puts("kern.\n\n");
 
 	// System init
 	if (gdt_init() != 0) panic("Failed to initalize GDT.");
@@ -29,7 +26,11 @@ void kmain(void* ptr, uint32_t magic) {
 	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
 	if (vmm_init() != 0) panic("Failed to initalize Virtual Memory Manager.");
 
-	debugf("Basic initialization complete!\n");
+	// VGA TTY
+	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
+	tty_puts("kern.\n\n");
+
+	debugf("[kernel] Basic initialization complete!\n");
 	
 	panic("kmain() reached end.");
 }

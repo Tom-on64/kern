@@ -98,7 +98,7 @@ extern uint32_t __kernel_stack_top, __kernel_stack_bottom;
 #define pr_wrn(_s)	printk("[warning] %s\n", (_s))
 #define pr_err(_s)	printk("[error] %s\n", (_s))
 #define panic(_s)	do {\
-		printk("[panic] %s\n", (_s));\
+		printk("[kernel] Panic! %s\n", (_s));\
 		while (1) __asm__ volatile ("cli; hlt");\
 	} while (0)
 #define BUG()		panic("BUG()")

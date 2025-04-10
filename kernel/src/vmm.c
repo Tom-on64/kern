@@ -16,13 +16,10 @@ int vmm_init(void) {
 	vmm_bitmap.bytes = dceil(vmm_bitmap.blocks, 8);
 	uint32_t bitmaploc = 0xC6000000;
 
-	debugf("%d blocks in %d bytes\n", vmm_bitmap.blocks, vmm_bitmap.bytes);
 	size_t pagecount = dceil(vmm_bitmap.bytes, PAGE_SIZE);
 	for (size_t i = 0; i < pagecount; i++) {
 		void* fr = pmm_allocPage();
-		debugf("Allocating page %d/%d...\n", i+1, pagecount);
 		if (fr == NULL) return 1;
-		debugf("Mapping page at 0x%08x to 0x%08x\n", fr, bitmaploc + i * PAGE_SIZE);
 		pag_mapPage(bitmaploc + i * PAGE_SIZE, (uint32_t)fr, 0);
 	}
 
