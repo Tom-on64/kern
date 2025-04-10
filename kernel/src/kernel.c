@@ -16,7 +16,6 @@ void kmain(void* ptr, uint32_t magic) {
 	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
 	debugf("\x1b[H\x1b[J\x1b[0mkern. \x1b[36m(serial console)\x1b[0m\n\n");
 
-
 	// System init
 	if (gdt_init() != 0) panic("Failed to initalize GDT.");
 	if (isr_init() != 0) panic("Failed to initalize ISRs.");

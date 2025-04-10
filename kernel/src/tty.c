@@ -1,4 +1,5 @@
 #include <kernel.h>
+#include <paging.h>
 #include <system.h>
 #include <tty.h>
 
@@ -11,10 +12,16 @@ struct {
 } ctx;
 
 int tty_init(void) {
+	// Map VGA Text memory to KERNEL_FRAMEBUF
+	size_t pagecount = dceil(VGA_WIDTH * VGA_HEIGHT * 2, PAGE_SIZE);
+	for (size_t i = 0; i < pagecount; i++) {
+		pag_mapPage(KERNEL_FRAMEBUF + i * PAGE_SIZE, VGA_MEMORY + i * PAGE_SIZE, 0);
+	}
+
 	ctx.row = 0;
 	ctx.col = 0;
 	ctx.attr = 0x07;
-	ctx.buf = (uint8_t*)VGA_MEMORY;
+	ctx.buf = (uint8_t*)KERNEL_FRAMEBUF;
 	tty_clear();
 
 	return 0;
