@@ -17,7 +17,7 @@ ASFLAGS =
 ARFLAGS =
 
 # Disk image
-IMG_NAME = kern.img
+IMG_NAME = disk.img
 IMG_SIZE = 256	# 256MB
 
 # Qemu
