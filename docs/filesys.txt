@@ -1,0 +1,17 @@
+Filesystem
+==========
+
+Here's how the filesystem is layed out:
+	/
+	|- bin/		Administrator binaries
+	|- boot/	Files required to boot, like the kernel
+	|- dev/		Device nodes
+	|- etc/		Configuration files
+	|- lib/		Shared libraties
+	|- sbin/	System binaries
+	|- usr/		Regular user stuff
+	|  |- bin/	User binaries
+	|  |- include/	Headers
+	|  '- share/	"Constant" stuff, same across systems
+	'- tmp/		Temporary filesystem, cleared on reboot
+

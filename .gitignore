@@ -19,6 +19,7 @@
 *.sys
 *.dtb
 *~
+sysroot
 
 # Local
 DS_Store

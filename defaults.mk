@@ -16,6 +16,10 @@ LDFLAGS = -melf_i386
 ASFLAGS = 
 ARFLAGS =
 
+# Disk image
+IMG_NAME = kern.img
+IMG_SIZE = 256	# 256MB
+
 # Qemu
 AUDIODEV = pipewire
 

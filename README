@@ -24,5 +24,15 @@ Features
 * Virtual memory manager
 * System calls
 
+Dependencies
+------------
+* binutils that can target i386-elf
+* sfdisk
+* GCC that can target i386-elf
+* Limine
+* make
+* Mtools
+* NASM
+
 Old Version: https://github.com/Tom-on64/old-kern
 

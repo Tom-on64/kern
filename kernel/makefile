@@ -7,7 +7,7 @@ SRCS_C = $(wildcard $(SRC)/*.c)
 SRCS_S = $(wildcard $(SRC)/*.s)
 OBJS_C = $(patsubst $(SRC)/%.c, $(BIN)/%.c.o, $(SRCS_C))
 OBJS_S = $(patsubst $(SRC)/%.s, $(BIN)/%.s.o, $(SRCS_S))
-OUT = ./kernel.elf
+OUT = $(SYSROOT)/boot/kernel.elf
 LINKER = ./linker.ld
 
 .PHONY: all clean

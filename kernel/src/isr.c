@@ -70,6 +70,8 @@ int isr_init(void) {
 
 	// Let interrupts interrupt
 	__asm__ volatile ("sti");
+
+	debugf("[isr] ISR initialized.\n");
 	return 0;
 }
 

@@ -22,7 +22,10 @@ int idt_init(void) {
 	idtp.limit = sizeof(idt);
 	idtp.base = (uint32_t)&idt;
 
+	// Load IDT instruction
 	__asm__ volatile ("lidt %0" : : "m"(idtp));
+
+	debugf("[idt] IDT initalized.\n");
 	return 0;
 }
 

@@ -45,12 +45,13 @@ Todos
     - [ ] dup()
     - [ ] pipe()
   - [ ] Memory
-    - [ ] Physical MM
-    - [ ] Virtual MM
-    - [ ] Paging
+    - [x] Physical MM
+    - [x] Virtual MM
+    - [x] Paging
     - [ ] Kernel Heap
   - [ ] Drivers
     - [x] tty
+    - [ ] ATA PIO
     - [x] serial
     - [ ] Timer
     - [ ] VFS
@@ -102,5 +103,6 @@ Todos
   - [ ] doom
 
 - [ ] Write an OS in kern.
+- [ ] Paradox
 - [ ] Finish all the TODOs
 

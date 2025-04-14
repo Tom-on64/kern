@@ -61,6 +61,8 @@ int gdt_init(void) {
 	gdt_reload();
 	tss_reload();
 
+	debugf("[gdt] GDT loaded.\n");
+
 	return 0;
 }
 

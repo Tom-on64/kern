@@ -43,6 +43,8 @@ int pag_init(void) {
 	memset(pagedirs, 0, PAGE_SIZE * PAGE_DIR_COUNT);
 	memset(pagedirUsed, 0, PAGE_DIR_COUNT);
 
+	debugf("[pag] Paging initalized.\n");
+
 	return 0;
 }
 
