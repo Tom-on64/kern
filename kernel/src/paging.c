@@ -9,7 +9,7 @@ static uint32_t	pagedirs[PAGE_DIR_COUNT][1024] __align(4096);
 static uint8_t	pagedirUsed[PAGE_DIR_COUNT];
 
 // TODO: Should this be initialized? If so, to what?
-size_t pag_pageCount;
+size_t pag_pageCount = 0;
 
 // Invalidates the pagedir entry in the CPUs TLB cache
 static inline void invalidate(uint32_t vaddr) {
@@ -38,8 +38,9 @@ int pag_init(void) {
 	 */
 	init_pagedir[1023] = ((uint32_t)init_pagedir - KERNEL_BASE) |
 		PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
-	invalidate(0xFFFFF000);
+	invalidate(1023 * PAGE_SIZE);
 
+	// TODO: This sometimes causes a #PF
 	memset(pagedirs, 0, PAGE_SIZE * PAGE_DIR_COUNT);
 	memset(pagedirUsed, 0, PAGE_DIR_COUNT);
 

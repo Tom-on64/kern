@@ -28,7 +28,7 @@ void bmap_setarea(bitmap_t* map, size_t base, size_t len, int val) {
 
 void bmap_setall(bitmap_t* map, int val) {
 	uint8_t b = (val) ? 0xff : 0;
-	memset(map->map, b, map->bytes);
+	for (size_t i = 0; i < map->bytes; i++) ((uint8_t*)map->map)[i] = b;
 	if (val) map->used = map->blocks;
 	else map->used = 0;
 }
