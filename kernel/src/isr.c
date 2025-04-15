@@ -89,7 +89,7 @@ void isr_sendEOI(uint8_t irq) {
 int isr_handleInterrupt(struct isr_intFrame iframe) {
 	if (iframe.interrupt < 32) { 
 		// ISRs 0-31 - Exceptions
-		panic(exceptions[iframe.interrupt]);
+		panic(exceptions[iframe.error]);
 	} else if (iframe.interrupt >= 32 && iframe.interrupt < 48) {
 		// ISRs 32-47 - Hardware interrupts
 		uint8_t irq = iframe.interrupt - 32;
