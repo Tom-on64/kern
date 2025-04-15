@@ -1,8 +1,0 @@
-Magic addresses
-===============
-
-This is a list of magic addreses that are used in kern.
-The goal is to minimize the number of these addreses.
-
-0x1000 - Memory map location, bootloader.memmap is a pointer to here
-

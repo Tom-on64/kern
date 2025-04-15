@@ -1,11 +1,17 @@
-=== System Calls === 
+System Calls 
+============
 
-Syscall handlers are prefixed by 'sys_'
-Syscalls can be called using interrupt 0x80
-The EAX register should countain a syscall number on calling and it will contain a return value (if applicable) after calling
+Syscall handlers are prefixed by 'sys_'. Syscalls can be called using int 0x80.
+Arguments are passed in registers like this:
+* EAX - Syscall number
+* EBX - Argument 0
+* ECX - Argument 1
+* EDX - Argument 2
 
---- Syscall Table ---
+If the syscall returns, the return value will be in EAX.
 
+Syscall Table (TODO: Update this)
+-------------
 | NR | SYSC NAME | RETURN (EAX) | ARG0 (EBX) | ARG1 (ECX) | ARG2 (EDX) |
 | 00 | reserved  |       -      |      -     |      -     |      -     |
 | 01 | sleep     |       -      | uint ms    |      -     |      -     |
