@@ -8,8 +8,8 @@
  * Virtual memory addresses
  */
 #define USER_HEAP	 0x10000000
-#define USER_STACK	 0xBF000000
 #define USER_SHARED	 0xA0000000
+#define USER_STACK	 0xBF000000
 #define KERNEL_BASE	 0xC0000000
 #define KERNEL_SIZE	 0x10000000
 #define KERNEL_HEAP_BASE 0xD0000000

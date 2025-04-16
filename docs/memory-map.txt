@@ -1,0 +1,16 @@
+Memory Map
+==========
+__This document specifies the **virtual** memory map. The **physical** memory
+map is not OS defined and should be provided by the bootloader.__
+
+| 00000000 | Null Page		|
+| 00001000 | TODO: userspace	|
+| C0000000 | Kernel Base	|
+| C0100000 | Kernel Binary Base	|
+| C6000000 | VMM Bitmap		|
+| C8000000 | Kernel Framebuffer	|
+| CFFE0000 | PMM Bitmap		|
+| D0000000 | Kernel Heap	|
+| F0000000 | Kernel Shared	|
+| FFFFF000 | Recursive pagedir	|
+
