@@ -10,19 +10,7 @@ Kern is broken at the moment. The last working commit is: '11feab5'
 About
 -----
 Kern is a 32-bit OS based on the x86 architecture written in NASM Assembly and C. 
-I'm working on a basic command line as well as a custom unix-esque filesystem.
-It has a simple shell with some commands (use 'help' for a list of available ones).
-
-Features
---------
-* Shell
-* Filesystem
-* Userspace
-* Font support
-* Graphics mode
-* Physical memory manager
-* Virtual memory manager
-* System calls
+It attempts to be a µ-kernel, although i have no clue what i'm doing.
 
 Dependencies
 ------------

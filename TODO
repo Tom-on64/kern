@@ -1,113 +1,20 @@
 TODO
 ====
 
-Legend
-------
-- [ ] Not done
-- [x] Done
-- [_] Was done at some point, but isn't now
-- [!] Important todo
-- [?] Optional
-
-Todos
------
-- [ ] Kernel
-  - [ ] Syscalls
-    - [ ] exit()
-    - [ ] fork()
-    - [ ] read()
-    - [ ] write()
-    - [ ] open()
-    - [ ] close()
-    - [ ] waitpid()
-    - [ ] creat()
-    - [ ] link()
-    - [ ] unlink()
-    - [ ] execve()
-    - [ ] chdir()
-    - [ ] time()
-    - [ ] mknod()
-    - [ ] chmod()
-    - [ ] chown()
-    - [ ] break()
-    - [ ] stat()
-    - [ ] mount()
-    - [ ] umount()
-    - [ ] alarm()
-    - [ ] pause()
-    - [ ] access()
-    - [ ] nice()
-    - [ ] sync()
-    - [ ] kill()
-    - [ ] rename()
-    - [ ] mkdir()
-    - [ ] rmdir()
-    - [ ] dup()
-    - [ ] pipe()
-  - [ ] Memory
-    - [x] Physical MM
-    - [x] Virtual MM
-    - [x] Paging
-    - [ ] Kernel Heap
-  - [ ] Drivers
-    - [x] tty
-    - [ ] ATA PIO
-    - [x] serial
-    - [ ] Timer
-    - [ ] VFS
-    - [ ] RAMFS
-    - [ ] FAT32
-    - [ ] DevFS
-      - [ ] /dev/std*
-      - [ ] /dev/tty
-      - [ ] /dev/sd*
-      - [ ] /dev/fb0
-      - [ ] /dev/null, /dev/zero, ...
-    - [ ] SysFS
-    - [ ] ProcFS
-
-- [ ] Bootloader
-  - [ ] MBR
-  - [ ] EFI
-
-- [ ] Libc
-  - [ ] assert.h
-  - [ ] complex.h (idk why we would need this)
-  - [ ] ctype.h
-  - [ ] errno.h
-  - [ ] fcntl.h
-  - [ ] float.h
-  - [ ] limits.h
-  - [ ] math.h 
-  - [ ] setjmp.h (this plagues my mind)
-  - [ ] signal.h (we would need signals first)
-  - [ ] stdarg.h
-  - [ ] stdbool.h
-  - [ ] stddef.h
-  - [ ] stdint.h
-  - [ ] stdio.h
-  - [ ] stdlib.h
-  - [ ] string.h
-  - [ ] syscall.h
-  - [ ] time.h
-  - [ ] unistd.h (does POSIX need us?)
-  - [ ] wchar.h (we would need text support for wide chars ig?)
-  - [ ] wctype.h (same as above)
-
-- [ ] Userspace
-  - [ ] sh
-  - [ ] as
-  - [ ] cc
-  - [ ] ld
-  - [ ] editor
-  - [ ] binutils
-  - [ ] coreutils
-  - [ ] minesweeper
-  - [ ] solitaire
-  - [ ] tetris
-  - [ ] doom
-
-- [ ] Write an OS in kern.
-- [ ] Paradox
-- [ ] Finish all the TODOs
+[x] Boot
+[x] Multiboot 1
+[x] IDT
+[x] ISRs
+[x] GDT
+[x] Physical MM
+[x] Virtual MM
+[x] Paging
+[x] Serial monitor
+[ ] Timer interrupts
+[ ] Task switching
+[ ] IPC
+[ ] Graphics
+[ ] Networking :)
+[ ] Finish all the TODOs
+[ ] Run DOOM
 

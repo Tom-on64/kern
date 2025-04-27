@@ -29,10 +29,12 @@ void kmain(void* ptr, uint32_t magic) {
 	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
 	tty_puts("kern.\n\n");
 
-	debugf("[kernel] Basic initialization complete!\n");
-
-	// TODO: Init VFS
-	// TODO: 
+	// TODO: Timer
+	// TODO: Scheduler
+	// TODO: Syscalls
+	// TODO: Interprocess communication
+	// TODO: Tasking
+	// TODO: Load & run /sbin/init
 
 	panic("kmain() reached end.");
 }
