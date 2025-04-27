@@ -29,20 +29,20 @@ struct boot_memmap {
  * Some values may not be provided by the bootloader, in this case
  * pointers will be NULL and integer values will be 0 if applicable.
  * Some unprovided values may also be implied. Eg.:
- * 	If 'memmap = NULL' then 'memmapLen' doesn't matter. 
+ * 	If 'memmap = NULL' then 'memmap_size' doesn't matter. 
 
  */
 struct boot_info {
-	uint32_t memLower;
-	uint32_t memUpper;
-	uint8_t bootDrive;
-	uint8_t bootPart1;
-	uint8_t bootPart2;
-	uint8_t bootPart3;
-	char* cmdline;
-	struct boot_memmap* memmap;
-	size_t memmapLen;
-	char* bootname;
+	uint32_t mem_lower;
+	uint32_t mem_upper;
+	uint8_t  boot_drive;
+	uint8_t  boot_part1;
+	uint8_t  boot_part2;
+	uint8_t  boot_part3;
+	struct   boot_memmap* memmap;
+	size_t   memmap_size;
+	char*    cmdline;
+	char*    bootname;
 } __packed;
 extern struct boot_info bootloader;
 
@@ -53,9 +53,9 @@ extern struct boot_info bootloader;
  */
 int boot_init(int type, ...);
 
-int boot_initMB1(void* ptr, uint32_t magic);
+int boot_init_mb1(void* ptr, uint32_t magic);
 // TODO:
-// int boot_initMB2(...);
-// int boot_initLimine(...);
+// int boot_init_mb2(...);
+// int boot_init_limine(...);
 
 #endif

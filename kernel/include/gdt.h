@@ -48,20 +48,20 @@
 
 #define GDT_DESC(_lim, _base, _acc, _flag) (struct gdt_entry){\
 	.limit 		= (_lim) & 0xffff,\
-	.baseLow	= (uint16_t)(_base),\
-	.baseMid	= (uint8_t)((_base) >> 16),\
+	.base_low	= (uint16_t)(_base),\
+	.base_mid	= (uint8_t)((_base) >> 16),\
 	.access		= (_acc),\
 	.flags		= ((_flag & 0x0f) << 4) | (((_lim) >> 16) & 0x0f),\
-	.baseHigh	= (uint8_t)((_base) >> 24),\
+	.base_high	= (uint8_t)((_base) >> 24),\
 }
 
 struct gdt_entry {
 	uint16_t limit;
-	uint16_t baseLow;
-	uint8_t	 baseMid;
+	uint16_t base_low;
+	uint8_t	 base_mid;
 	uint8_t  access;
 	uint8_t  flags;		// low 4 bits are 4 msbs of limit, high 4 bits are flags
-	uint8_t  baseHigh;
+	uint8_t  base_high;
 } __packed;
 
 struct gdt_pointer {

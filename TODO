@@ -58,6 +58,11 @@ Todos
     - [ ] RAMFS
     - [ ] FAT32
     - [ ] DevFS
+      - [ ] /dev/std*
+      - [ ] /dev/tty
+      - [ ] /dev/sd*
+      - [ ] /dev/fb0
+      - [ ] /dev/null, /dev/zero, ...
     - [ ] SysFS
     - [ ] ProcFS
 

@@ -57,8 +57,8 @@ should not be placed after/before unary operators or member access operators.
 Naming
 ------
 _The hardest thing in programming_
-Identifiers should use camelCase (starting with lowercase). And may have a
-short prefix separated with an underscore (e.g. 'sys_malloc').
+Identifiers should use snake_case (starting with lowercase). And should have a
+short prefix to indicate what system they're from (e.g. 'vmm_alloc' & 'pmm_alloc').
 
 Global variables (that should be sparse) and global functions need good,
 descriptive names. A disk reading function shouldn't be called 'dskrd()'.
@@ -69,15 +69,14 @@ should be named 'i' and not loopCounter.
 Some good naming examples:
 ```c
 // Random good function names
-int32_t disk_findFreeBlock(uint32_t count);
+int32_t disk_find_free_block(uint32_t count);
 int32_t tty_write(const void* buf, size_t len);
-uint8_t	getRtcRegister(uint8_t reg);
+uint8_t	get_rtc_register(uint8_t reg);
 
 // Serial functions all start with 'serial_'
 int serial_init();
 void serial_write(uint8_t byte);
 uint8_t serial_read();
-
 ```
 
 Labels, for 'goto' statements or assembly, should be snake_case.
@@ -212,5 +211,5 @@ For example `drivers/fat32.h would have this guard:
 Hex literals
 ************
 Hexadecimal literals are preffered over binary and should be written in uppercase.
-Example: 0xA1B2
+Example: 0xA1B2C0DE
 

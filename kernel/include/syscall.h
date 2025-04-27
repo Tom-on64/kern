@@ -3,6 +3,6 @@
 
 #include <isr.h>
 
-int syscallHandler(struct isr_intFrame* iframe) { return 1; }
+int syscall_handler(struct isr_int_frame* iframe) { (void)iframe; return 1; }
 
 #endif

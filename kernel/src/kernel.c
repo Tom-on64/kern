@@ -10,7 +10,7 @@
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
-	if (boot_initMB1(ptr, magic) != 0) panic("Unsupported bootloader.");
+	if (boot_init_mb1(ptr, magic) != 0) panic("Unsupported bootloader.");
 
 	// Serial console for debugging
 	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
@@ -30,7 +30,10 @@ void kmain(void* ptr, uint32_t magic) {
 	tty_puts("kern.\n\n");
 
 	debugf("[kernel] Basic initialization complete!\n");
-	
+
+	// TODO: Init VFS
+	// TODO: 
+
 	panic("kmain() reached end.");
 }
 

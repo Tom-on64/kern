@@ -4,7 +4,7 @@
 #include <kernel.h>
 
 // Interrupt frame (ie. what's on the stack on interrupt)
-struct isr_intFrame {
+struct isr_int_frame {
 	// Pushed by OS
 	uint32_t esp, ebx, ecx, edx, esi, edi, ebp;
 	uint32_t ds, es, fs, gs, eax;
@@ -13,14 +13,14 @@ struct isr_intFrame {
 	// Pushed by CPU
 	uint32_t eip, cs, eflags, user_esp, user_ss;
 };
-typedef void (*isr_handlerPtr)(struct isr_intFrame* iframe);
+typedef void (*isr_handler_ptr)(struct isr_int_frame* iframe);
 
 int isr_init(void);
-void isr_registerIRQ(uint8_t i, isr_handlerPtr handler);
-int isr_handleInterrupt(struct isr_intFrame iframe);
+void isr_register_IRQ(uint8_t i, isr_handler_ptr handler);
+int isr_handle_interrupt(struct isr_int_frame iframe);
 
 // Assembly definitions (isr.s)
-extern void* isr_redirectTable[48]; // ISR Table
+extern void* isr_redirect_table[48]; // ISR Table
 extern void isr128(); // int 0x80 - syscall
 
 #endif

@@ -5,7 +5,7 @@
 #include <idt.h>
 #include <isr.h>
 
-isr_handlerPtr irqHandlers[16];
+isr_handler_ptr irq_handlers[16];
 
 const char* exceptions[] = {
 	"Division By Zero",
@@ -43,7 +43,7 @@ const char* exceptions[] = {
 };
 
 // I have no clue how this works or what it does, but it doesn't work without it
-void isr_remapPIC(void) {
+void isr_remap_pic(void) {
 	outb(0x20, 0x11); iowait();
 	outb(0xa0, 0x11); iowait();
 	outb(0x21, 0x20); iowait();
@@ -58,15 +58,15 @@ void isr_remapPIC(void) {
 
 int isr_init(void) {
 	idt_init();
-	isr_remapPIC();
+	isr_remap_pic();
 
 	for (int i = 0; i < 48; i++) {
 		// First 32 IRSs are exceptions (traps) and the next 16 are hardware interrupts
-		idt_setGate(i, isr_redirectTable[i], (i < 32) ? IDT_FLAG_TRAP : IDT_FLAG_INT);
+		idt_set_gate(i, isr_redirect_table[i], (i < 32) ? IDT_FLAG_TRAP : IDT_FLAG_INT);
 	}
 
 	// System call (should be callable from userspace)
-	idt_setGate(0x80, (void*)(uint32_t)isr128, IDT_FLAG_USER);
+	idt_set_gate(0x80, (void*)(uint32_t)isr128, IDT_FLAG_USER);
 
 	// Let interrupts interrupt
 	__asm__ volatile ("sti");
@@ -75,31 +75,31 @@ int isr_init(void) {
 	return 0;
 }
 
-void isr_registerIRQ(uint8_t i, isr_handlerPtr handler) {
-	irqHandlers[i] = handler;
+void isr_register_irq(uint8_t i, isr_handler_ptr handler) {
+	irq_handlers[i] = handler;
 }
 
-void isr_sendEOI(uint8_t irq) {
+void isr_send_eoi(uint8_t irq) {
 	if (irq >= 8) {
 		outb(0xa0, 0x20);
 	}
 	outb(0x20, 0x20);
 }
 
-int isr_handleInterrupt(struct isr_intFrame iframe) {
+int isr_handle_interrupt(struct isr_int_frame iframe) {
 	if (iframe.interrupt < 32) { 
 		// ISRs 0-31 - Exceptions
 		panic(exceptions[iframe.error]);
 	} else if (iframe.interrupt >= 32 && iframe.interrupt < 48) {
 		// ISRs 32-47 - Hardware interrupts
 		uint8_t irq = iframe.interrupt - 32;
-		if (irqHandlers[irq]) {
-			irqHandlers[irq](&iframe);
-			isr_sendEOI(irq);
+		if (irq_handlers[irq]) {
+			irq_handlers[irq](&iframe);
+			isr_send_eoi(irq);
 		}
 	} else if (iframe.interrupt == 128) { 
 		// ISR 128 - System call
-		return syscallHandler(&iframe);
+		return syscall_handler(&iframe);
 	}
 
 	return 0;

@@ -24,18 +24,18 @@
 #define PAGE_FLAG_OWNER		(1 << 9)
 
 extern uint32_t	init_pagedir[1024]; // Defined in entry.s for initial paging
-extern size_t	pag_pageCount;
+extern size_t	pag_page_count;
 
 int pag_init(void);
-void pag_registerTempFrame(uint32_t target);
-uint32_t pag_tempFrame(void);
-void pag_mapPage(uint32_t vaddr, uint32_t paddr, uint32_t flags);
-uint32_t pag_umapPage(uint32_t vaddr);
-void* pag_virtToPhys(uint32_t vaddr);
-uint32_t* pag_getPagedir();
-void pag_setPagedir(uint32_t* pagedir);
-void pag_syncPagedir();
-uint32_t* pag_allocPagedir();
-void pag_freePagedir(uint32_t* pagedir);
+void pag_register_temp_frame(uint32_t target);
+uint32_t pag_temp_frame(void);
+void pag_map(uint32_t vaddr, uint32_t paddr, uint32_t flags);
+uint32_t pag_umap(uint32_t vaddr);
+void* pag_virt_to_phys(uint32_t vaddr);
+uint32_t* pag_get_pagedir();
+void pag_set_pagedir(uint32_t* pagedir);
+void pag_sync_pagedir();
+uint32_t* pag_alloc_pagedir();
+void pag_free_pagedir(uint32_t* pagedir);
 
 #endif

@@ -18,8 +18,8 @@ typedef struct bitmap_t {
 void*	bmap_ptr(bitmap_t* map, size_t bit);
 void	bmap_set(bitmap_t* map, size_t bit, int val);
 int	bmap_get(bitmap_t* map, size_t bit);
-void	bmap_setarea(bitmap_t* map, size_t base, size_t len, int val);
-void	bmap_setall(bitmap_t* map, int val);
-size_t	bmap_findarea(bitmap_t* map, size_t len, int val);
+void	bmap_set_area(bitmap_t* map, size_t base, size_t len, int val);
+size_t	bmap_get_area(bitmap_t* map, size_t len, int val);
+void	bmap_set_all(bitmap_t* map, int val);
 
 #endif

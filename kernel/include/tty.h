@@ -9,9 +9,9 @@
 
 int  tty_init(void);
 void tty_clear(void);
-void tty_setattr(uint8_t attr);
-void tty_enableCursor(uint8_t start, uint8_t end);
-void tty_disableCursor(void);
+void tty_set_attr(uint8_t attr);
+void tty_show_cursor(uint8_t start, uint8_t end);
+void tty_hide_cursor(void);
 void tty_write(char* buf, size_t len);
 void tty_putc(char c);
 void tty_puts(char* s);

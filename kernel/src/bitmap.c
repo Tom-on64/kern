@@ -19,21 +19,14 @@ int bmap_get(bitmap_t* map, size_t bit) {
 	return (p[bit / 32] & (1 << (bit % 32))) ? 1 : 0; 
 }
 
-void bmap_setarea(bitmap_t* map, size_t base, size_t len, int val) {
+void bmap_set_area(bitmap_t* map, size_t base, size_t len, int val) {
 	uint32_t align = dceil(base, BLOCK_SIZE);
 	uint32_t count = dceil(len, BLOCK_SIZE);
 
 	while (count-- > 0) bmap_set(map, align++, val);
 }
 
-void bmap_setall(bitmap_t* map, int val) {
-	uint8_t b = (val) ? 0xff : 0;
-	for (size_t i = 0; i < map->bytes; i++) ((uint8_t*)map->map)[i] = b;
-	if (val) map->used = map->blocks;
-	else map->used = 0;
-}
-
-size_t bmap_findarea(bitmap_t* map, size_t len, int val) {
+size_t bmap_get_area(bitmap_t* map, size_t len, int val) {
 	if (len == 0) return BMAP_NOT_FOUND;
 
 	uint32_t found = 0;
@@ -45,5 +38,12 @@ size_t bmap_findarea(bitmap_t* map, size_t len, int val) {
 	}
 
 	return BMAP_NOT_FOUND;
+}
+
+void bmap_set_all(bitmap_t* map, int val) {
+	uint8_t b = (val) ? 0xff : 0;
+	for (size_t i = 0; i < map->bytes; i++) ((uint8_t*)map->map)[i] = b;
+	if (val) map->used = map->blocks;
+	else map->used = 0;
 }
 

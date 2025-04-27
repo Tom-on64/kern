@@ -2,7 +2,7 @@
 [bits 32]
 
 isr_common:
-	;; Push registers to the intFrame_t struct
+	;; Push registers to the int_frame_t struct
 	push eax
 	push gs
 	push fs
@@ -16,8 +16,8 @@ isr_common:
 	push ebx
 	push esp
 	
-	[extern isr_handleInterrupt]
-	call isr_handleInterrupt
+	[extern isr_handle_interrupt]
+	call isr_handle_interrupt
 isr_return:
 	add esp, 4  ; Keep ESP
 	pop ebx
@@ -109,8 +109,8 @@ isr128:
 	jmp isr_common
 
 ;; Create table of ISRs
-[global isr_redirectTable]
-isr_redirectTable:
+[global isr_redirect_table]
+isr_redirect_table:
 %assign i 0
 %rep 48
 	dd isr%+i

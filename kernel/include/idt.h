@@ -9,11 +9,11 @@
 #define IDT_FLAG_USER 	0xee	// P = 1, Priv = 11, S = 0, Type = 1110 (32-bit int)
 
 struct idt_entry {
-	uint16_t offsetLow;
+	uint16_t offset_low;
 	uint16_t selector;
 	uint8_t  __unused;
 	uint8_t  flags;
-	uint16_t offsetHigh;
+	uint16_t offset_high;
 } __packed;
 
 struct idt_pointer {
@@ -22,6 +22,6 @@ struct idt_pointer {
 } __packed;
 
 int idt_init(void);
-void idt_setGate(uint8_t i, void* handler, uint8_t flags);
+void idt_set_gate(uint8_t i, void* handler, uint8_t flags);
 
 #endif

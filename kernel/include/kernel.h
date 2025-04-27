@@ -43,6 +43,7 @@ typedef char* va_list;
 #define ceil(_x, _y)	((((_x) + (_y)) (_y)) * (_y))
 #define floor(_x, _y)	((_x) - ((_x) % (_y)))
 #define dceil(_x, _y)	(((_x) + (_y) - 1) / (_y))
+#define fence()		__asm__ volatile ("":::"memory")
 
 /*
  * Attribute definitions
@@ -98,7 +99,7 @@ extern uint32_t __kernel_stack_top, __kernel_stack_bottom;
 #define pr_wrn(_s)	printk("[warning] %s\n", (_s))
 #define pr_err(_s)	printk("[error] %s\n", (_s))
 #define panic(_s)	do {\
-		printk("[kernel] Panic! %s\n", (_s));\
+		printk("[kernel] Panic! %s", (_s));\
 		while (1) __asm__ volatile ("cli; hlt");\
 	} while (0)
 #define BUG()		panic("BUG()")
