@@ -10,10 +10,18 @@ TODO
 [x] Virtual MM
 [x] Paging
 [x] Serial monitor
-[ ] Timer interrupts
+[ ] Make dedicated asm functions like lidt(), sti(), ...
+[x] PIT
+[ ] RTC
+[ ] HPET
+[ ] System calls
+[ ] Userspace
+[ ] Processes
+[ ] Scheduler
 [ ] Task switching
-[ ] IPC
+[ ] Inter-process communication
 [ ] Graphics
+[ ] Multicore support
 [ ] Networking :)
 [ ] Finish all the TODOs
 [ ] Run DOOM

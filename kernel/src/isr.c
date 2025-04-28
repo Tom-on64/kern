@@ -75,28 +75,26 @@ int isr_init(void) {
 	return 0;
 }
 
-void isr_register_irq(uint8_t i, isr_handler_ptr handler) {
+void isr_register(uint8_t i, isr_handler_ptr handler) {
+	if (i > 16) return; // Security 
 	irq_handlers[i] = handler;
 }
 
 void isr_send_eoi(uint8_t irq) {
-	if (irq >= 8) {
-		outb(0xa0, 0x20);
-	}
+	if (irq >= 8) outb(0xA0, 0x20);
 	outb(0x20, 0x20);
 }
 
+// TODO: Write fault handlers and make this more robust 
 int isr_handle_interrupt(struct isr_int_frame iframe) {
 	if (iframe.interrupt < 32) { 
 		// ISRs 0-31 - Exceptions
-		panic(exceptions[iframe.error]);
+		panic(exceptions[iframe.interrupt]);
 	} else if (iframe.interrupt >= 32 && iframe.interrupt < 48) {
 		// ISRs 32-47 - Hardware interrupts
 		uint8_t irq = iframe.interrupt - 32;
-		if (irq_handlers[irq]) {
-			irq_handlers[irq](&iframe);
-			isr_send_eoi(irq);
-		}
+		if (irq_handlers[irq]) irq_handlers[irq](&iframe);
+		isr_send_eoi(irq);
 	} else if (iframe.interrupt == 128) { 
 		// ISR 128 - System call
 		return syscall_handler(&iframe);

@@ -2,6 +2,7 @@
 #include <kernel.h>
 #include <paging.h>
 #include <serial.h>
+#include <timer.h>
 #include <gdt.h>
 #include <isr.h>
 #include <pmm.h>
@@ -29,12 +30,16 @@ void kmain(void* ptr, uint32_t magic) {
 	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
 	tty_puts("kern.\n\n");
 
-	// TODO: Timer
-	// TODO: Scheduler
+	// Timer
+	if (timer_init() != 0) panic("Failed to initialize timer.");
+
 	// TODO: Syscalls
+	// TODO: Scheduler
 	// TODO: Interprocess communication
 	// TODO: Tasking
 	// TODO: Load & run /sbin/init
+
+	while (1);
 
 	panic("kmain() reached end.");
 }
