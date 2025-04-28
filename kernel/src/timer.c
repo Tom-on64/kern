@@ -31,9 +31,9 @@ void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz) {
 	outb(PIT_CMD, ((ch << 6) | (3 << 4) | (mode << 1)));
 
 	uint32_t div = PIT_DIV / hz;
-	debugf("[PIT] Setting PIT divisor to %d...\n", div);
 	outb(PIT_CH0 + ch, div & 0xFF);
 	outb(PIT_CH0 + ch, div >> 8);
+	debugf("[PIT] Set PIT divisor to %d (%d Hz).\n", div, hz);
 
 	__asm__ volatile ("sti");
 }
