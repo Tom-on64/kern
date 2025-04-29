@@ -1,4 +1,5 @@
 #include <bootloader.h>
+#include <kmalloc.h>
 #include <kernel.h>
 #include <paging.h>
 #include <serial.h>
@@ -7,7 +8,6 @@
 #include <isr.h>
 #include <pmm.h>
 #include <tty.h>
-#include <vmm.h>
 
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
@@ -24,17 +24,16 @@ void kmain(void* ptr, uint32_t magic) {
 
 	// Memory manager init
 	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
-	if (vmm_init() != 0) panic("Failed to initalize Virtual Memory Manager.");
+	if (kmalloc_init() != 0) panic("Failed to initialize kernel heap.");
 
 	// VGA TTY
 	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
 	tty_puts("kern.\n\n");
 
-	// Timer
 	if (timer_init() != 0) panic("Failed to initialize timer.");
 
-	// TODO: Syscalls
 	// TODO: Scheduler
+	// TODO: Syscalls
 	// TODO: Interprocess communication
 	// TODO: Tasking
 	// TODO: Load & run /sbin/init
