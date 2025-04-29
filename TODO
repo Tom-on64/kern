@@ -10,14 +10,17 @@ TODO
 [x] Virtual MM
 [x] Paging
 [x] Serial monitor
+[x] kmalloc()
 [ ] Make dedicated asm functions like lidt(), sti(), ...
 [ ] Add something like <errno.h> in the kernel
+[ ] Improve kmalloc() to reduce fragmentation
+[ ] Improve kmalloc() for better alignment
 [x] PIT
 [ ] RTC
 [ ] HPET
 [ ] System calls
 [ ] Userspace
-[ ] Processes
+[ ] Processes/Tasks
 [ ] Scheduler
 [ ] Task switching
 [ ] Inter-process communication

@@ -4,7 +4,7 @@ kern.
 Idk why i called it that it was 3am and i needed sleep.
 
 !! WARNING !!
-Kern is broken at the moment. The last working commit is: '11feab5'
+Kern is being rewritten at the moment. To see the last version before the rewrite, see commit 11feab5 on master.
 (https://github.com/Tom-on64/kern/tree/11feab5)
 
 About
