@@ -11,6 +11,7 @@ TODO
 [x] Paging
 [x] Serial monitor
 [ ] Make dedicated asm functions like lidt(), sti(), ...
+[ ] Add something like <errno.h> in the kernel
 [x] PIT
 [ ] RTC
 [ ] HPET

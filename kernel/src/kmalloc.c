@@ -59,7 +59,7 @@ void kmalloc_merge() {
 		if (current->free && current->next->free) {
 			current->size += current->next->size + sizeof(struct kmalloc_node);
 			current->next = current->next->next;
-			break;
+			continue;
 		}
 
 		current = current->next;
