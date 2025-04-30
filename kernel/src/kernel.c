@@ -4,6 +4,7 @@
 #include <paging.h>
 #include <serial.h>
 #include <timer.h>
+#include <task.h>
 #include <gdt.h>
 #include <isr.h>
 #include <pmm.h>
@@ -31,6 +32,7 @@ void kmain(void* ptr, uint32_t magic) {
 	tty_puts("kern.\n\n");
 
 	if (timer_init() != 0) panic("Failed to initialize timer.");
+	if (task_init() != 0) panic("Failed to initialize tasking.");
 
 	// TODO: Scheduler
 	// TODO: Syscalls

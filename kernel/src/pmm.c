@@ -83,19 +83,19 @@ int pmm_init(void) {
 	return 0;
 }
 
-void* pmm_alloc(void) {
-	if (pmm_bitmap.blocks - pmm_bitmap.used == 0) return NULL;
+uint32_t pmm_alloc(void) {
+	if (pmm_bitmap.blocks - pmm_bitmap.used == 0) return 0;
 
 	size_t base = bmap_get_area(&pmm_bitmap, 1, 0);
-	if (base == BMAP_NOT_FOUND) return NULL;
+	if (base == BMAP_NOT_FOUND) return 0;
 	
 	bmap_set(&pmm_bitmap, base, 1);
 
-	return bmap_ptr(&pmm_bitmap, base);
+	return (uint32_t)bmap_ptr(&pmm_bitmap, base);
 }
 
-void pmm_free(void* page) {
-	size_t base = (size_t)page / BLOCK_SIZE;
+void pmm_free(uint32_t page) {
+	size_t base = page / BLOCK_SIZE;
 	bmap_set_area(&pmm_bitmap, base, 1, 0);
 	bmap_set(&pmm_bitmap, 0, 1);
 }

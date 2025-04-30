@@ -3,37 +3,41 @@
 
 isr_common:
 	;; Push registers to the int_frame_t struct
-	push eax
-	push gs
-	push fs
-	push es
+	
+	pushad
+	;; push eax
+	;; push ecx
+	;; push edx
+	;; push ebx
+	;; push esp
+	;; push ebp
+	;; push esi
+	;; push edi
 	push ds
-	push ebp
-	push edi
-	push esi
-	push edx
-	push ecx
+	push es
+	push fs
+	push gs
+
+	;; Load kernel data segment
 	push ebx
-	push esp
+	mov bx, 0x10
+	mov ds, bx
+	mov es, bx
+	mov fs, bx
+	mov gs, bx
+	pop ebx
 	
 	[extern isr_handle_interrupt]
 	call isr_handle_interrupt
-isr_return:
-	add esp, 4  ; Keep ESP
-	pop ebx
-	pop ecx
-	pop edx
-	pop esi
-	pop edi
-	pop ebp
-	pop ds
-	pop es
-	pop fs
+[global isr_return]
+isr_return:	; Also used by task switching
 	pop gs
-	add esp, 4  ; Keep EAX
-	add esp, 8  ; Pop interupt number and error code
-
-	iretd   ; Pop CS, EIP & EFLAGS (Also SS & ESP if it's from userspace)
+	pop fs
+	pop es
+	pop ds
+	popad
+	add esp, 8 ; Pop interupt number and error code
+	iretd ; Pop CS, EIP & EFLAGS (Also SS & ESP if it's from userspace)
 
 %macro ISR_WITH_ERRNO 1
 isr%1:

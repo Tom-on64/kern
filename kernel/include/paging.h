@@ -31,7 +31,7 @@ void pag_register_temp_frame(uint32_t target);
 uint32_t pag_temp_frame(void);
 void pag_map(uint32_t vaddr, uint32_t paddr, uint32_t flags);
 uint32_t pag_umap(uint32_t vaddr);
-void* pag_virt_to_phys(uint32_t vaddr);
+uint32_t pag_virt_to_phys(uint32_t vaddr);
 uint32_t* pag_get_pagedir();
 void pag_set_pagedir(uint32_t* pagedir);
 void pag_sync_pagedir();
