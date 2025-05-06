@@ -31,7 +31,7 @@ int task_init(void) {
 }
 
 void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv) {
-	__asm__ volatile ("cli"); // Make sure we don't get interrupted
+	__asm__ volatile ("cli"); // Make sure we don't get interrupted	
 
 	uint32_t kstack = (uint32_t)kmalloc(0x1000 - 16) + (0x1000 - 16);
 	uint8_t* kesp = (uint8_t*)kstack;
@@ -55,7 +55,7 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 	trap->eflags = 0x200; // Enable interrupts
 	trap->eip = eip;
 
-	kesp -= sizeof(struct isr_int_frame);
+	kesp -= sizeof(struct task_switch_ctx);
 	struct task_switch_ctx* ctx = (struct task_switch_ctx*)kesp;
 	ctx->edi = 0;
 	ctx->esi = 0;
@@ -82,6 +82,9 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 	new->heap_start = USER_HEAP;
 	new->heap_end = USER_HEAP;
 
+	debugf("[task] NEW! Task #%d - EIP = 0x%08x, ESP = 0x%08x%s\n",
+		id, eip, kesp, kernel_task ? " (kernel)" : "");
+
 	// We don't need to setup a stack frame
 	if (kernel_task) {
 		__asm__ volatile ("sti");
@@ -91,7 +94,7 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 	void* old_pagedir = pag_get_pagedir();
 	pag_set_pagedir(new->pagedir);
 
-	// Setup argc, argv & environ
+	// Setup argc, argv
 	size_t arg_len = 0;
 	for (int i = 0; i < argc; i++) arg_len += strlen(argv[i]) + 1;
 	size_t page_count = dceil(4 + (argc * 4) + 10 + arg_len, PAGE_SIZE);
@@ -186,7 +189,7 @@ void task_set_user_heap(struct task* task, size_t heap_end) {
 	else if (new_page_top > old_page_top) { // Grow
 		int num = new_page_top - old_page_top;
 
-		for (size_t i = 0; i < num; i++) {
+		for (int i = 0; i < num; i++) {
 			uint32_t paddr = (uint32_t)pmm_alloc();
 			if (paddr == 0) {
 				debugf("[task] Task %d tried to grow heap too much.\n", task->id);
@@ -199,7 +202,7 @@ void task_set_user_heap(struct task* task, size_t heap_end) {
 	} else { // Shrink
 		int num = old_page_top - new_page_top;
 
-		for (size_t i = 0; i < num; i++) {
+		for (int i = 0; i < num; i++) {
 			uint32_t vaddr = old_page_top * PAGE_SIZE + i * PAGE_SIZE;
 			uint32_t paddr = pag_virt_to_phys(vaddr);
 			pmm_free(paddr);

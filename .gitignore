@@ -28,4 +28,5 @@ DS_Store
 *.swo
 /.clangd
 /.cache
+/compile_commands.json
 

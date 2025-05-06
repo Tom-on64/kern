@@ -1,25 +1,64 @@
 System Calls 
 ============
 
-Syscall handlers are prefixed by 'sys_'. Syscalls can be called using int 0x80.
-Arguments are passed in registers like this:
-* EAX - Syscall number
-* EBX - Argument 0
-* ECX - Argument 1
-* EDX - Argument 2
+pid_t fork(void);
+Creates a child process.
 
-If the syscall returns, the return value will be in EAX.
+void exit(int status);
+Terminate the calling process.
 
-Syscall Table (TODO: Update this)
--------------
-| NR | SYSC NAME | RETURN (EAX) | ARG0 (EBX) | ARG1 (ECX) | ARG2 (EDX) |
-| 00 | reserved  |       -      |      -     |      -     |      -     |
-| 01 | sleep     |       -      | uint ms    |      -     |      -     |
-| 02 | read      | int count    | int fd     | char* buf  | uint count |
-| 03 | write     | int count    | int fd     | char* buf  | uint count |
-| 04 | open      | int fd       | char* path | int oflag  |      -     |
-| 05 | close     | int status   | int fd     |      -     |      -     |
-| 06 | malloc    | void* buf    | int count  |      -     |      -     |
-| 07 | free      |       -      | void* buf  |      -     |      -     |
-| 08 | seek      | #TBD         |            |            |            |
+pid_t waitpid(pid_t pid);
+Wait untill a process changes state.
+
+int kill(pid_t, int sig);
+Send a signal to a process.
+
+pid_t getpid(void);
+Get PID of calling process.
+
+void sleep(size_t t);
+Sleep for **t** clock ticks.
+
+int exec(char* path, char** argv);
+Execute a program.
+
+int brk(void* addr);
+Change data segment size.
+
+int open(char* path, int flags);
+Open and possibly create a file.
+
+int close(int fd);
+Close a file descriptor.
+
+ssize_t read(int fd, void* buf, size_t count);
+Read up to **count** bytes into **buf**.
+
+ssize_t write(int fd, void* buf, size_t count);
+Write up to **count** bytes from **buf**.
+
+int dup(int oldfd);
+Duplicate a file descriptor.
+
+int pipe(int pipe[2]);
+Create a pipe and return it's file descriptors in **pipe**.
+
+int chdir(char* path);
+Change the current directory of calling process.
+
+int mkdir(char* path);
+Create a new directory.
+
+int mknod(char* path, int maj, int min);
+Create a new device file.
+
+int link(char* f1, char* f2);
+Creates another filename (**f2**) for **f1**.
+
+int unlink(char* path);
+Delete a filename.
+
+int fstat(int fd, struct stat* statbuf);
+Return info about a file.
+
 

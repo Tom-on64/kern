@@ -7,8 +7,8 @@ bits 32
 global task_switch
 task_switch:
 	mov eax, [esp + 4]	; eax = struct task* old
-	mov edx, [esp + 8]	; ebx = struct task* nex
-	
+	mov edx, [esp + 8]	; ebx = struct task* new
+
 	;; Push registers that weren't pushed by the CDECL call
 	push ebp
 	push ebx

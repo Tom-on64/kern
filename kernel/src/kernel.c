@@ -10,6 +10,8 @@
 #include <pmm.h>
 #include <tty.h>
 
+void test(void);
+
 __noreturn
 void kmain(void* ptr, uint32_t magic) {
 	if (boot_init_mb1(ptr, magic) != 0) panic("Unsupported bootloader.");
@@ -20,6 +22,8 @@ void kmain(void* ptr, uint32_t magic) {
 
 	// System init
 	if (gdt_init() != 0) panic("Failed to initalize GDT.");
+	debugf("[gdt] Segment selectors: NULL: 0x%04x, KCODE: 0x%04x, KDATA: 0x%04x, UCODE: 0x%04x, UDATA: 0x%04x, TSS: 0x%04x\n",
+		GDT_NULL, GDT_KERNEL_CODE, GDT_KERNEL_DATA, GDT_USER_CODE, GDT_USER_DATA, GDT_TSS);
 	if (isr_init() != 0) panic("Failed to initalize ISRs.");
 	if (pag_init() != 0) panic("Failed to initalize Paging.");
 
@@ -34,14 +38,36 @@ void kmain(void* ptr, uint32_t magic) {
 	if (timer_init() != 0) panic("Failed to initialize timer.");
 	if (task_init() != 0) panic("Failed to initialize tasking.");
 
-	// TODO: Scheduler
+	// Create a temporary test task
+	task_create(task_create_id(), (uint32_t)test, 1, pag_get_pagedir(), 0, NULL);
+
+	size_t delay = 0;
+	while (1) {
+		delay++;
+
+		if (delay < 0x1FFFFFF) continue;
+		delay = 0;
+
+		tty_puts("[kernel] Hello!\n");
+	}
+	
 	// TODO: Syscalls
 	// TODO: Interprocess communication
-	// TODO: Tasking
 	// TODO: Load & run /sbin/init
 
-	while (1);
-
 	panic("kmain() reached end.");
+}
+
+// An imaginary second task
+void test(void) {
+	size_t delay = 0;
+	while (1) {
+		delay++;
+
+		if (delay < 0x2FFFFFF) continue;
+		delay = 0;
+
+		tty_puts("[test] Hello!\n");
+	}
 }
 

@@ -89,12 +89,13 @@ void isr_send_eoi(uint8_t irq) {
 int isr_handle_interrupt(struct isr_int_frame iframe) {
 	if (iframe.interrupt < 32) { 
 		// ISRs 0-31 - Exceptions
+		if (iframe.error) debugf("[kernel] Error code: 0x%08x\n", iframe.error);
 		panic(exceptions[iframe.interrupt]);
 	} else if (iframe.interrupt >= 32 && iframe.interrupt < 48) {
 		// ISRs 32-47 - Hardware interrupts
 		uint8_t irq = iframe.interrupt - 32;
-		if (irq_handlers[irq]) irq_handlers[irq](&iframe);
 		isr_send_eoi(irq);
+		if (irq_handlers[irq]) irq_handlers[irq](&iframe);
 	} else if (iframe.interrupt == 128) { 
 		// ISR 128 - System call
 		return syscall_handler(&iframe);

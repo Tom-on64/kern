@@ -9,6 +9,8 @@
 #define PIT_CH2	0x42
 #define PIT_CMD	0x43
 
+#define TIMER_FREQ	1000
+
 int  timer_init(void);
 void timer_wait(size_t ticks);
 

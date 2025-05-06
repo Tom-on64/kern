@@ -30,14 +30,14 @@ isr_common:
 	[extern isr_handle_interrupt]
 	call isr_handle_interrupt
 [global isr_return]
-isr_return:	; Also used by task switching
+isr_return:	; Also used by a newly created task
 	pop gs
 	pop fs
 	pop es
 	pop ds
 	popad
 	add esp, 8 ; Pop interupt number and error code
-	iretd ; Pop CS, EIP & EFLAGS (Also SS & ESP if it's from userspace)
+	iret ; Pop CS, EIP & EFLAGS (Also SS & ESP if it's from userspace)
 
 %macro ISR_WITH_ERRNO 1
 isr%1:

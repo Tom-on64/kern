@@ -22,6 +22,6 @@ int isr_handle_interrupt(struct isr_int_frame iframe);
 // Assembly definitions (isr.s)
 extern void isr_return(void);
 extern void* isr_redirect_table[48]; // ISR Table
-extern void isr128(); // int 0x80 - syscall
+extern void isr128(void); // int 0x80 - syscall
 
 #endif

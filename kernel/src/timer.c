@@ -1,5 +1,6 @@
 #include <kernel.h>
 #include <system.h>
+#include <sched.h>
 #include <isr.h>
 #include <tty.h>
 
@@ -19,7 +20,7 @@ void timer_wait(size_t t) {
 
 int pit_init(void) {
 	isr_register(0, pit_handler);
-	pit_phase(0, 2, 1000);
+	pit_phase(0, 2, TIMER_FREQ);
 	return 0;
 }
 
@@ -39,8 +40,10 @@ void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz) {
 }
 
 void pit_handler(struct isr_int_frame* iframe) {
+	(void)iframe; // We must take it as an argument even if we don't use it
 	timer_ticks++;
 
-	if (timer_ticks % 1000 == 0) tty_puts(".");
+	// TODO: This assumes the timer is at 1000 Hz
+	if (timer_ticks % SCHED_QUANTUM == 0) schedule();
 }
 
