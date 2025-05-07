@@ -2,6 +2,8 @@
 #include <kernel.h>
 #include <paging.h>
 #include <string.h>
+#include <system.h>
+#include <sched.h>
 #include <gdt.h>
 #include <isr.h>
 #include <pmm.h>
@@ -31,7 +33,7 @@ int task_init(void) {
 }
 
 void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv) {
-	__asm__ volatile ("cli"); // Make sure we don't get interrupted	
+	cli();
 
 	uint32_t kstack = (uint32_t)kmalloc(0x1000 - 16) + (0x1000 - 16);
 	uint8_t* kesp = (uint8_t*)kstack;
@@ -82,12 +84,9 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 	new->heap_start = USER_HEAP;
 	new->heap_end = USER_HEAP;
 
-	debugf("[task] NEW! Task #%d - EIP = 0x%08x, ESP = 0x%08x%s\n",
-		id, eip, kesp, kernel_task ? " (kernel)" : "");
-
 	// We don't need to setup a stack frame
 	if (kernel_task) {
-		__asm__ volatile ("sti");
+		sti();
 		return;
 	}
 
@@ -131,7 +130,7 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 }
 
 void task_kill(size_t id) {
-	__asm__ volatile ("cli");
+	cli();
 
 	struct task* current = task_first;
 	while (current != NULL) {
@@ -171,8 +170,8 @@ void task_kill(size_t id) {
 	}
 	kfree(task);
 
-	// schedule();
-	__asm__ volatile ("sti");
+	schedule();
+	sti();
 }
 
 void task_set_user_heap(struct task* task, size_t heap_end) {

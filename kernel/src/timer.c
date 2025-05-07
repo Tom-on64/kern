@@ -27,7 +27,7 @@ int pit_init(void) {
 void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz) {
 	if (ch > 2 || mode > 7) return;
 	
-	__asm__ volatile ("cli");
+	cli();
 
 	outb(PIT_CMD, ((ch << 6) | (3 << 4) | (mode << 1)));
 
@@ -36,7 +36,7 @@ void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz) {
 	outb(PIT_CH0 + ch, div >> 8);
 	debugf("[PIT] Set PIT divisor to %d (%d Hz).\n", div, hz);
 
-	__asm__ volatile ("sti");
+	sti();
 }
 
 void pit_handler(struct isr_int_frame* iframe) {

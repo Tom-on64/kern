@@ -42,3 +42,11 @@ void outl(uint16_t port, uint32_t data) {
 	__asm__ volatile ("outl %1, %0" :: "dN"(port), "a"(data));
 }
 
+void cli(void) {
+	__asm__ volatile ("cli");
+}
+
+void sti(void) {
+	__asm__ volatile ("sti");
+}
+

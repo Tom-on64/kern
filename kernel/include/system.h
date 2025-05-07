@@ -2,6 +2,8 @@
 #define _SYSTEM_H
 
 #include <kernel.h>
+#include <gdt.h>
+#include <idt.h>
 
 // cpuid
 void cpuid(uint32_t* eax, uint32_t* ebx, uint32_t* ecx, uint32_t* edx);
@@ -14,5 +16,9 @@ uint16_t inw(uint16_t port);
 void     outw(uint16_t port, uint16_t data);
 uint32_t inl(uint16_t port);
 void     outl(uint16_t port, uint32_t data);
+
+// x86
+void cli(void);
+void sti(void);
 
 #endif

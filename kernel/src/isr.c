@@ -1,6 +1,5 @@
 #include <syscall.h>
 #include <kernel.h>
-#include <string.h>
 #include <system.h>
 #include <idt.h>
 #include <isr.h>
@@ -69,7 +68,7 @@ int isr_init(void) {
 	idt_set_gate(0x80, (void*)(uint32_t)isr128, IDT_FLAG_USER);
 
 	// Let interrupts interrupt
-	__asm__ volatile ("sti");
+	sti();
 
 	debugf("[isr] ISR initialized.\n");
 	return 0;
