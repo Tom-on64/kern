@@ -1,0 +1,62 @@
+Unix-like system calls
+======================
+
+pid_t fork(void);
+Creates a child process.
+
+void exit(int status);
+Terminate the calling process.
+
+pid_t waitpid(pid_t pid);
+Wait untill a process changes state.
+
+int kill(pid_t, int sig);
+Send a signal to a process.
+
+pid_t getpid(void);
+Get PID of calling process.
+
+void sleep(size_t t);
+Sleep for **t** clock ticks.
+
+int exec(char* path, char** argv);
+Execute a program.
+
+int brk(void* addr);
+Change data segment size.
+
+int open(char* path, int flags);
+Open and possibly create a file.
+
+int close(int fd);
+Close a file descriptor.
+
+ssize_t read(int fd, void* buf, size_t count);
+Read up to **count** bytes into **buf**.
+
+ssize_t write(int fd, void* buf, size_t count);
+Write up to **count** bytes from **buf**.
+
+int dup(int oldfd);
+Duplicate a file descriptor.
+
+int pipe(int pipe[2]);
+Create a pipe and return it's file descriptors in **pipe**.
+
+int chdir(char* path);
+Change the current directory of calling process.
+
+int mkdir(char* path);
+Create a new directory.
+
+int mknod(char* path, int maj, int min);
+Create a new device file.
+
+int link(char* f1, char* f2);
+Creates another filename (**f2**) for **f1**.
+
+int unlink(char* path);
+Delete a filename.
+
+int fstat(int fd, struct stat* statbuf);
+Return info about a file.

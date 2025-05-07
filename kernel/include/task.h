@@ -9,6 +9,7 @@ enum {
 	TASK_STATE_DEAD,
 	TASK_STATE_IDLE,
 	TASK_STATE_READY,
+	TASK_STATE_RECV,
 };
 
 /*
@@ -30,7 +31,7 @@ enum {
  * 	 task.s which uses hardcoded offsets.
  */
 struct task {
-	size_t id;
+	pid_t id;
 
 	size_t kstack_pointer;
 	size_t kstack_bottom;
@@ -58,13 +59,13 @@ extern struct task* task_first;
 extern struct task* task_current;
 
 int task_init(void);
-void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv);
-void task_kill(size_t id);
-void task_set_user_heap(struct task* task, size_t heap_end);
-struct task* task_get(size_t id);
-uint8_t task_get_state(size_t id);
-void task_set_state(size_t id, uint8_t state);
-size_t task_create_id(void);
+void task_create(pid_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv);
+void task_kill(pid_t id);
+void task_set_user_heap(pid_t id, size_t heap_end);
+struct task* task_get(pid_t id);
+uint8_t task_get_state(pid_t id);
+void task_set_state(pid_t id, uint8_t state);
+pid_t task_create_id(void);
 
 // Defined in task.s
 extern void task_switch(struct task* old, struct task* new);

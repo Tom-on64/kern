@@ -1,5 +1,6 @@
 #include <kernel.h>
 #include <task.h>
+#include <ipc.h>
 #include <tty.h>
 
 #include <syscall.h>
@@ -7,21 +8,23 @@
 // Syscall table
 void* syscalls[SYSCALL_MAX] = { 0 };
 
-void sys_exit(int code) {
-	debugf("[syscall] Task #%d exited with code %d.\n", task_current->id, code);
-	task_kill(task_current->id);
-}
-
-void sys_test(char* msg) {
-	debugf("[syscall] Test: %s\n", msg);
-}
-
 int syscall_init(void) {
-	syscall_register(SYS_EXIT, (void*)sys_exit);
-	syscall_register(SYS_TEST, (void*)sys_test);
+	syscall_register(SYS_SEND, (void*)sys_send);
+	syscall_register(SYS_RECV, (void*)sys_recv);
 
 	debugf("[syscall] Initiated syscalls!\n");
 
+	return 0;
+}
+
+int sys_send(pid_t dst, ipc_msg_t* msg) {
+	msg->sender = task_current->id;
+	debugf("[syscall] Task #%d sent a message to Task #%d.\n", msg->sender, dst);
+	return ipc_send(dst, msg);
+}
+
+int sys_recv(pid_t src, ipc_msg_t* msg) {
+	debugf("[syscall] Task #%d is receiving a message from Task #%d.\n", task_current->id, src);
 	return 0;
 }
 

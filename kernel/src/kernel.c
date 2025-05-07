@@ -36,10 +36,6 @@ void kmain(void* ptr, uint32_t magic) {
 	if (syscall_init() != 0) panic("Failed to initialize syscalls.");
 	if (task_init() != 0) panic("Failed to initialize tasking.");
 
-	char* s = "Hello, World!";
-	__asm__ volatile("int $0x80" :: "a"(SYS_TEST), "b"(s));
-
-	// TODO: Interprocess communication
 	// TODO: Load & run /sbin/init
 
 	// We don't want to halt

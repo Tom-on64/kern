@@ -32,7 +32,7 @@ int task_init(void) {
 	return 0;
 }
 
-void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv) {
+void task_create(pid_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, int argc, char** argv) {
 	cli();
 
 	uint32_t kstack = (uint32_t)kmalloc(0x1000 - 16) + (0x1000 - 16);
@@ -129,7 +129,7 @@ void task_create(size_t id, uint32_t eip, int kernel_task, uint32_t* pagedir, in
 	pag_set_pagedir(old_pagedir);
 }
 
-void task_kill(size_t id) {
+void task_kill(pid_t id) {
 	cli();
 
 	struct task* current = task_first;
@@ -174,7 +174,9 @@ void task_kill(size_t id) {
 	sti();
 }
 
-void task_set_user_heap(struct task* task, size_t heap_end) {
+void task_set_user_heap(pid_t id, size_t heap_end) {
+	struct task* task = task_get(id);
+
 	if (heap_end <= task->heap_start) {
 		debugf("[task] Task %d tried to shrink heap bellow 0.\n", task->id);
 		task_kill(task->id);
@@ -212,7 +214,7 @@ void task_set_user_heap(struct task* task, size_t heap_end) {
 	task->heap_end = heap_end;
 }
 
-struct task* task_get(size_t id) {
+struct task* task_get(pid_t id) {
 	struct task* find = task_first;
 	while (find != NULL) {
 		if (find->id == id) break;
@@ -222,22 +224,22 @@ struct task* task_get(size_t id) {
 	return find;
 }
 
-uint8_t task_get_state(size_t id) {
+uint8_t task_get_state(pid_t id) {
 	struct task* t = task_get(id);
 	if (t == NULL) return TASK_STATE_DEAD;
 	return t->state;
 }
 
-void task_set_state(size_t id, uint8_t state) {
+void task_set_state(pid_t id, uint8_t state) {
 	struct task* t = task_get(id);
 	if (t == NULL) return;
 	t->state = state;
 }
 
-size_t task_create_id(void) {
+pid_t task_create_id(void) {
 	struct task* current = task_first;
 
-	size_t max = current->id;
+	pid_t max = current->id;
 	current = current->next;
 	while (current != NULL) {
 		if (max < current->id) max = current->id;

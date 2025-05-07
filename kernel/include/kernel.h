@@ -30,6 +30,9 @@ typedef char* va_list;
 /*
  * Utility macros
  */
+#define STATIC_ASSERT(_cond, _msg)\
+	typedef int static_assert_##_msg[(_cond) ? 1 : -1]
+
 #define ARRAY_SIZE(_a)	(sizeof((_a)) / sizeof((_a)[0]))
 #define BIT(_n)		(1UL << (_n))
 #define BIT_MASK(_n)	(BIT(_n) - 1)
@@ -83,6 +86,11 @@ typedef int32_t		intptr_t;
 #define bool _Bool
 #define true 1
 #define false 0
+
+/*
+ * System types
+ */
+typedef uint32_t	pid_t;
 
 /*
  * Linker defined values

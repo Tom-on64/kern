@@ -25,7 +25,8 @@ TODO
 [x] Scheduler
 [ ] Priority scheduler
 [x] Task switching
-[ ] Inter-process communication
+[ ] Interprocess communication
+[ ] ALL the message types
 [ ] Graphics
 [ ] Multicore support
 [ ] Networking :)
