@@ -56,10 +56,11 @@ void syscall_handler(struct isr_int_frame* iframe) {
 		"call *%7\n"
 		"add $24, %%esp\n"
 		"mov %%eax, %0\n"
-		: "=a"(ret)
+		: "=r"(ret)
 		: "g"(iframe->ebp), "g"(iframe->edi), "g"(iframe->esi),
 		  "g"(iframe->edx), "g"(iframe->ecx), "g"(iframe->ebx),
 		  "g"(handler)
+		: "eax", "memory"
 	);
 	iframe->eax = ret;
 }
