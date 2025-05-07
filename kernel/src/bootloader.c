@@ -79,6 +79,8 @@ int boot_init_mb1(void* ptr, uint32_t magic) {
 	// TODO: APM table
 	// TODO: VBE table
 	// TODO: Framebuffer
+	
+	debugf("[boot] Initiated with MultiBoot 1\n");
 
 	return 0;
 }

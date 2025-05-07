@@ -17,6 +17,8 @@ int serial_init(int dev) {
 	if (inb(dev + 0) != 0xAE) return 1;
 	outb(dev + 4, 0x0F);	// non-loopback, IRQs enabled, OUT#1 and OUT#2 bits enabled
 	
+	debugf("\x1b[H\x1b[JSerial display initiated!\n\n");
+	
 	return 0;
 }
 

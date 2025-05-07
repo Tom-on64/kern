@@ -1,6 +1,21 @@
 System Calls 
 ============
 
+System calls are a way of interfacing with the kernel from userspace.
+
+Calling
+-------
+System calls are called via interrupt 0x80. Arguments can be passed through
+registers in this order with EAX containing the system call number (see [Table](#Table))
+and arguments in EBX, ECX, EDX, ESI, EDI and EBP respectively.
+
+Table
+-----
+
+
+Syscalls
+--------
+
 pid_t fork(void);
 Creates a child process.
 

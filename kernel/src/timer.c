@@ -34,7 +34,7 @@ void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz) {
 	uint32_t div = PIT_DIV / hz;
 	outb(PIT_CH0 + ch, div & 0xFF);
 	outb(PIT_CH0 + ch, div >> 8);
-	debugf("[PIT] Set PIT divisor to %d (%d Hz).\n", div, hz);
+	debugf("[pit] Set PIT divisor to %d (%d Hz).\n", div, hz);
 
 	sti();
 }

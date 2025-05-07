@@ -28,6 +28,8 @@ int tty_init(void) {
 	tty_ctx.buf = (uint8_t*)KERNEL_FRAMEBUF;
 	tty_clear();
 
+	debugf("[tty] Initiated %dx%d VGA display to TTY.\n", VGA_WIDTH, VGA_HEIGHT);
+
 	return 0;
 }
 

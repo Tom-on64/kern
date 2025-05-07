@@ -85,7 +85,7 @@ void isr_send_eoi(uint8_t irq) {
 }
 
 // TODO: Write fault handlers and make this more robust 
-int isr_handle_interrupt(struct isr_int_frame iframe) {
+void isr_handle_interrupt(struct isr_int_frame iframe) {
 	if (iframe.interrupt < 32) { 
 		// ISRs 0-31 - Exceptions
 		if (iframe.error) debugf("[kernel] Error code: 0x%08x\n", iframe.error);
@@ -97,9 +97,7 @@ int isr_handle_interrupt(struct isr_int_frame iframe) {
 		if (irq_handlers[irq]) irq_handlers[irq](&iframe);
 	} else if (iframe.interrupt == 128) { 
 		// ISR 128 - System call
-		return syscall_handler(&iframe);
+		syscall_handler(&iframe);
 	}
-
-	return 0;
 }
 

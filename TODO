@@ -18,7 +18,8 @@ TODO
 [x] PIT
 [ ] RTC
 [ ] HPET
-[ ] System calls
+[x] System calls
+[ ] Separate syscall sources into individual files
 [ ] Userspace
 [x] Processes/Tasks
 [x] Scheduler

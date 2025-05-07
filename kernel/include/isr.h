@@ -17,7 +17,7 @@ typedef void (*isr_handler_ptr)(struct isr_int_frame* iframe);
 
 int isr_init(void);
 void isr_register(uint8_t i, isr_handler_ptr handler);
-int isr_handle_interrupt(struct isr_int_frame iframe);
+void isr_handle_interrupt(struct isr_int_frame iframe);
 
 // Assembly definitions (isr.s)
 extern void isr_return(void);
