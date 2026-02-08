@@ -3,39 +3,34 @@
 
 #include <kernel.h>
 
-#define PHYS_ADDR(_a)	((_a) & ~0xFFF)
+#define PAGE_FLAG_PRESENT	(1 << 0) // Page is present in the table
+#define PAGE_FLAG_WRITE		(1 << 1) // Read-write
+#define PAGE_FLAG_USER		(1 << 2) // User-mode (DPL3) access allowed
+#define PAGE_FLAG_PWT		(1 << 3) // Page write-thru
+#define PAGE_FLAG_NOCACHE	(1 << 4) // Cache disable
+#define PAGE_FLAG_ACCESSED	(1 << 5) // Indicates whether page was accessed
+#define PAGE_FLAG_DIRTY		(1 << 6) // Page size (valid for PD and PDPT only)
+#define PAGE_FLAG_PAT		(1 << 7) // Page Attribute Table (valid for PT only)
+#define PAGE_FLAG_GLOBAL	(1 << 8) // Indicates the page is globally cached
+#define PAGE_FLAG_SHARED	(1 << 9) // Userland page is shared
+// Region caching according to the Limine protocol
+#define PAGE_FLAG_CACHE	(PAGE_FLAG_PWT | PAGE_FLAG_PAT)
 
-// The kernels pagedir
-#define PAGEDIR		((uint32_t*)(0xFFFFF000))
-#define PAGETAB(_i)	((uint32_t*)(0xFFC00000 + ((_i) << 12)))
+#define PAGE_SIZE	0x1000
+#define PAGE_SIZE_LARGE	0x200000
+#define PAGE_SIZE_HUGE	0x40000000
 
-#define PAGE_SIZE	4096
+#define PHYS_ADDR(_x) ((_x) & ~0xFFF)
 
-#define PAGE_FLAG_PRESENT	(1 << 0)
-#define PAGE_FLAG_WRITE		(1 << 1)
-#define PAGE_FLAG_USER		(1 << 2)
-#define PAGE_FLAG_PWT		(1 << 3)
-#define PAGE_FLAG_NOCACHE	(1 << 4)
-#define PAGE_FLAG_ACCESSED	(1 << 5)
-#define PAGE_FLAG_DIRTY		(1 << 6) // AVL in PDE where PS = 0
-#define PAGE_FLAG_PS		(1 << 7) // If PS = 1 then directly maps a 4MB page
-#define PAGE_FLAG_GLOBAL	(1 << 8)
-// bits 9-11 are AVL - OS is free to use these as its own flags
-#define PAGE_FLAG_OWNER		(1 << 9)
-
-extern uint32_t	init_pagedir[1024]; // Defined in entry.s for initial paging
-extern size_t	pag_page_count;
-
-int pag_init(void);
-void pag_register_temp_frame(uint32_t target);
-uint32_t pag_temp_frame(void);
-void pag_map(uint32_t vaddr, uint32_t paddr, uint32_t flags);
-uint32_t pag_umap(uint32_t vaddr);
-uint32_t pag_virt_to_phys(uint32_t vaddr);
-uint32_t* pag_get_pagedir();
-void pag_set_pagedir(uint32_t* pagedir);
-void pag_sync_pagedir();
-uint32_t* pag_alloc_pagedir();
-void pag_free_pagedir(uint32_t* pagedir);
+int	pag_init(void);
+void	pag_map(size_t vaddr, size_t paddr, size_t flags);
+size_t	pag_umap(size_t vaddr);
+size_t	pag_virt_to_phys(size_t vaddr);
+size_t*	pag_get_pagedir();
+size_t*	pag_get_task_pagedir(void* task);
+void	pag_set_pagedir(size_t* pagedir);
+size_t*	pag_alloc_pagedir();
+void	pag_free_pagedir(size_t* pagedir);
+void	pag_invalidate(size_t vaddr);
 
 #endif

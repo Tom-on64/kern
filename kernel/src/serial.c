@@ -63,9 +63,9 @@ int debugf(char* fmt, ...) {
 }
 
 int vdebugf(char* fmt, va_list args) {
-	static char buf[DF_BUF_LEN];
-	int ret = vsnprintf(buf, DF_BUF_LEN, fmt, args);
-	serial_puts(COM1, buf);
-	return ret;
+	char buf[DF_BUF_LEN];
+	int len = vsnprintf(buf, DF_BUF_LEN, fmt, args);
+	serial_write(COM1, buf, len);
+	return len;
 }
 

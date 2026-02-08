@@ -1,4 +1,4 @@
-include ../defaults.mk
+include ../config.mk
 
 SRC = ./src
 BIN = ./bin
@@ -9,6 +9,10 @@ OBJS_C = $(patsubst $(SRC)/%.c, $(BIN)/%.c.o, $(SRCS_C))
 OBJS_S = $(patsubst $(SRC)/%.s, $(BIN)/%.s.o, $(SRCS_S))
 OUT = $(SYSROOT)/boot/kernel.elf
 LINKER = ./linker.ld
+
+# Stack Canary
+SSP := 0x$(shell openssl rand -hex 8)
+CCFLAGS += -DSTACK_CHK_GUARD=$(SSP)
 
 .PHONY: all clean
 all: $(OUT)
@@ -21,7 +25,7 @@ $(BIN)/%.c.o: $(SRC)/%.c
 
 $(BIN)/%.s.o: $(SRC)/%.s
 	@mkdir -p $(dir $@)
-	$(AS) $(ASFLAGS) -felf32 -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
 
 clean:
 	rm -fr $(BIN) $(OUT)

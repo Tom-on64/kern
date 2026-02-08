@@ -20,12 +20,11 @@
 /*
  * Variable arguments
  */
-typedef char* va_list;
-#define __VA_ALIGN		4
-#define __va_align(_t)		(((sizeof(_t) + __VA_ALIGN - 1) / __VA_ALIGN) * __VA_ALIGN)
-#define va_start(_ap, _arg)	((_ap) = (char*)(&(_arg) + 1))
-#define va_arg(_ap, _type)	(*(_type*)((_ap += __va_align(_type)) - __va_align(_type)))
-#define va_end(_ap)		(void)((_ap) = 0)
+//typedef struct { unsigned int gp_off; unsigned int fp_off; void *arg_overflow; void *reg_save; } va_list;
+typedef __builtin_va_list va_list;
+#define va_start(_ap, _last) __builtin_va_start(_ap, _last)
+#define va_end(_ap)         __builtin_va_end(_ap)
+#define va_arg(_ap, _type)   __builtin_va_arg(_ap, _type)
 
 /*
  * Utility macros
@@ -75,10 +74,10 @@ typedef signed char	int8_t;
 typedef signed short	int16_t;
 typedef signed int	int32_t;
 typedef signed long	int64_t;
-typedef uint32_t	size_t;
-typedef int32_t		ssize_t;
-typedef uint32_t	uintptr_t;
-typedef int32_t		intptr_t;
+typedef uint64_t	size_t;
+typedef int64_t		ssize_t;
+typedef uint64_t	uintptr_t;
+typedef int64_t		intptr_t;
 
 /*
  * Boolean
@@ -95,11 +94,12 @@ typedef uint32_t	pid_t;
 /*
  * Linker defined values
  */
-extern uint32_t __kernel_start, __kernel_end;
-extern uint32_t __kernel_stack_top, __kernel_stack_bottom;
+extern uint64_t __kernel_start, __kernel_text_start, __kernel_rodata_start, __kernel_data_start;
+extern uint64_t __kernel_end, __kernel_text_end, __kernel_rodata_end, __kernel_data_end;
 
 /*
  * Logging and errors
+ * TODO: Use something other than debugf()
  */
 #include <serial.h>
 #define printk		debugf

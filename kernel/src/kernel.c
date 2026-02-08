@@ -1,23 +1,29 @@
 #include <bootloader.h>
-#include <kmalloc.h>
-#include <syscall.h>
 #include <kernel.h>
+#include <limine.h>
 #include <paging.h>
 #include <serial.h>
+#include <splash.h>
 #include <timer.h>
-#include <task.h>
 #include <gdt.h>
+#include <idt.h>
 #include <isr.h>
 #include <pmm.h>
-#include <tty.h>
+
+static volatile LIMINE_BASE_REVISION(4);
 
 __noreturn
-void kmain(void* ptr, uint32_t magic) {
+void _start(void) {
 	// Serial console for debugging
 	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
 
+	if (LIMINE_BASE_REVISION_SUPPORTED == false) panic("Unsuported Limine version.");
+
 	// Load structures from bootloader
-	if (boot_init_mb1(ptr, magic) != 0) panic("Unsupported bootloader.");
+	if (boot_init() != 0) panic("Failed to parse bootloader structures.");
+
+	// The most important function in the world.
+	splash();
 
 	// System init
 	if (gdt_init() != 0) panic("Failed to initalize GDT.");
@@ -25,16 +31,12 @@ void kmain(void* ptr, uint32_t magic) {
 	if (pag_init() != 0) panic("Failed to initalize Paging.");
 
 	// Memory manager init
-	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
-	if (kmalloc_init() != 0) panic("Failed to initialize kernel heap.");
+	//if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
+	//if (kmalloc_init() != 0) panic("Failed to initialize kernel heap.");
 
-	// VGA TTY
-	if (tty_init() != 0) panic("Failed to initalize TTY driver.");
-	tty_puts("kern.\n\n");
-
-	if (timer_init() != 0) panic("Failed to initialize timer.");
-	if (syscall_init() != 0) panic("Failed to initialize syscalls.");
-	if (task_init() != 0) panic("Failed to initialize tasking.");
+	//if (timer_init() != 0) panic("Failed to initialize timer.");
+	//if (syscall_init() != 0) panic("Failed to initialize syscalls.");
+	//if (task_init() != 0) panic("Failed to initialize tasking.");
 
 	// TODO: Load & run /sbin/init
 

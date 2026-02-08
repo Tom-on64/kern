@@ -1,0 +1,13 @@
+Bootup Sequence
+===============
+
+When the system boots, the bootloader will look for a kernel image and init ram
+disk. It will do some basic setup, load these into memory and hand over control.
+Since kern uses a µ-kernel, it only contains the minimal number of device
+drives that it must. One of these is a ramfs/tmpfs driver. It uses this driver
+to load and execute a program at '/init' inside the initrd as process 1. This
+process is then responsable for running things like a disk & filesystem server
+that loads the actual OSes root filesystem. Usually it would also replace
+iself with '/sbin/init' from the root filesystem that would finish initialization
+and do things like launching a login shell, etc.
+

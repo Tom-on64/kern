@@ -3,24 +3,24 @@
 #include <gdt.h>
 #include <idt.h>
 
-__align(16) // performace :fire:
+__align(16) // performace 
 static struct idt_entry idt[IDT_ENTRIES];
 static struct idt_pointer idtp;
 
-void idt_set_gate(uint8_t i, void* handler, uint8_t flags) {
-	uint32_t offset = (uint32_t)handler;
-	struct idt_entry* entry = &idt[i];
-	
-	entry->offset_low = (uint16_t)offset;
-	entry->selector = GDT_KERNEL_CODE;
-	entry->flags = flags;
-	entry->offset_high = (uint16_t)(offset >> 16);
+void idt_set_gate(uint8_t i, void* handler, uint8_t attrib) {
+	size_t addr = (size_t)handler;
+	idt[i].offset_low = (uint16_t)addr;
+	idt[i].selector = GDT_KERNEL_CODE;
+	idt[i].ist = 0;
+	idt[i].__reserved = 0;
+	idt[i].attrib = attrib;
+	idt[i].offset_mid = (uint16_t)(addr >> 16);
+	idt[i].offset_high = (uint32_t)(addr >> 32);
 }
 
 int idt_init(void) {
-	memset(&idt, 0, sizeof(idt));
-	idtp.limit = sizeof(idt);
-	idtp.base = (uint32_t)&idt;
+	idtp.size = sizeof(idt) - 1;
+	idtp.offset = (size_t)&idt;
 
 	// Load IDT instruction
 	__asm__ volatile ("lidt %0" : : "m"(idtp));

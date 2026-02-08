@@ -2,60 +2,25 @@
 #define _BOOTLOADER_H
 
 #include <kernel.h>
+#include <limine.h>
 
-// Boot protocols
-#define BOOT_UNKNOWN	0	// Unknown
-#define BOOT_MB1	1	// MultiBoot 1
-#define BOOT_MB2	2	// MultiBoot 2
-#define BOOT_LIMINE	3	// Limine
+struct bootloader {
+	size_t hhdm_offset;
+	size_t kernel_virt_base;
+	size_t kernel_phys_base;
+	size_t mm_total;
+	uint64_t mm_entry_count;
+	LIMINE_PTR(struct limine_memmap_entry**) mm_entries;
+	uint64_t fb_entry_count;
+	LIMINE_PTR(struct limine_framebuffer**) fb_entries;
+};
 
-// Memmap region types
-#define BOOT_MMAP_AVAILABLE	1
-#define BOOT_MMAP_RESERVED	2
-#define BOOT_MMAP_ACPI_RECLAIM	3
-#define BOOT_MMAP_NVS		4
-#define BOOT_MMAP_BADRAM	5
+extern struct bootloader bootloader;
 
-#define BOOT_MAX_MMAP_ENTRIES	128
+#define IS_INSIDE_HHDM(_addr) \
+	((size_t)(_addr) >= bootloader.hhdm_offset &&	\
+	 (size_t)(_addr) <= (bootloader.hhdm_offset + bootloader.mm_total))
 
-// A memory map entry
-struct boot_memmap {
-	uint64_t base;	// Memory region address
-	uint64_t size;	// Memory region length
-	uint8_t  type;	// Memory region type
-} __packed;
-
-/*
- * Some values may not be provided by the bootloader, in this case
- * pointers will be NULL and integer values will be 0 if applicable.
- * Some unprovided values may also be implied. Eg.:
- * 	If 'memmap = NULL' then 'memmap_size' doesn't matter. 
-
- */
-struct boot_info {
-	uint32_t mem_lower;
-	uint32_t mem_upper;
-	uint8_t  boot_drive;
-	uint8_t  boot_part1;
-	uint8_t  boot_part2;
-	uint8_t  boot_part3;
-	struct   boot_memmap* memmap;
-	size_t   memmap_size;
-	char*    cmdline;
-	char*    bootname;
-} __packed;
-extern struct boot_info bootloader;
-
-/*
- * This functions arguments depend on the boot protocol provided.
- * This is the reason for the varargs thing. It runs on of the functions
- * defined after it.
- */
-int boot_init(int type, ...);
-
-int boot_init_mb1(void* ptr, uint32_t magic);
-// TODO:
-// int boot_init_mb2(...);
-// int boot_init_limine(...);
+int boot_init(void);
 
 #endif

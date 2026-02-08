@@ -7,7 +7,7 @@
 extern bitmap_t pmm_bitmap;
 
 int pmm_init(void);
-uint32_t pmm_alloc(void);
-void pmm_free(uint32_t page);
+size_t pmm_alloc(void);
+void pmm_free(size_t page);
 
 #endif

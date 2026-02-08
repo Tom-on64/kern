@@ -1,86 +1,49 @@
 #include <bootloader.h>
-#include <multiboot.h>
 #include <kernel.h>
-#include <string.h>
+#include <limine.h>
 
-struct boot_memmap memmap[BOOT_MAX_MMAP_ENTRIES];
-struct boot_info bootloader;
+struct bootloader bootloader = { 0 };
 
-// TODO:
-int boot_init(int type, ...) {
-	va_list va;
-	va_start(va, type);
+static struct limine_paging_mode_request lim_paging_req = {
+	.id = LIMINE_PAGING_MODE_REQUEST,
+	.revision = 4,
+	.mode = LIMINE_PAGING_MODE_X86_64_4LVL,
+};
 
-	void* ptr = va_arg(va, void*);
-	uint32_t magic = va_arg(va, uint32_t);
+static struct limine_kernel_address_request lim_kaddr_req =
+	{ .id = LIMINE_KERNEL_ADDRESS_REQUEST, .revision = 4 };
 
-	switch (type) {
-	case BOOT_MB1: return boot_init_mb1(ptr, magic);
-	}
-	
-	return 1;
-}
+static struct limine_hhdm_request lim_hhdm_req = 
+	{ .id = LIMINE_HHDM_REQUEST, .revision = 4 };
 
-int boot_init_mb1(void* ptr, uint32_t magic) {
-	multiboot_info_t* mbi = ptr;
+static struct limine_memmap_request lim_memmap_req =
+	{ .id = LIMINE_MEMMAP_REQUEST, .revision = 4 };
 
-	if (magic != MULTIBOOT_BOOTLOADER_MAGIC) return 1;
+static struct limine_framebuffer_request lim_fbuf_req =
+	{ .id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0 };
 
-	// mem_* fields are valid
-	if (mbi->flags & MULTIBOOT_INFO_MEMORY) {
-		bootloader.mem_lower = mbi->mem_lower;
-		bootloader.mem_upper = mbi->mem_upper;
-	}
+int boot_init(void) {
+	struct limine_paging_mode_response* lim_paging_res = lim_paging_req.response;
+	struct limine_kernel_address_response* lim_kaddr_res = lim_kaddr_req.response;
+	struct limine_hhdm_response* lim_hhdm_res = lim_hhdm_req.response;
+	struct limine_memmap_response* lim_memmap_res = lim_memmap_req.response;
+	struct limine_framebuffer_response* lim_fbuf_res = lim_fbuf_req.response;
 
-	// boot_device is valid
-	if (mbi->flags & MULTIBOOT_INFO_BOOTDEV) {
-		bootloader.boot_drive = (mbi->boot_device & 0xff000000) >> 24;
-		bootloader.boot_part1 = (mbi->boot_device & 0x00ff0000) >> 16;
-		bootloader.boot_part2 = (mbi->boot_device & 0x0000ff00) >> 8;
-		bootloader.boot_part3 = (mbi->boot_device & 0x000000ff);
-	}
+	if (lim_paging_res->mode != LIMINE_PAGING_MODE_X86_64_4LVL) return 1;
+	bootloader.hhdm_offset = lim_hhdm_res->offset;
+	bootloader.kernel_phys_base = lim_kaddr_res->physical_base;
+	bootloader.kernel_virt_base = lim_kaddr_res->virtual_base;
+	bootloader.mm_entries = lim_memmap_res->entries;
+	bootloader.mm_entry_count = lim_memmap_res->entry_count;
 
-	// cmdline is valid
-	if (mbi->flags & MULTIBOOT_INFO_CMDLINE) {
-		bootloader.cmdline = (char*)mbi->cmdline;
+	bootloader.mm_total = 0;
+	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
+		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
+		if (entry->type != LIMINE_MEMMAP_USABLE) bootloader.mm_total += entry->length;
 	}
 
-	// TODO: mods
-	// TODO: a.out symbol table
-	// TODO: ELF symbol table
-	
-	// mmap_* fields are valid
-	if (mbi->flags & MULTIBOOT_INFO_MEM_MAP) {
-		bootloader.memmap = &memmap[0];
-
-		size_t i = 0;
-		multiboot_memory_map_t* entry = (multiboot_memory_map_t*)mbi->mmap_addr;
-		uint32_t limit = mbi->mmap_addr + mbi->mmap_length;
-
-		while ((uint32_t)entry < limit) {
-			bootloader.memmap[i].base = entry->addr;
-			bootloader.memmap[i].size = entry->len;
-			bootloader.memmap[i].type = (uint8_t)entry->type;
-
-			entry++;
-			i++;
-		}
-		bootloader.memmap_size = i;
-	}
-
-	// TODO: drives_*
-	// TODO: config_table
-
-	// boot_loader_name is valid
-	if (mbi->flags & MULTIBOOT_INFO_BOOT_LOADER_NAME) {
-		bootloader.bootname = (char*)mbi->boot_loader_name;
-	}
-
-	// TODO: APM table
-	// TODO: VBE table
-	// TODO: Framebuffer
-	
-	debugf("[boot] Initiated with MultiBoot 1\n");
+	bootloader.fb_entries = lim_fbuf_res->framebuffers;
+	bootloader.fb_entry_count = lim_fbuf_res->framebuffer_count;
 
 	return 0;
 }

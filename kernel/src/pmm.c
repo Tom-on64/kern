@@ -1,3 +1,4 @@
+#include "bitmap.h"
 #include <bootloader.h>
 #include <kernel.h>
 #include <paging.h>
@@ -8,82 +9,65 @@
 bitmap_t pmm_bitmap;
 
 int pmm_init(void) {
-	// Full 32-bit address space
-	pmm_bitmap.membase = 0x00000000;
-	pmm_bitmap.blocks = 0x100000;	// 0xFFFFFFFF / BLOCK_SIZE
-	pmm_bitmap.bytes = 0x20000;	// blocks / 8
-	pmm_bitmap.map = NULL;
+	pmm_bitmap.blocks = dceil(bootloader.mm_total, BLOCK_SIZE);
+	pmm_bitmap.bytes = dceil(pmm_bitmap.blocks, 8);
 
 	// # of pagetabs required to map the bitmap 
 	size_t ptcount = dceil(dceil(pmm_bitmap.bytes, PAGE_SIZE), 1024);
 
 	// Find enough space for the bitmap
-	struct boot_memmap* mmap;
-	int found = 0;
-	for (size_t i = 0; i < bootloader.memmap_size; i++) {
-		mmap = &bootloader.memmap[i];
+	struct limine_memmap_entry* mm = NULL;
+	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
+		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
 
-		if (mmap->type == BOOT_MMAP_AVAILABLE && mmap->size >= pmm_bitmap.bytes) {
-			found = 1;
-			break;
-		}
+		if (entry->type != LIMINE_MEMMAP_USABLE || entry->length < pmm_bitmap.bytes) continue;
+		mm = entry;
 	}
-	if (!found) return 1; // Not enough memory
 
-	uint32_t page_frame_start = mmap->base;
-	pag_register_temp_frame(page_frame_start);
-	mmap->base += ptcount * PAGE_SIZE;
-	
-	uint32_t bitmap_start = KERNEL_HEAP_BASE - dceil(pmm_bitmap.bytes, PAGE_SIZE) * PAGE_SIZE;
-	uint32_t bitmap_start_phys = mmap->base;
-	pmm_bitmap.map = (void*)bitmap_start;
-
-	size_t page_count = dceil(pmm_bitmap.bytes, PAGE_SIZE);
-	for (size_t i = 0; i < page_count; i++) {
-		// NOTE: We can't unmap this with pag_umap(), it's in a tempFrame
-		pag_map(bitmap_start + i * PAGE_SIZE, mmap->base + i * PAGE_SIZE, 0);
+	if (!mm) {
+		debugf("[pmm] Not enough memory! Needs %d bytes.\n", pmm_bitmap.bytes);
+		return 1;
 	}
+
+	size_t bitmap_start_phys = mm->base;
+	pmm_bitmap.map = (void*)(bitmap_start_phys + bootloader.hhdm_offset);
 
 	// Set all blocks as used
 	bmap_set_all(&pmm_bitmap, 1);
 
 	debugf("[pmm] Memory map:\n"); // Use the loop to also print the memmap
+	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
+		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
+		if (entry->length == 0) continue; // Ignore dummy entries
 
-	for (size_t i = 0; i < bootloader.memmap_size; i++) {
-		mmap = &bootloader.memmap[i];
-		if (mmap->size == 0) continue; // Ignore dummy entries
-
-		if (mmap->type == BOOT_MMAP_AVAILABLE) {
-			bmap_set_area(&pmm_bitmap, mmap->base, mmap->size, 0);
+		if (entry->type == LIMINE_MEMMAP_USABLE) {
+			bmap_set_area(&pmm_bitmap, entry->base, entry->length, 0);
 		}
 
 		// Print entry
 		debugf("\tRegion %2d: 0x%08x - 0x%08x (%d bytes) %s\n",
-			i + 1, mmap->base, mmap->base + mmap->size - 1, mmap->size, 
-			(mmap->type == BOOT_MMAP_AVAILABLE) ? "AVAILABLE" : "RESERVED");
+			i + 1, entry->base, entry->base + entry->length - 1, entry->length, 
+			(entry->type == LIMINE_MEMMAP_USABLE) ? "AVAILABLE" : "RESERVED");
 	}
-
 	bmap_set_area(&pmm_bitmap, bitmap_start_phys, pmm_bitmap.bytes, 1);
-	bmap_set_area(&pmm_bitmap, page_frame_start, ptcount * PAGE_SIZE, 1);
+	pmm_bitmap.used = 0;
 
-	bmap_set(&pmm_bitmap, 0, 1); // Reserve block 0 - NULL page
-
-	// Beatifull print statement :)
+	// Beatiful print statement :)
 	debugf(
 		"[pmm] Physical memory manager initialized.\n"
 		"\tAvailable memory: %d blocks free (%d bytes)\n"
-		"\tBitmap at 0x%08x mapped to 0x%08x\n"
+		"\tBitmap at 0x%08x in physical memory\n"
 		"\tBitmap is %d bytes contained in %d pages\n",
 		pmm_bitmap.blocks - pmm_bitmap.used,
 		(pmm_bitmap.blocks - pmm_bitmap.used) * BLOCK_SIZE,
-		bitmap_start_phys, bitmap_start, pmm_bitmap.bytes, page_count
+		bitmap_start_phys, pmm_bitmap.bytes
 	      );
 
 	pmm_bitmap.ready = 1;
 	return 0;
 }
 
-uint32_t pmm_alloc(void) {
+size_t pmm_alloc(void) {
 	if (pmm_bitmap.blocks - pmm_bitmap.used == 0) return 0;
 
 	size_t base = bmap_get_area(&pmm_bitmap, 1, 0);
@@ -91,10 +75,10 @@ uint32_t pmm_alloc(void) {
 	
 	bmap_set(&pmm_bitmap, base, 1);
 
-	return (uint32_t)bmap_ptr(&pmm_bitmap, base);
+	return (size_t)bmap_ptr(&pmm_bitmap, base);
 }
 
-void pmm_free(uint32_t page) {
+void pmm_free(size_t page) {
 	size_t base = page / BLOCK_SIZE;
 	bmap_set_area(&pmm_bitmap, base, 1, 0);
 	bmap_set(&pmm_bitmap, 0, 1);

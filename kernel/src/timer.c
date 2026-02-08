@@ -1,8 +1,7 @@
 #include <kernel.h>
 #include <system.h>
-#include <sched.h>
+//#include <sched.h>
 #include <isr.h>
-#include <tty.h>
 
 #include <timer.h>
 
@@ -44,6 +43,6 @@ void pit_handler(struct isr_int_frame* iframe) {
 	timer_ticks++;
 
 	// TODO: This assumes the timer is at 1000 Hz
-	if (timer_ticks % SCHED_QUANTUM == 0) schedule();
+	//if (timer_ticks % SCHED_QUANTUM == 0) schedule();
 }
 
