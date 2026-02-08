@@ -15,8 +15,6 @@ CCFLAGS = -Wall -Wextra -m64 -ffreestanding -fcommon -Iinclude \
 	  -fno-stack-protector \
 	  -mno-mmx \
 	  -mno-80387 \
-	  -mno-sse \
-	  -mno-sse2 \
 	  -mno-red-zone \
 	  -nostartfiles \
 	  -nostdlib \
