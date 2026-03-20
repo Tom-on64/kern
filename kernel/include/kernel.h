@@ -29,22 +29,37 @@ typedef __builtin_va_list va_list;
 /*
  * Utility macros
  */
+
+// Assertions
 #define STATIC_ASSERT(_cond, _msg)\
 	typedef int static_assert_##_msg[(_cond) ? 1 : -1]
 
+// Array
 #define ARRAY_SIZE(_a)	(sizeof((_a)) / sizeof((_a)[0]))
-#define BIT(_n)		(1UL << (_n))
-#define BIT_MASK(_n)	(BIT(_n) - 1)
-#define ALIGN(_x, _a)	__ALIGN_MASK((_x), (typeof(_x))(_a) - 1)
-#define __ALIGN_MASK(_x, _m) (((_x) + (_m)) & ~(_m))
+#define array_sizeof	ARRAY_SIZE
 #define container_of(_p, _t, _m) \
 	((_t*)((char*)(_p) - offsetof(_t, _m)))
+
+// Align
+#define ALIGN(x, a)              __ALIGN_MASK((x), (typeof(x))(a) - 1)
+#define ALIGN_DOWN(x, a)         ((x) & ~((typeof(x))(a) - 1))
+#define __ALIGN_MASK(x, mask)    (((x) + (mask)) & ~(mask))
+#define PTR_ALIGN(p, a)          ((typeof(p))ALIGN((unsigned long)(p), (a)))
+#define PTR_ALIGN_DOWN(p, a)     ((typeof(p))ALIGN_DOWN((unsigned long)(p), (a)))
+
+// Bit
+#define BIT(_n)		(1UL << (_n))
+#define BIT_MASK(_n)	(BIT(_n) - 1)
+
+// Math
 #define swap(_a, _b)	({ typeof(_a) _tmp = (_a); (_a) = (_b); (_b) = (_a); })
 #define min(_x, _y)	({ typeof(_x) __x = (_x); typeof(_y) __y = (_y); __x < __y ? __x : __y; })
 #define max(_x, _y)	({ typeof(_x) __x = (_x); typeof(_y) __y = (_y); __x > __y ? __x : __y; })
 #define ceil(_x, _y)	((((_x) + (_y)) (_y)) * (_y))
 #define floor(_x, _y)	((_x) - ((_x) % (_y)))
 #define dceil(_x, _y)	(((_x) + (_y) - 1) / (_y))
+
+// Misc
 #define fence()		__asm__ volatile ("":::"memory")
 
 /*
@@ -74,10 +89,14 @@ typedef signed char	int8_t;
 typedef signed short	int16_t;
 typedef signed int	int32_t;
 typedef signed long	int64_t;
+
 typedef uint64_t	size_t;
 typedef int64_t		ssize_t;
+
 typedef uint64_t	uintptr_t;
 typedef int64_t		intptr_t;
+
+typedef uint64_t	offset_t;
 
 /*
  * Boolean
