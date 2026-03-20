@@ -469,6 +469,7 @@ struct LIMINE_MP(request) {
 #  define LIMINE_MEMMAP_KERNEL_AND_MODULES 6
 #endif
 #define LIMINE_MEMMAP_FRAMEBUFFER            7
+#define LIMINE_MEMMAP_ACPI_TABLES            8
 
 struct limine_memmap_entry {
     uint64_t base;

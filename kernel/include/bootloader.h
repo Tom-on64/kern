@@ -8,7 +8,7 @@ struct bootloader {
 	size_t hhdm_offset;
 	size_t kernel_virt_base;
 	size_t kernel_phys_base;
-	size_t mm_total;
+	size_t mm_total_memory;
 	uint64_t mm_entry_count;
 	LIMINE_PTR(struct limine_memmap_entry**) mm_entries;
 	uint64_t fb_entry_count;
