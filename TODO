@@ -1,35 +1,65 @@
 TODO
 ====
 
-[x] Boot
-[x] Multiboot 1
-[x] IDT
-[x] ISRs
+Architectural Milestones
+[-] 64-bit rewrite
+[x] Limine (Bootloader)
+[ ] Decent build system (Makefile/CMake with cross-compiler)
+[ ] kernel.h rewrite & header cleanup
+[ ] debugf() cleanup & kprintf() (Standardized logging levels)
+
+Low-Level Hardware & Interrupts
 [x] GDT
-[x] Physical MM
-[x] Virtual MM
-[x] Paging
-[x] Serial monitor
-[x] kmalloc()
-[x] Make dedicated asm functions like lidt(), sti(), ...
-[ ] Add something like <errno.h> in the kernel
-[ ] Improve kmalloc() to reduce fragmentation
-[ ] Improve kmalloc() for better alignment
-[x] PIT
-[ ] RTC
-[ ] HPET
-[x] System calls
-[ ] Separate syscall sources into individual files
-[ ] Userspace
-[x] Processes/Tasks
-[x] Scheduler
-[ ] Priority scheduler
-[x] Task switching
-[ ] Interprocess communication
-[ ] ALL the message types
-[ ] Graphics
-[ ] Multicore support
-[ ] Networking :)
-[ ] Finish all the TODOs
-[ ] Run DOOM
+[x] IDT
+[x] Basic IRQs (Internal/Legacy)
+[ ] Proper fault handling (Exceptions, Page Faults, #GP)
+[ ] Check for features with CPUID (NX-bit, SSE, AVX)
+[ ] APIC driver (Local APIC & I/O APIC)
+[ ] ACPI driver (Parsing RSDP/MADT for multi-core/APIC)
+[ ] HPET driver (High precision timing)
+
+Memory Management
+[x] Physical memory manager (Bitmap or Buddy)
+[x] Paging (Recursive or Offset mapping)
+[ ] Kernel heap (kmalloc/kfree - Linked list or Slab)
+[ ] Memory mapped I/O (MMIO) API for drivers
+[ ] VMM: Shared memory regions (For IPC/Framebuffers)
+[ ] VMM: Copy-on-Write (COW) support (Optional but good)
+
+Multitasking & User Space
+[ ] System calls (SYSCALL/SYSRET implementation)
+[ ] Context switching (Saving/Restoring CPU state)
+[ ] Tasking (Thread/Process control blocks)
+[ ] Scheduler (Round Robin or Priority-based)
+[ ] User-space stacks & privilege isolation (Ring 3)
+[x] Stack Smash Protector
+
+Interprocess Communication
+[ ] Interprocess Communication (Sync/Async messaging)
+[ ] Capability-based security (Optional: basic handle system)
+[ ] Signal/Event system (Interrupt forwarding to user space)
+
+Bootstrapping & Filesystem
+[ ] USTAR parser (Read initrd.tar)
+[ ] Initrd integration (Loading modules via Limine)
+[ ] ELF parser (Loading PT_LOAD segments)
+[ ] /init (The first user-space process)
+[ ] VFS Server (Abstracting file requests via IPC)
+
+Drivers & IO
+[x] Serial driver (For kernel debugging)
+[-] Framebuffer driver (Basic LFB/GOP)
+[ ] PS/2 Keyboard driver (As a user-space server)
+[ ] PCI Bus Enumerator (The "parent" of hardware drivers)
+[ ] Storage driver (SATA/AHCI or VirtIO)
+
+The Final TODOs
+[ ] Run DOOM (Requires: VFS, Input, Timer, LibC, and Graphics)
+[-] Finish all the TODOs
+
+Legend
+------
+[ ] Not finished
+[-] In progress
+[x] Finished
 

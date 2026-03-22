@@ -4,23 +4,36 @@ kern.
 Idk why i called it that it was 3am and i needed sleep.
 
 !! WARNING !!
-Kern is being rewritten at the moment. To see the last version before the rewrite, see commit 11feab5 on master.
-(https://github.com/Tom-on64/kern/tree/11feab5)
+Kern is being rewritten at the moment. To see the last version before the
+rewrite, see commit 11feab5 on master. (https://github.com/Tom-on64/kern/tree/11feab5)
 
 About
 -----
-Kern is a 32-bit OS based on the x86 architecture written in NASM Assembly and C. 
-It attempts to be a µ-kernel, although i have no clue what i'm doing.
+Kern is a 64-bit OS based on the x86_64 architecture written in C & NASM
+Assembly. It attempts to be a µ-kernel, although i have no clue what i'm doing.
 
 Dependencies
 ------------
-* binutils that can target i386-elf
-* sfdisk
-* GCC that can target i386-elf
+* binutils that can target x86_64-elf
+* GCC that can target x86_64-elf
 * Limine
 * make
 * Mtools
 * NASM
+* OpenSSL
+* sfdisk
+* QEMU (for emulation)
+
+Building
+--------
+Building should be as easy as running:
+	$ make
+If it says that a command was not found, check that the utilities are correctly
+defined in config.mk.
+
+If you want to emulate it with QEMU, you can run:
+	$ make qemu
+
 
 Old Version: https://github.com/Tom-on64/old-kern
 
