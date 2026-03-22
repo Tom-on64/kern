@@ -1,3 +1,5 @@
+#include "paging.h"
+#include "pmm.h"
 #include <kernel.h>
 #include <string.h>
 #include <gdt.h>

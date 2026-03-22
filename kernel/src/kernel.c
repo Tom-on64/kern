@@ -1,4 +1,5 @@
 #include <bootloader.h>
+#include <kmalloc.h>
 #include <paging.h>
 #include <serial.h>
 #include <splash.h>
