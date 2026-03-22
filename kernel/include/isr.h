@@ -15,7 +15,7 @@ struct isr_int_frame {
 
 	// Pushed by CPU
 	uint64_t rip, cs, rflags, user_rsp, user_ss;
-};
+} __packed;
 typedef void (*isr_handler_ptr)(struct isr_int_frame* iframe);
 
 int  isr_init(void);
