@@ -29,6 +29,7 @@ DS_Store
 /.clangd
 /.cache
 /compile_commands.json
+.ssp
 
 # Logs
 *.log

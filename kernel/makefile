@@ -9,24 +9,24 @@ OBJS_C = $(patsubst $(SRC)/%.c, $(BIN)/%.c.o, $(SRCS_C))
 OBJS_S = $(patsubst $(SRC)/%.s, $(BIN)/%.s.o, $(SRCS_S))
 OUT = $(SYSROOT)/boot/kernel.elf
 LINKER = ./linker.ld
-
-# Stack Canary
-SSP := 0x$(shell openssl rand -hex 8)
-CCFLAGS += -DSTACK_CHK_GUARD=$(SSP)
+SSP = ./.ssp
 
 .PHONY: all clean
 all: $(OUT)
 $(OUT): $(OBJS_C) $(OBJS_S)
 	$(LD) $(LDFLAGS) -T$(LINKER) -o $@ $^
 
-$(BIN)/%.c.o: $(SRC)/%.c
+$(BIN)/%.c.o: $(SRC)/%.c $(SSP)
 	@mkdir -p $(dir $@)
-	$(CC) $(CCFLAGS) -I$(INC) -c -o $@ $^
+	$(CC) $(CCFLAGS) -DSTACK_CHK_GUARD=$(shell cat $(SSP)) -I$(INC) -c -o $@ $<
 
 $(BIN)/%.s.o: $(SRC)/%.s
 	@mkdir -p $(dir $@)
-	$(AS) $(ASFLAGS) -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $<
+
+$(SSP):
+	echo "0x$$(openssl rand -hex 8)UL" > $(SSP)
 
 clean:
-	rm -fr $(BIN) $(OUT)
+	rm -fr $(BIN) $(OUT) $(SSP)
 

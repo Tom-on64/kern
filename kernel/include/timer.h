@@ -14,11 +14,8 @@
 int  timer_init(void);
 void timer_wait(size_t ticks);
 
-int  pit_init(void);
-void pit_phase(uint8_t ch, uint8_t mode, uint32_t hz);
-void pit_handler(struct isr_int_frame* iframe);
+int hpet_init(void);
 
 // TODO: rtc_init(void);
-// TODO: hpet_init(void);
 
 #endif

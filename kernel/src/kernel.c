@@ -1,15 +1,13 @@
 #include <bootloader.h>
-#include <kernel.h>
-#include <limine.h>
 #include <paging.h>
 #include <serial.h>
 #include <splash.h>
 #include <system.h>
-#include <timer.h>
 #include <gdt.h>
-#include <idt.h>
-#include <isr.h>
 #include <pmm.h>
+#include <isr.h>
+
+#include <kernel.h>
 
 __noreturn
 void _start(void) {
@@ -35,16 +33,8 @@ void _start(void) {
 	// Memory management
 	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
 	if (pag_init() != 0) panic("Failed to initalize Paging.");
-	//if (kmalloc_init() != 0) panic("Failed to initialize kernel heap.");
 
-	// Tasking
-	//if (timer_init() != 0) panic("Failed to initialize timer.");
-	//if (syscall_init() != 0) panic("Failed to initialize syscalls.");
-	//if (task_init() != 0) panic("Failed to initialize tasking.");
-
-	// TODO: Load & run /sbin/init
-
-	// We don't want to halt
+	// Patiently wait for things to do :)
 	while (1);
 }
 
