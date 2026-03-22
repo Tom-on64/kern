@@ -1,0 +1,63 @@
+How paging works
+================
+NOTE: This is mainly so I can wrap my head around paging.
+
+Table levels
+------------
+Since 2^64 is quite a large number, paging uses a bunch of tables to organize
+& navigate pages. These are also called layers & 4-layer paging is most common.
+* Level 1 - Page Table (PT)
+* Level 2 - Page Directory (PD)
+* Level 3 - Page Directory Pointer Table (PDPT)
+* Level 4 - Page Map Layer 4 (PML4)
+* Level 5 - Page Map Layer 5 (PML5) (optional)
+
+Virtual address
+---------------
+A 64-bit virtual address has four parts:
+* 47-39 - PML4 index
+* 38-30 - PDPT index
+* 29-21 - PD index
+* 20-12 - PT index
+* 11-0  - 4 kiB page offset
+
+Note that the top 16 bits are unused. These must always be all 0s or all 1s.
+
+Walking the tables
+------------------
+Here are the steps that the MMU will take to translate an address:
+1. Find the physical address of the PML4 in the CR3 register
+2. Index the PML4 with bits 47-39 to find the paddr of the PDPT
+3. Index the PDPT with bits 38-30 to find the paddr of the PD
+4. Index the PD with bits 29-21 to find the paddr of the PT
+5. Index the PT with bits 20-12 to find the paddr of the Page
+6. Offset the Page address by bits 11-0 to find the actual byte
+
+The flags
+---------
+Since all physical addresses in these tables MUST be page (4 kiB) aligned, the
+bottom 12 bits will always be zero. These bits are used to store Page Table
+Entry (PTE) flags. Since the 64-bit address space is SO large, bits 52-63 are
+also used for flags. Here's how a PTE entry looks:
+* 0 - Present, 0 - page fault, 1 - page is in RAM
+* 1 - Writable, 0 - read-only, 1 - read & write
+* 2 - Userspace, 0 - kernel only, 1 - user & kernel
+* 3 - Page-level write-through caching
+* 4 - Page-level cache disable
+* 5 - Accesed, set by CPU when page is read or written to
+* 6 - Dirty, set by CPU when page is written to (level 1 only)
+* 7 - Page size, 0 - 4 kiB, 1 - 2 MiB or 1 GiB
+* 8-11 and 52-62 - Available to be used by kernel
+* 63 - No execute, 0 - executable, 1 - not executable
+
+There are some flags that only apply to certain levels and page sizes, Please
+see the diagram at https://wiki.osdev.org/Paging for more info.
+
+Large pages
+-----------
+I don't know man.
+
+Caching
+-------
+I couldn't tell ya.
+
