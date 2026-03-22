@@ -59,7 +59,7 @@ int pag_init(void) {
 	debugf("[pag] Switching to kernel PML4 at %p.\n", pag_kernel_pml4);
 	pag_set_pml4(pag_kernel_pml4);
 
-	debugf("[pag] Paging initialized.");
+	debugf("[pag] Paging initialized.\n");
 	return 0;
 }
 

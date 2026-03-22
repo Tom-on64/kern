@@ -7,9 +7,9 @@
 #include <pmm.h>
 
 uint64_t* pmm_head = NULL;
+size_t pmm_total_mem = 0;
 
 int pmm_init(void) {
-	size_t total_mem = 0;
 
 	debugf("[pmm] Physical memory map:\n"); // We're gonna use the loop to also print the memmap
 	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
@@ -34,22 +34,40 @@ int pmm_init(void) {
 			uint64_t* addr = TO_VIRT(entry->base) + offset;
 			*addr = (uint64_t)pmm_head;
 			pmm_head = addr;
-			total_mem += PAGE_SIZE;
+			pmm_total_mem += PAGE_SIZE;
 		}
 	}
 
-	debugf("[pmm] %d bytes of available memory.\n", total_mem);
+	debugf("[pmm] %d bytes of available memory.\n", pmm_total_mem);
 
 	return 0;
 }
 
 void* pmm_alloc() {
+	if (pmm_head == NULL) {
+		debugf("[pmm] Could not allocate page, not enough memory.\n");
+		return NULL;
+	}
 	uint64_t* addr = pmm_head;
+	if ((uintptr_t)addr % PAGE_SIZE != 0) {
+		debugf("[pmm] Tried to allocate non-aligned page.\n");
+		// It may fix itself if a page gets freed
+		// panic("pmm_head corrupted."); 
+		return NULL;
+	}
 	pmm_head = (uint64_t*)(*addr);
 	return TO_PHYS(addr);
 }
 
 void pmm_free(void* page) {
+	if (page == NULL) {
+		debugf("[pmm] Tried to free NULL.\n");
+		return;
+	}
+	if ((uintptr_t)page % PAGE_SIZE != 0) {
+		debugf("[pmm] Tried to free non-aligned page.\n");
+		return;
+	}
 	uint64_t* addr = TO_VIRT(page);
 	*addr = (uint64_t)pmm_head;
 	pmm_head = addr;
