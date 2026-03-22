@@ -34,7 +34,10 @@ void _start(void) {
 
 	// Memory management
 	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
-	if (pag_init() != 0) panic("Failed to initalize Paging.");
+	void* paddr = pmm_alloc();
+	pmm_free(paddr);
+
+	//if (pag_init() != 0) panic("Failed to initalize Paging.");
 	//if (kmalloc_init() != 0) panic("Failed to initialize kernel heap.");
 
 	// Tasking

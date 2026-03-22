@@ -30,3 +30,7 @@ DS_Store
 /.cache
 /compile_commands.json
 
+# Logs
+*.log
+/log
+
