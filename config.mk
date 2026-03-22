@@ -33,4 +33,6 @@ IMG_SIZE = 256	# 256MB
 # Qemu
 Q_MEMORY = 256M
 Q_AUDIODEV = pipewire
+Q_LOGGING = int,cpu_reset
+Q_LOGFILE = qemu.log
 

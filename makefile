@@ -44,6 +44,7 @@ $(MODULES):
 clean:
 	rm -f $(TARGET)
 	rm -fr $(SYSROOT)
+	rm -f $(Q_LOGFILE)
 	for m in $(MODULES); do $(MAKE) -C $$m clean; done
 
 qemu:
@@ -51,5 +52,6 @@ qemu:
 		-drive format=raw,file=$(TARGET),index=0,media=disk\
 		-m $(Q_MEMORY) -accel tcg -monitor stdio -net none\
 		-rtc base=localtime,clock=host,driftfix=slew\
-		-audiodev $(Q_AUDIODEV),id=audio0 -machine pcspk-audiodev=audio0
+		-audiodev $(Q_AUDIODEV),id=audio0 -machine pcspk-audiodev=audio0\
+		-d $(Q_LOGGING) -D $(Q_LOGFILE)
 

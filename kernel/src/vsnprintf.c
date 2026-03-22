@@ -124,6 +124,7 @@ int vsnprintf(char* buf, size_t n, char* fmt, va_list ap) {
 		char pad = ' ';
 		int width = 0;
 		int prec = -1;
+		int is_long = 0;
 
 		if (*fmt == '-') {
 			left = 1;
@@ -149,10 +150,22 @@ int vsnprintf(char* buf, size_t n, char* fmt, va_list ap) {
 			}
 		}
 
+		if (*fmt == 'l') {
+		    is_long = 1;
+		    fmt++;
+		    if (*fmt == 'l') { // handle ll
+			fmt++;
+		    }
+		}
+
 		switch (*fmt) {
-		case 'd': fmt_int(buf, n, &idx, va_arg(ap, int), width, pad, left); break;
-		case 'u': fmt_uint(buf, n, &idx, va_arg(ap, unsigned int), 10, width, pad, left); break;
-		case 'x': fmt_uint(buf, n, &idx, va_arg(ap, unsigned int), 16, width, pad, left); break;
+		case 'd': fmt_int(buf, n, &idx, is_long ? va_arg(ap, int64_t) : va_arg(ap, int32_t), width, pad, left); break;
+		case 'u': fmt_uint(buf, n, &idx, is_long ? va_arg(ap, uint64_t) : va_arg(ap, uint32_t), 10, width, pad, left); break;
+		case 'x': fmt_uint(buf, n, &idx, is_long ? va_arg(ap, uint64_t) : va_arg(ap, uint32_t), 16, width, pad, left); break;
+		case 'p':
+			  fmt_string(buf, n, &idx, "0x", 2, 0, ' ', 0);
+			  fmt_uint(buf, n, &idx, va_arg(ap, uintptr_t), 16, 16, '0', 0);
+			  break;
 		case 'f': fmt_float(buf, n, &idx, va_arg(ap, double), prec, width, pad, left); break;
 		case 's': {
 			char* s = va_arg(ap, char*);
