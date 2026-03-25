@@ -3,6 +3,7 @@
 #include <limine.h>
 #include <paging.h>
 #include <serial.h>
+#include <errno.h>
 
 #include <pmm.h>
 
@@ -10,7 +11,6 @@ uint64_t* pmm_head = NULL;
 size_t pmm_total_mem = 0;
 
 int pmm_init(void) {
-
 	debugf("[pmm] Physical memory map:\n"); // We're gonna use the loop to also print the memmap
 	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
 		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
@@ -39,37 +39,29 @@ int pmm_init(void) {
 	}
 
 	debugf("[pmm] %d bytes of available memory.\n", pmm_total_mem);
+	if (pmm_total_mem == 0) return -ENOMEM;
 
-	return 0;
+	return SUCCESS;
 }
 
 void* pmm_alloc() {
-	if (pmm_head == NULL) {
-		debugf("[pmm] Could not allocate page, not enough memory.\n");
-		return NULL;
-	}
+	if (pmm_head == NULL) return ERR_PTR(-ENOMEM);
+
 	uint64_t* addr = pmm_head;
-	if ((uintptr_t)addr % PAGE_SIZE != 0) {
-		debugf("[pmm] Tried to allocate non-aligned page.\n");
-		// It may fix itself if a page gets freed
-		// panic("pmm_head corrupted."); 
-		return NULL;
-	}
+	if ((uintptr_t)addr % PAGE_SIZE != 0) panic("pmm_head corrupted.");
 	pmm_head = (uint64_t*)(*addr);
+
 	return TO_PHYS(addr);
 }
 
-void pmm_free(void* page) {
-	if (page == NULL) {
-		debugf("[pmm] Tried to free NULL.\n");
-		return;
-	}
-	if ((uintptr_t)page % PAGE_SIZE != 0) {
-		debugf("[pmm] Tried to free non-aligned page.\n");
-		return;
-	}
+int pmm_free(void* page) {
+	if (page == NULL || IS_ERR(page)) return -EFAULT;
+	if ((uintptr_t)page % PAGE_SIZE != 0) return -EALIGN;
+
 	uint64_t* addr = TO_VIRT(page);
 	*addr = (uint64_t)pmm_head;
 	pmm_head = addr;
+
+	return SUCCESS;
 }
 

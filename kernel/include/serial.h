@@ -18,6 +18,7 @@ int  serial_rcvd(int dev);
 char serial_recv(int dev);
 void serial_write(int dev, char* buf, size_t len);
 void serial_puts(int dev, char* s);
+void serial_cls(int dev);
 
 int debugf(char* fmt, ...);
 int vdebugf(char* fmt, va_list args);

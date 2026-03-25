@@ -2,6 +2,7 @@
 #include <serial.h>
 #include <string.h>
 #include <system.h>
+#include <errno.h>
 #include <idt.h>
 #include <isr.h>
 
@@ -64,24 +65,23 @@ void pic_remap(void) {
 int isr_init(void) {
 	memset(irq_handlers, 0, sizeof(irq_handlers));
 
-	if (idt_init() != 0) {
-		debugf("[isr] Could not load IDT.");
-		return 1;
-	}
+	idt_init();
 
 	for (int i = 0; i < 48; i++) {
 		// First 32 IRSs are exceptions (traps) and the next 16 are hardware interrupts
-		idt_set_gate(i, isr_redirect_table[i], IDT_FLAG_INT);
+		idt_set_gate(i, isr_redirect_table[i], i < 32 ? IDT_FLAG_TRAP : IDT_FLAG_INT, 0);
 	}
-	idt_set_gate(0x03, isr_redirect_table[3], IDT_FLAG_USER); // Allow breakpoints
-	idt_set_gate(0x80, isr128, IDT_FLAG_USER); // Syscall
+
+	idt_set_gate(0x02, isr_redirect_table[2], IDT_FLAG_TRAP, 2); // Use IST2 for NMIs
+	idt_set_gate(0x03, isr_redirect_table[3], IDT_FLAG_USER, 0); // Allow breakpoints
+	idt_set_gate(0x08, isr_redirect_table[8], IDT_FLAG_TRAP, 1); // Use IST1 for Double Faults
+	idt_set_gate(0x80, isr128, IDT_FLAG_USER, 0); // Syscall
 	
 	pic_remap();
 	// TODO: apic_init();
 
 	sti();
-	debugf("[isr] ISR initialized.\n");
-	return 0;
+	return SUCCESS;
 }
 
 void isr_register(uint8_t i, isr_handler_ptr handler) {

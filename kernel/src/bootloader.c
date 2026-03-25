@@ -1,14 +1,12 @@
 #include <bootloader.h>
 #include <kernel.h>
 #include <limine.h>
+#include <errno.h>
 
-/*
- * This defines our expected Limine version
- */
+// This defines our expected Limine version
 static volatile uint64_t lim_base_revision[] = LIMINE_BASE_REVISION(4);
 
-struct bootloader bootloader = { 0 };
-
+// Limine requests
 static struct limine_paging_mode_request lim_paging_req =
 	{ .id = LIMINE_PAGING_MODE_REQUEST_ID, .revision = 4,
 	  .mode = LIMINE_PAGING_MODE_X86_64_4LVL, };
@@ -28,6 +26,9 @@ static struct limine_framebuffer_request lim_fbuf_req =
 static struct limine_executable_file_request lim_exe_req =
 	{ .id = LIMINE_EXECUTABLE_FILE_REQUEST_ID, .revision = 4 };
 
+// Bootloader data struct
+struct bootloader bootloader = { 0 };
+
 int boot_init(void) {
 	if (LIMINE_BASE_REVISION_SUPPORTED(lim_base_revision) == false) panic("Unsupported Limine base revision.");
 
@@ -38,10 +39,7 @@ int boot_init(void) {
 	struct limine_framebuffer_response* lim_fbuf_res = lim_fbuf_req.response;
 	struct limine_executable_file_response* lim_exe_res = lim_exe_req.response;
 
-	if (lim_paging_res->mode != LIMINE_PAGING_MODE_X86_64_4LVL) {
-		debugf("[boot] Expected 4 level paging.\n");
-		return 1;
-	}
+	if (lim_paging_res->mode != LIMINE_PAGING_MODE_X86_64_4LVL) panic("Expected 4 level paging.");
 	bootloader.hhdm_offset = lim_hhdm_res->offset;
 	bootloader.kernel_phys_base = lim_kaddr_res->physical_base;
 	bootloader.kernel_virt_base = lim_kaddr_res->virtual_base;
@@ -58,6 +56,6 @@ int boot_init(void) {
 	bootloader.fb_entries = lim_fbuf_res->framebuffers;
 	bootloader.fb_entry_count = lim_fbuf_res->framebuffer_count;
 
-	return 0;
+	return SUCCESS;
 }
 

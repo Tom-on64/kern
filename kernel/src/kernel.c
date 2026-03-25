@@ -1,5 +1,4 @@
 #include <bootloader.h>
-#include <kmalloc.h>
 #include <paging.h>
 #include <serial.h>
 #include <splash.h>
@@ -13,10 +12,10 @@
 __noreturn
 void _start(void) {
 	// Serial console for debugging
-	if (serial_init(COM1) != 0) panic("Failed to initialize Serial driver.");
+	if (serial_init(COM1) < 0) panic("Failed to initialize Serial driver.");
 
 	// Load structures from bootloader
-	if (boot_init() != 0) panic("Failed to parse bootloader structures.");
+	if (boot_init() < 0) panic("Failed to parse bootloader structures.");
 
 	// The most important function in the world.
 	splash();
@@ -28,12 +27,12 @@ void _start(void) {
 	debugf("[kernel] CPUID_GETVENDORID: %s\n", s);
 
 	// System init
-	if (gdt_init() != 0) panic("Failed to initalize GDT.");
-	if (isr_init() != 0) panic("Failed to initalize ISRs.");
+	if (gdt_init() < 0) panic("Failed to initalize GDT.");
+	if (isr_init() < 0) panic("Failed to initalize ISRs.");
 
 	// Memory management
-	if (pmm_init() != 0) panic("Failed to initalize Physical Memory Manager.");
-	if (pag_init() != 0) panic("Failed to initalize Paging.");
+	if (pmm_init() < 0) panic("Failed to initalize Physical Memory Manager.");
+	if (pag_init() < 0) panic("Failed to initalize Paging.");
 
 	// Patiently wait for things to do :)
 	while (1);

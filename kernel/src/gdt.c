@@ -1,7 +1,6 @@
-#include "paging.h"
-#include "pmm.h"
 #include <kernel.h>
 #include <string.h>
+#include <errno.h>
 #include <gdt.h>
 
 static struct gdt_entries gdt;
@@ -105,8 +104,6 @@ int gdt_init(void) {
 	memset(&tss, 0, sizeof(tss));
 	tss_load(&tss);
 
-	debugf("[gdt] GDT loaded.\n");
-
-	return 0;
+	return SUCCESS;
 }
 

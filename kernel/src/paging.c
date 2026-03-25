@@ -3,6 +3,7 @@
 #include <limine.h>
 #include <string.h>
 #include <serial.h>
+#include <errno.h>
 #include <pmm.h>
 
 #include <paging.h>
@@ -12,19 +13,17 @@ uint64_t* pag_kernel_pml4 = NULL;
 
 int pag_init(void) {
 	pag_kernel_pml4 = TO_VIRT(pmm_alloc());
-	if (pag_kernel_pml4 == NULL) {
-		debugf("[pag] Failed to allocate kernel PML4. Not enough memory.\n");
-		return 1;
-	}
+	if (IS_ERR(pag_kernel_pml4)) return PTR_ERR(pag_kernel_pml4);
 	memset(pag_kernel_pml4, 0, PAGE_SIZE);
 
-	pag_map_region(
+	int ret = pag_map_region(
 		pag_kernel_pml4, 
 		(void*)bootloader.kernel_virt_base, 
 		(void*)bootloader.kernel_phys_base, 
 		dceil(bootloader.executable->size, PAGE_SIZE), 
 		PTE_FLAG_WRITE | PTE_FLAG_PRESENT
 	);
+	if (ret != SUCCESS) return ret;
 
 	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
 		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
@@ -48,115 +47,106 @@ int pag_init(void) {
 			continue;
 		}
 
-		pag_map_region(
+		ret = pag_map_region(
 			pag_kernel_pml4,
 			(void*)(entry->base + bootloader.hhdm_offset), (void*)entry->base,
 			dceil(entry->length, PAGE_SIZE),
 			flags | PTE_FLAG_PRESENT
 		);
+		if (ret != SUCCESS) return ret;
 	}
 
-	debugf("[pag] Switching to kernel PML4 at %p.\n", pag_kernel_pml4);
 	pag_set_pml4(pag_kernel_pml4);
 
-	debugf("[pag] Paging initialized.\n");
 	return 0;
 }
 
 uint64_t* pag_get_pte(uint64_t* pml4, void* vaddr) {
 	uintptr_t v = (uintptr_t)vaddr;
-	if (v % PAGE_SIZE != 0) {
-		debugf("[pag] Could not get PTE from non-aligned virtual address %p.\n", vaddr);
-		return NULL;
-	}
+	if (v % PAGE_SIZE != 0) return ERR_PTR(-EALIGN);
 
 	uint64_t* pdpt = pag_get_next_tab(pml4,	PML4_IDX(v));
-	if (pdpt == NULL) {
-		debugf("[pag] Could not get PTE. %p was not found in PML4.\n");
-		return NULL;
-	}
+	if (IS_ERR(pdpt)) return pdpt;
+
 	uint64_t* pd = pag_get_next_tab(pdpt, PDPT_IDX(v));
-	if (pd == NULL) {
-		debugf("[pag] Could not get PTE. %p was not found in PDPT.\n");
-		return NULL;
-	}
+	if (IS_ERR(pd)) return pd;
+
 	uint64_t* pt = pag_get_next_tab(pd, PD_IDX(v));
-	if (pt == NULL) {
-		debugf("[pag] Could not get PTE. %p was not found in PD.\n");
-		return NULL;
-	}
+	if (IS_ERR(pt)) return pt;
 
 	return &pt[PT_IDX(v)];
 }
 
 uint64_t* pag_new_pte(uint64_t* pml4, void* vaddr) {
 	uintptr_t v = (uintptr_t)vaddr;
-	if (v % PAGE_SIZE != 0) {
-		debugf("[pag] Could not create PTE for non-aligned virtual address %p.\n", vaddr);
-		return NULL;
-	}
+	if (v % PAGE_SIZE != 0) return ERR_PTR(-EALIGN);
 
 	uint64_t* pdpt = pag_new_next_tab(pml4,	PML4_IDX(v));
-	if (pdpt == NULL) {
-		debugf("[pag] Failed to create PDPT. Not enough memory.\n");
-		return NULL;
-	}
+	if (IS_ERR(pdpt)) return pdpt;
+
 	uint64_t* pd = pag_new_next_tab(pdpt, PDPT_IDX(v));
-	if (pd == NULL) {
-		debugf("[pag] Failed to create PD. Not enough memory.\n");
-		if (pdpt != NULL) pmm_free(pdpt);
-		return NULL;
-	}
+	if (IS_ERR(pd)) return pd;
+
 	uint64_t* pt = pag_new_next_tab(pd, PD_IDX(v));
-	if (pt == NULL) {
-		debugf("[pag] Failed to create PT. Not enough memory.\n");
-		if (pd != NULL) pmm_free(pd);
-		if (pdpt != NULL) pmm_free(pdpt);
-		return NULL;
-	}
+	if (IS_ERR(pt)) return pt;
 
 	return &pt[PT_IDX(v)];
 }
 
-void pag_map(uint64_t* pml4, void* vaddr, void* paddr, uint64_t flags) {
+int pag_map(uint64_t* pml4, void* vaddr, void* paddr, uint64_t flags) {
 	uintptr_t p = (uintptr_t)paddr;
-	if (p % PAGE_SIZE != 0) {
-		debugf("[pag] Could not map %p to %p. Physical address is not aligned.\n", paddr, vaddr);
-		return;
-	}
-	
-	uint64_t* page = pag_new_pte(pml4, vaddr);
-	*page = PTE_ADDR(p) | flags | PTE_FLAG_PRESENT;
+	if (p % PAGE_SIZE != 0) return -EALIGN;
+
+	uint64_t* pte = pag_new_pte(pml4, vaddr);
+	if (IS_ERR(pte)) return PTR_ERR(pte);
+
+	*pte = PTE_ADDR(p) | flags | PTE_FLAG_PRESENT;
 	pag_invalidate(vaddr);
+
+	return SUCCESS;
 }
 
-void pag_map_region(uint64_t* pml4, void* vaddr, void* paddr, size_t count, uint64_t flags) {
+int pag_map_region(uint64_t* pml4, void* vaddr, void* paddr, size_t count, uint64_t flags) {
 	for (size_t i = 0; i < count; i++) {
-		pag_map(pml4, vaddr + i * PAGE_SIZE, paddr + i * PAGE_SIZE, flags);
+		int ret = pag_map(pml4, vaddr + i * PAGE_SIZE, paddr + i * PAGE_SIZE, flags);
+		if (ret != SUCCESS) return ret;
 	}
+	return SUCCESS;
 }
 
 // TODO: This is a pmm memory leak. If all pages in a PT are unmapped, remove
 // that PT from it's PD. This applies to PDs & PDPTs too.
-void pag_unmap(uint64_t* pml4, void* vaddr) {
+int pag_unmap(uint64_t* pml4, void* vaddr) {
 	uint64_t* pte = pag_get_pte(pml4, vaddr);
+	if (IS_ERR(pte)) return PTR_ERR(pte);
+
 	*pte = 0;
 	pag_invalidate(vaddr);
+
+	return SUCCESS;
 }
 
-void pag_unmap_region(uint64_t* pml4, void* vaddr, size_t count) {
+int pag_unmap_region(uint64_t* pml4, void* vaddr, size_t count) {
 	for (size_t i = 0; i < count; i++) {
-		pag_unmap(pml4, vaddr + i * PAGE_SIZE);
+		int ret = pag_unmap(pml4, vaddr + i * PAGE_SIZE);
+		if (ret != SUCCESS) return ret;
 	}
+	return SUCCESS;
 }
 
-void pag_protect(uint64_t* pml4, void* vaddr, uint64_t flags) {
+int pag_protect(uint64_t* pml4, void* vaddr, uint64_t flags) {
 	uint64_t* pte = pag_get_pte(pml4, vaddr);
+	if (IS_ERR(pte)) return PTR_ERR(pte);
+
 	*pte = PTE_ADDR(*pte) | flags | PTE_FLAG_PRESENT;
+
+	return SUCCESS;
 }
 
 void* pag_get_phys(uint64_t* pml4, void* vaddr) {
 	uint64_t* pte = pag_get_pte(pml4, vaddr);
+	if (IS_ERR(pte)) return pte;
+
 	return (void*)PTE_ADDR(*pte);
 }
 
@@ -171,21 +161,20 @@ uint64_t* pag_get_pml4(void) {
 }
 
 uint64_t* pag_get_next_tab(uint64_t* tab, offset_t index) {
-	if (index >= 512 || tab == NULL) return NULL;
-	else if (tab[index] & PTE_FLAG_PRESENT) return TO_VIRT(tab[index] & PTE_ADDR_MASK);
-	else return NULL;
+	if (tab == NULL || IS_ERR(tab)) return ERR_PTR(-EFAULT);
+	if (index >= 512) return ERR_PTR(-EINVAL);
+
+	if (tab[index] & PTE_FLAG_PRESENT) return TO_VIRT(PTE_ADDR(tab[index]));
+	else return ERR_PTR(-ENOENT);
 }
 
 uint64_t* pag_new_next_tab(uint64_t* tab, offset_t index) {
-	if (tab == NULL) return NULL;
 	uint64_t* vaddr = pag_get_next_tab(tab, index);
-	if (vaddr != NULL) return vaddr;
+	if (!IS_ERR(vaddr)) return vaddr;
+	if (PTR_ERR(vaddr) != -ENOENT) return vaddr;
 
 	void* paddr = pmm_alloc();
-	if (!paddr) {
-		debugf("[pag] Failed to allocate page for new table.\n");
-		return NULL;
-	}
+	if (IS_ERR(paddr)) return paddr;
 
 	vaddr = TO_VIRT(paddr);
 	memset(vaddr, 0, PAGE_SIZE);

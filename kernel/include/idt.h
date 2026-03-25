@@ -32,6 +32,6 @@ struct idt_pointer {
 } __packed;
 
 int idt_init(void);
-void idt_set_gate(uint8_t i, void* handler, uint8_t flags);
+void idt_set_gate(uint8_t i, void* handler, uint8_t flags, uint8_t ist);
 
 #endif

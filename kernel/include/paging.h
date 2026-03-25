@@ -41,11 +41,11 @@ static inline bool pag_is_user_addr(void* vaddr) { return (uintptr_t)vaddr < 0x0
 // NOTE: All uint64_t* are VIRTUAL addresses
 int	  pag_init(void);
 uint64_t* pag_get_pte(uint64_t* pml4, void* vaddr);
-void	  pag_map(uint64_t* pml4, void* vaddr, void* paddr, uint64_t flags);
-void	  pag_map_region(uint64_t* pml4, void* vaddr, void* paddr, size_t count, uint64_t flags);
-void	  pag_unmap(uint64_t* pml4, void* vaddr);
-void	  pag_unmap_region(uint64_t* pml4, void* vaddr, size_t count);
-void	  pag_protect(uint64_t* pml4, void* vaddr, uint64_t flags);
+int	  pag_map(uint64_t* pml4, void* vaddr, void* paddr, uint64_t flags);
+int	  pag_map_region(uint64_t* pml4, void* vaddr, void* paddr, size_t count, uint64_t flags);
+int	  pag_unmap(uint64_t* pml4, void* vaddr);
+int	  pag_unmap_region(uint64_t* pml4, void* vaddr, size_t count);
+int	  pag_protect(uint64_t* pml4, void* vaddr, uint64_t flags);
 void*	  pag_get_phys(uint64_t* pml4, void* vaddr);
 void	  pag_set_pml4(uint64_t* pml4);
 uint64_t* pag_get_pml4(void);

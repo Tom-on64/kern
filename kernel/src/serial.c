@@ -1,3 +1,4 @@
+#include "errno.h"
 #include <vsnprintf.h>
 #include <kernel.h>
 #include <system.h>
@@ -11,13 +12,15 @@ int serial_init(int dev) {
 	outb(dev + 3, 0x03);	// 8 bits, no parity, one stop bit
 	outb(dev + 2, 0xC7);	// Enable FIFO, clear them, with 14 byte threshold
 	outb(dev + 4, 0x0B);	// IRQs enabled, RTS/DSR set
+
 	outb(dev + 4, 0x1E);	// Set in loopback mode, test the serial chip
 	outb(dev + 0, 0xAE);	// Test serial chip (send byte 0xAE and check if it returns)
-	
-	if (inb(dev + 0) != 0xAE) return 1;
+	if (inb(dev + 0) != 0xAE) return -ENODEV;
+
 	outb(dev + 4, 0x0F);	// non-loopback, IRQs enabled, OUT#1 and OUT#2 bits enabled
 	
-	debugf("\x1b[H\x1b[JSerial display initiated!\n\n");
+	serial_cls(COM1);
+	serial_puts(COM1, "Serial display (COM1)\n\n");
 	
 	return 0;
 }
@@ -52,6 +55,10 @@ void serial_puts(int dev, char* s) {
 	char* p = s;
 	while (*p++ != '\0') len++;
 	serial_write(dev, s, len);
+}
+
+void serial_cls(int dev) {
+	serial_write(dev, "\x1b[H\x1b[J", 6);
 }
 
 int debugf(char* fmt, ...) {

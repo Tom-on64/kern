@@ -1,0 +1,32 @@
+Error handling
+==============
+
+Functions that can fail must have a way of telling the caller that something
+went wrong and preferably what went wrong. The simplest and cleanest way of 
+indicating an error is a return code. Error codes are defined in the <errno.h>
+header alongside some helpfull macros.
+
+Error codes have identifiers like these: ENOMEM, ENOENT, EALIGN, ...
+They are defined as positive values, however all functions should return a
+negative integer on error, so it would look something like 'return -EFAULT;'.
+Also theres SUCCESS which is just 0. You can use it, but don't need to.
+
+If you are returning a pointer/address, the highest address is almost certainly
+unused, so returning '(void*)-EINVAL', should work just fine. This is quite an
+eyesore, so there are three macros for working with these "errno-in-pointer"s.
+IS_ERR(ptr) just returns 1 if the pointer is an errno. Otherwise 0.
+ERR_PTR(err) does that void* cast mentioned above so it would be ERR_PTR(-EINVAL).
+PTR_ERR(ptr) is the inverse of ERR_PTR(), as it converts a errno-in-pointer to
+an errno value. PTR_ERR(ERR_PTR(-EIO)) == -EIO
+
+
+Here are some usage examples:
+	int pag_init(void) {
+		if (...) return -ENOMEM; // Not enough memory
+		
+		void* paddr = pmm_alloc();
+		if (IS_ERR(paddr)) return PTR_ERR(paddr); // Pass the error down
+
+		return SUCCESS;
+	}
+
