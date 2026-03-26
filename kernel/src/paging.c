@@ -11,6 +11,8 @@
 // VIRTUAL address of the kernels PML4
 uint64_t* pag_kernel_pml4 = NULL;
 
+// abcabcaaabcaab
+
 int pag_init(void) {
 	pag_kernel_pml4 = TO_VIRT(pmm_alloc());
 	if (IS_ERR(pag_kernel_pml4)) return PTR_ERR(pag_kernel_pml4);
@@ -20,14 +22,14 @@ int pag_init(void) {
 		pag_kernel_pml4, 
 		(void*)bootloader.kernel_virt_base, 
 		(void*)bootloader.kernel_phys_base, 
-		ALIGN(bootloader.executable->size, PAGE_SIZE), 
+		dceil(bootloader.executable->size, PAGE_SIZE), 
 		PTE_FLAG_WRITE | PTE_FLAG_PRESENT
 	);
 	if (ret != SUCCESS) return ret;
 
 	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
 		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
-		
+
 		uint64_t flags = 0;
 		switch (entry->type) {
 		case LIMINE_MEMMAP_USABLE: flags = PTE_FLAG_WRITE; break;
@@ -50,7 +52,7 @@ int pag_init(void) {
 		ret = pag_map_region(
 			pag_kernel_pml4,
 			(void*)(entry->base + bootloader.hhdm_offset), (void*)entry->base,
-			ALIGN(entry->length, PAGE_SIZE),
+			dceil(entry->length, PAGE_SIZE),
 			flags | PTE_FLAG_PRESENT
 		);
 		if (ret != SUCCESS) return ret;

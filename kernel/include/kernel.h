@@ -25,8 +25,12 @@
 #define ALIGN_DOWN(_addr, _align) ((_addr) & ~((_align) - 1))
 #define BIT(_n)                  (1ULL << (_n))
 
-#define min(_a, _b) ((_a) < (_b) ? (_a) : (_b))
-#define max(_a, _b) ((_a) > (_b) ? (_a) : (_b))
+#define swap(_a, _b)	({ typeof(_a) _tmp = (_a); (_a) = (_b); (_b) = (_a); })
+#define min(_x, _y)	({ typeof(_x) __x = (_x); typeof(_y) __y = (_y); __x < __y ? __x : __y; })
+#define max(_x, _y)	({ typeof(_x) __x = (_x); typeof(_y) __y = (_y); __x > __y ? __x : __y; })
+#define ceil(_x, _y)	((((_x) + (_y)) (_y)) * (_y))
+#define floor(_x, _y)	((_x) - ((_x) % (_y)))
+#define dceil(_x, _y)	(((_x) + (_y) - 1) / (_y))
 
 #define fence() __asm__ volatile ("" ::: "memory")
  
