@@ -109,7 +109,7 @@ static void fmt_float(char* buf, size_t n, size_t* idx, double v, int prec, int 
 	if (left) { while (pad_len--) _putc(buf, n, idx, pad); }
 }
 
-int vsnprintf(char* buf, size_t n, char* fmt, va_list ap) {
+int vsnprintf(char* buf, size_t n, const char* fmt, va_list ap) {
 	size_t idx = 0;
 
 	for (; *fmt != '\0'; fmt++) {
@@ -195,7 +195,7 @@ int vsnprintf(char* buf, size_t n, char* fmt, va_list ap) {
 	return (int)idx;
 }
 
-int snprintf(char *buf, size_t n, char *fmt, ...) {
+int snprintf(char *buf, size_t n, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	int ret = vsnprintf(buf, n, fmt, ap);

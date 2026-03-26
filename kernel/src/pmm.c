@@ -2,7 +2,6 @@
 #include <kernel.h>
 #include <limine.h>
 #include <paging.h>
-#include <serial.h>
 #include <errno.h>
 
 #include <pmm.h>
@@ -11,11 +10,11 @@ uint64_t* pmm_head = NULL;
 size_t pmm_total_mem = 0;
 
 int pmm_init(void) {
-	debugf("[pmm] Physical memory map:\n"); // We're gonna use the loop to also print the memmap
+	pr_info("[pmm] Physical memory map:\n"); // We're gonna use the loop to also print the memmap
 	for (size_t i = 0; i < bootloader.mm_entry_count; i++) {
 		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
 		
-		debugf(
+		pr_info(
 			"\t%p - %p (%d bytes), type %d\n",
 			entry->base, entry->base + entry->length, entry->length, entry->type
 		);
@@ -25,7 +24,7 @@ int pmm_init(void) {
 		// Limine spec says that it'll be aligned, but just as a sanity check
 		if (entry->base % PAGE_SIZE != 0) {
 			size_t diff = PAGE_SIZE - (entry->base % PAGE_SIZE);
-			debugf("\t Not 4 kiB aligned, shifting %p -> %p (%d bytes).\n", entry->base, entry->base + diff, diff);
+			pr_info("\t Not 4 kiB aligned, shifting %p -> %p (%d bytes).\n", entry->base, entry->base + diff, diff);
 			entry->base += diff;
 			entry->length -= diff;
 		}
@@ -38,7 +37,7 @@ int pmm_init(void) {
 		}
 	}
 
-	debugf("[pmm] %d bytes of available memory.\n", pmm_total_mem);
+	pr_info("[pmm] %d bytes of available memory.\n", pmm_total_mem);
 	if (pmm_total_mem == 0) return -ENOMEM;
 
 	return SUCCESS;

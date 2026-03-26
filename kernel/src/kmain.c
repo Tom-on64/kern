@@ -1,13 +1,12 @@
 #include <bootloader.h>
+#include <kernel.h>
 #include <paging.h>
 #include <serial.h>
 #include <splash.h>
 #include <system.h>
 #include <gdt.h>
-#include <pmm.h>
 #include <isr.h>
-
-#include <kernel.h>
+#include <pmm.h>
 
 __noreturn
 void _start(void) {
@@ -24,7 +23,7 @@ void _start(void) {
 	uint32_t eax = 0;
 	char s[12];
 	cpuid(&eax, (void*)&s[0], (void*)&s[8], (void*)&s[4]);
-	debugf("[kernel] CPUID_GETVENDORID: %s\n", s);
+	pr_info("[kernel] CPUID_GETVENDORID: %s\n", s);
 
 	// System init
 	if (gdt_init() < 0) panic("Failed to initalize GDT.");
@@ -33,6 +32,8 @@ void _start(void) {
 	// Memory management
 	if (pmm_init() < 0) panic("Failed to initalize Physical Memory Manager.");
 	if (pag_init() < 0) panic("Failed to initalize Paging.");
+
+	panic("Yeah..");
 
 	// Patiently wait for things to do :)
 	while (1);

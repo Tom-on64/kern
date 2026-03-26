@@ -18,7 +18,7 @@ $(OUT): $(OBJS_C) $(OBJS_S)
 
 $(BIN)/%.c.o: $(SRC)/%.c $(SSP)
 	@mkdir -p $(dir $@)
-	$(CC) $(CCFLAGS) -DSTACK_CHK_GUARD="$$(cat $(SSP))" -I$(INC) -c -o $@ $<
+	$(CC) $(CCFLAGS) -DCONSOLE_LOGLEVEL='$(CONSOLE_LOGLEVEL)' -DSTACK_CHK_GUARD="$$(cat $(SSP))" -I$(INC) -c -o $@ $<
 
 $(BIN)/%.s.o: $(SRC)/%.s
 	@mkdir -p $(dir $@)

@@ -12,9 +12,10 @@ HOSTCCFLAGS = -Wall -Wextra -O2
 CCFLAGS = -Wall -Wextra -m64 -ffreestanding -fcommon -Iinclude \
 	  -mcmodel=kernel \
 	  -fno-pie \
-	  -fno-stack-protector \
+	  -fno-omit-frame-pointer \
 	  -mno-mmx \
 	  -mno-80387 \
+	  -fno-stack-protector \
 	  -mno-red-zone \
 	  -nostartfiles \
 	  -nostdlib \
@@ -25,6 +26,9 @@ LDFLAGS = -melf_x86_64 -nostdlib -static \
 	  --no-dynamic-linker \
 	  -z text -z max-page-size=0x1000
 ARFLAGS =
+
+# Kernel config
+CONSOLE_LOGLEVEL=7
 
 # Disk image
 IMG_NAME = disk.img

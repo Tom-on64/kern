@@ -20,7 +20,7 @@ int pag_init(void) {
 		pag_kernel_pml4, 
 		(void*)bootloader.kernel_virt_base, 
 		(void*)bootloader.kernel_phys_base, 
-		dceil(bootloader.executable->size, PAGE_SIZE), 
+		ALIGN(bootloader.executable->size, PAGE_SIZE), 
 		PTE_FLAG_WRITE | PTE_FLAG_PRESENT
 	);
 	if (ret != SUCCESS) return ret;
@@ -40,7 +40,7 @@ int pag_init(void) {
 		case LIMINE_MEMMAP_FRAMEBUFFER: flags = PTE_FLAG_WRITE | PTE_FLAG_PWT; break;
 		case LIMINE_MEMMAP_RESERVED_MAPPED: flags = 0; break;
 		default: 
-			debugf(
+			pr_warning(
 				"[pag] %p - %p: Unknown memmap type %d. Will remain unmapped.\n",
 				entry->base, entry->base + entry->length, entry->type
 			      );
@@ -50,7 +50,7 @@ int pag_init(void) {
 		ret = pag_map_region(
 			pag_kernel_pml4,
 			(void*)(entry->base + bootloader.hhdm_offset), (void*)entry->base,
-			dceil(entry->length, PAGE_SIZE),
+			ALIGN(entry->length, PAGE_SIZE),
 			flags | PTE_FLAG_PRESENT
 		);
 		if (ret != SUCCESS) return ret;

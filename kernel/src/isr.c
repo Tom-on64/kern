@@ -1,5 +1,4 @@
 #include <kernel.h>
-#include <serial.h>
 #include <string.h>
 #include <system.h>
 #include <errno.h>
@@ -99,16 +98,16 @@ void isr_handle_interrupt(size_t rsp) {
 	struct isr_int_frame* iframe = (void*)rsp;
 
 	if (iframe->interrupt < 32) { 
-		debugf("[kernel] Register Dump:\n");
-		debugf("\tRAX: %016lu RBX: %016lu RCX: %016lx\n", iframe->rax, iframe->rbx, iframe->rcx);
-		debugf("\tRDX: %016lu RSI: %016lu RDI: %016lx\n", iframe->rdx, iframe->rsi, iframe->rdi);
-		debugf("\tR08: %016lu R09: %016lu R10: %016lx\n", iframe->r8, iframe->r9, iframe->r10);
-		debugf("\tR11: %016lu R12: %016lu R13: %016lx\n", iframe->r11, iframe->r12, iframe->r13);
-		debugf("\tR14: %016lu R15: %016lu DS/ES: %016lx\n", iframe->r14, iframe->r15, iframe->ds);
-		debugf("\tRBP: %016lu RSP: %016lu SS: %016lx\n", iframe->rbp, iframe->user_rsp, iframe->user_ss);
-		debugf("\tRIP: %016lu RFLAGS: %016lx CS: %016lx\n", iframe->rip, iframe->rflags, iframe->cs);
+		pr_emerg("Register Dump:\n");
+		pr_emerg("\tRAX: %016lu RBX: %016lu RCX: %016lx\n", iframe->rax, iframe->rbx, iframe->rcx);
+		pr_emerg("\tRDX: %016lu RSI: %016lu RDI: %016lx\n", iframe->rdx, iframe->rsi, iframe->rdi);
+		pr_emerg("\tR08: %016lu R09: %016lu R10: %016lx\n", iframe->r8, iframe->r9, iframe->r10);
+		pr_emerg("\tR11: %016lu R12: %016lu R13: %016lx\n", iframe->r11, iframe->r12, iframe->r13);
+		pr_emerg("\tR14: %016lu R15: %016lu DS/ES: %016lx\n", iframe->r14, iframe->r15, iframe->ds);
+		pr_emerg("\tRBP: %016lu RSP: %016lu SS: %016lx\n", iframe->rbp, iframe->user_rsp, iframe->user_ss);
+		pr_emerg("\tRIP: %016lu RFLAGS: %016lx CS: %016lx\n", iframe->rip, iframe->rflags, iframe->cs);
 
-		if (iframe->error) debugf("[kernel] Error code: 0x%lx\n", iframe->error);
+		if (iframe->error) pr_emerg("Error code: 0x%lx\n", iframe->error);
 		panic(exceptions[iframe->interrupt]);
 	} else if (iframe->interrupt >= 32 && iframe->interrupt < 48) {
 		// ISRs 32-47 - Hardware interrupts
@@ -117,7 +116,7 @@ void isr_handle_interrupt(size_t rsp) {
 		if (irq_handlers[irq]) irq_handlers[irq](iframe);
 	} else if (iframe->interrupt == 128) { 
 		// ISR 128 - System call
-		debugf("SYSCALL!\n");
+		pr_notice("SYSCALL!\n");
 	}
 }
 

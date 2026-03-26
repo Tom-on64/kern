@@ -43,16 +43,16 @@ char serial_recv(int dev) {
 	return inb(dev);
 }
 
-void serial_write(int dev, char* buf, size_t len) {
+void serial_write(int dev, const char* buf, size_t len) {
 	for (size_t i = 0; i < len; i++) {
 		if (buf[i] == '\n') serial_send(dev, '\r');
 		serial_send(dev, buf[i]);
 	}
 }
 
-void serial_puts(int dev, char* s) {
+void serial_puts(int dev, const char* s) {
 	size_t len = 0;
-	char* p = s;
+	const char* p = s;
 	while (*p++ != '\0') len++;
 	serial_write(dev, s, len);
 }
@@ -61,7 +61,7 @@ void serial_cls(int dev) {
 	serial_write(dev, "\x1b[H\x1b[J", 6);
 }
 
-int debugf(char* fmt, ...) {
+int debugf(const char* fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	int ret = vdebugf(fmt, args);
@@ -69,7 +69,7 @@ int debugf(char* fmt, ...) {
 	return ret;
 }
 
-int vdebugf(char* fmt, va_list args) {
+int vdebugf(const char* fmt, va_list args) {
 	char buf[DF_BUF_LEN];
 	int len = vsnprintf(buf, DF_BUF_LEN, fmt, args);
 	serial_write(COM1, buf, len);

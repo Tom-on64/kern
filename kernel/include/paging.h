@@ -30,7 +30,7 @@
 #define TO_VIRT(_ptr) 	((void*)((uintptr_t)(_ptr) + bootloader.hhdm_offset))
 #define TO_PHYS(_ptr) 	((void*)((uintptr_t)(_ptr) - bootloader.hhdm_offset))
 
-#define PAGE_SIZE	0x1000
+#define PAGE_SIZE 4096
 #define PAGE_SIZE_LARGE	0x200000
 #define PAGE_SIZE_HUGE	0x40000000
 

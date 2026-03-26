@@ -16,11 +16,11 @@ int  serial_txem(int dev);
 void serial_send(int dev, char data);
 int  serial_rcvd(int dev);
 char serial_recv(int dev);
-void serial_write(int dev, char* buf, size_t len);
-void serial_puts(int dev, char* s);
+void serial_write(int dev, const char* buf, size_t len);
+void serial_puts(int dev, const char* s);
 void serial_cls(int dev);
 
-int debugf(char* fmt, ...);
-int vdebugf(char* fmt, va_list args);
+int debugf(const char* fmt, ...);
+int vdebugf(const char* fmt, va_list args);
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <kernel.h>
 
-int snprintf(char *buf, size_t n, char *fmt, ...);
-int vsnprintf(char* buf, size_t n, char* fmt, va_list ap);
+int snprintf(char *buf, size_t n, const char *fmt, ...);
+int vsnprintf(char* buf, size_t n, const char* fmt, va_list ap);
 
 #endif
