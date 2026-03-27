@@ -99,13 +99,13 @@ void isr_handle_interrupt(size_t rsp) {
 
 	if (iframe->interrupt < 32) { 
 		pr_emerg("Register Dump:\n");
-		pr_emerg("\tRAX: %016lu RBX: %016lu RCX: %016lx\n", iframe->rax, iframe->rbx, iframe->rcx);
-		pr_emerg("\tRDX: %016lu RSI: %016lu RDI: %016lx\n", iframe->rdx, iframe->rsi, iframe->rdi);
-		pr_emerg("\tR08: %016lu R09: %016lu R10: %016lx\n", iframe->r8, iframe->r9, iframe->r10);
-		pr_emerg("\tR11: %016lu R12: %016lu R13: %016lx\n", iframe->r11, iframe->r12, iframe->r13);
-		pr_emerg("\tR14: %016lu R15: %016lu DS/ES: %016lx\n", iframe->r14, iframe->r15, iframe->ds);
-		pr_emerg("\tRBP: %016lu RSP: %016lu SS: %016lx\n", iframe->rbp, iframe->user_rsp, iframe->user_ss);
-		pr_emerg("\tRIP: %016lu RFLAGS: %016lx CS: %016lx\n", iframe->rip, iframe->rflags, iframe->cs);
+		pr_emerg("\tRAX: %016lx RBX: %016lx RCX: %016lx\n", iframe->rax, iframe->rbx, iframe->rcx);
+		pr_emerg("\tRDX: %016lx RSI: %016lx RDI: %016lx\n", iframe->rdx, iframe->rsi, iframe->rdi);
+		pr_emerg("\tR08: %016lx R09: %016lx R10: %016lx\n", iframe->r8, iframe->r9, iframe->r10);
+		pr_emerg("\tR11: %016lx R12: %016lx R13: %016lx\n", iframe->r11, iframe->r12, iframe->r13);
+		pr_emerg("\tR14: %016lx R15: %016lx DS/ES: %016lx\n", iframe->r14, iframe->r15, iframe->ds);
+		pr_emerg("\tRBP: %016lx RSP: %016lx SS: %016lx\n", iframe->rbp, iframe->user_rsp, iframe->user_ss);
+		pr_emerg("\tRIP: %016lx RFLAGS: %016lx CS: %016lx\n", iframe->rip, iframe->rflags, iframe->cs);
 
 		if (iframe->error) pr_emerg("Error code: 0x%lx\n", iframe->error);
 		panic(exceptions[iframe->interrupt]);
