@@ -7,7 +7,8 @@
 #include <pmm.h>
 
 uint64_t* pmm_head = NULL;
-size_t pmm_total_mem = 0;
+size_t pmm_total_pages = 0;
+size_t pmm_free_pages = 0;
 
 int pmm_init(void) {
 	pr_info("[pmm] Physical memory map:\n"); // We're gonna use the loop to also print the memmap
@@ -33,12 +34,13 @@ int pmm_init(void) {
 			uint64_t* addr = TO_VIRT(entry->base) + offset;
 			*addr = (uint64_t)pmm_head;
 			pmm_head = addr;
-			pmm_total_mem += PAGE_SIZE;
+			pmm_total_pages++;
 		}
 	}
 
-	pr_info("[pmm] %d bytes of available memory.\n", pmm_total_mem);
-	if (pmm_total_mem == 0) return -ENOMEM;
+	pr_info("[pmm] %d free pages.\n", pmm_total_pages);
+	if (pmm_total_pages == 0) return -ENOMEM;
+	pmm_free_pages = pmm_total_pages;
 
 	return SUCCESS;
 }
@@ -49,6 +51,7 @@ void* pmm_alloc() {
 	uint64_t* addr = pmm_head;
 	if ((uintptr_t)addr % PAGE_SIZE != 0) panic("pmm_head corrupted.");
 	pmm_head = (uint64_t*)(*addr);
+	pmm_free_pages--;
 
 	return TO_PHYS(addr);
 }
@@ -60,6 +63,7 @@ int pmm_free(void* page) {
 	uint64_t* addr = TO_VIRT(page);
 	*addr = (uint64_t)pmm_head;
 	pmm_head = addr;
+	pmm_free_pages++;
 
 	return SUCCESS;
 }
