@@ -11,8 +11,6 @@
 // VIRTUAL address of the kernels PML4
 uint64_t* pag_kernel_pml4 = NULL;
 
-// abcabcaaabcaab
-
 int pag_init(void) {
 	pag_kernel_pml4 = TO_VIRT(pmm_alloc());
 	if (IS_ERR(pag_kernel_pml4)) return PTR_ERR(pag_kernel_pml4);
@@ -43,8 +41,8 @@ int pag_init(void) {
 		case LIMINE_MEMMAP_RESERVED_MAPPED: flags = 0; break;
 		default: 
 			pr_warning(
-				"[pag] %p - %p: Unknown memmap type %d. Will remain unmapped.\n",
-				entry->base, entry->base + entry->length, entry->type
+				"[pag] %p - %p: Unknown memmap type %lu. Will remain unmapped.\n",
+				(void*)entry->base, (void*)entry->base + entry->length, entry->type
 			      );
 			continue;
 		}

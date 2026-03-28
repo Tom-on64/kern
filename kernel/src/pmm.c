@@ -16,8 +16,8 @@ int pmm_init(void) {
 		struct limine_memmap_entry* entry = bootloader.mm_entries[i];
 		
 		pr_info(
-			"\t%p - %p (%d bytes), type %d\n",
-			entry->base, entry->base + entry->length, entry->length, entry->type
+			"\t%p - %p (%lu bytes), type %lu\n",
+			(void*)entry->base, (void*)entry->base + entry->length, entry->length, entry->type
 		);
 
 		if (entry->type != LIMINE_MEMMAP_USABLE) continue;
@@ -25,7 +25,7 @@ int pmm_init(void) {
 		// Limine spec says that it'll be aligned, but just as a sanity check
 		if (entry->base % PAGE_SIZE != 0) {
 			size_t diff = PAGE_SIZE - (entry->base % PAGE_SIZE);
-			pr_info("\t Not 4 kiB aligned, shifting %p -> %p (%d bytes).\n", entry->base, entry->base + diff, diff);
+			pr_info("\t Not 4 kiB aligned, shifting %p -> %p (%lu bytes).\n", (void*)entry->base, (void*)entry->base + diff, diff);
 			entry->base += diff;
 			entry->length -= diff;
 		}
@@ -38,7 +38,7 @@ int pmm_init(void) {
 		}
 	}
 
-	pr_info("[pmm] %d free pages.\n", pmm_total_pages);
+	pr_info("[pmm] %lu free pages.\n", pmm_total_pages);
 	if (pmm_total_pages == 0) return -ENOMEM;
 	pmm_free_pages = pmm_total_pages;
 

@@ -18,7 +18,7 @@ void panic_call_trace(void) {
 		// TODO: Parse ELF and print function names
 		char* fname = "???";
 
-		pr_emerg("  [<%p>] %s+0x%x\n", retaddr, fname, offset);
+		pr_emerg("  [<%p>] %s+0x%lx\n", (void*)retaddr, fname, offset);
 
 		rbp = (uintptr_t*)*rbp;
 	}
@@ -45,7 +45,7 @@ void vpanic(const char *fmt, va_list ap) {
 
 	pr_emerg("--- [ Kernel panic: %s ] ---\n\n", buf);	
 
-	pr_emerg("%d / %d pages free.\n\n", pmm_free_pages, pmm_total_pages);
+	pr_emerg("%lu / %lu pages free.\n\n", pmm_free_pages, pmm_total_pages);
 	panic_call_trace();
 
 	pr_emerg("\n--- [ End kernel panic: %s ] ---\n", buf);

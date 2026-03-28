@@ -20,7 +20,7 @@ void serial_write(int dev, const char* buf, size_t len);
 void serial_puts(int dev, const char* s);
 void serial_cls(int dev);
 
-int debugf(const char* fmt, ...);
+int debugf(const char* fmt, ...) __printf(1, 2);
 int vdebugf(const char* fmt, va_list args);
 
 #endif

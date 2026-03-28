@@ -8,8 +8,6 @@
 #include <isr.h>
 #include <pmm.h>
 
-void a(void) { *(char*)(1234) = 0; } 
-
 __noreturn
 void _start(void) {
 	int err = 0;
@@ -36,8 +34,6 @@ void _start(void) {
 
 	// The most important function in the world.
 	splash();
-
-	a();
 
 	// Patiently wait for things to do :)
 	while (1);

@@ -66,7 +66,7 @@
 extern uint8_t console_loglevel;
 
 // TODO: Add a ring buffer for the logs
-int printk(const char* fmt, ...);
+int printk(const char* fmt, ...) __printf(1, 2);
 int vprintk(const char* fmt, va_list ap);
 
 #define pr_emerg(fmt, ...)	printk(KERN_EMERG fmt, ##__VA_ARGS__)
@@ -80,7 +80,7 @@ int vprintk(const char* fmt, va_list ap);
 
 #define PANIC_MSG_BUFSZ	1024
 
-void panic(const char* fmt, ...) __noreturn __cold;
+void panic(const char* fmt, ...) __noreturn __cold __printf(1, 2);
 void vpanic(const char* fmt, va_list ap)__noreturn __cold;
 
 extern uintptr_t __kernel_start, __kernel_text_start, __kernel_rodata_start, __kernel_data_start;
