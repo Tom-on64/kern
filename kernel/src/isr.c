@@ -5,6 +5,7 @@
 #include <idt.h>
 #include <isr.h>
 
+isr_handler_ptr exception_handlers[EXCEPTION_COUNT];
 isr_handler_ptr irq_handlers[ISR_COUNT];
 
 const char* exceptions[] = {
@@ -62,6 +63,7 @@ void pic_remap(void) {
 }
 
 int isr_init(void) {
+	memset(exception_handlers, 0, sizeof(exception_handlers));
 	memset(irq_handlers, 0, sizeof(irq_handlers));
 
 	idt_init();
@@ -98,25 +100,24 @@ void isr_handle_interrupt(size_t rsp) {
 	struct isr_int_frame* iframe = (void*)rsp;
 
 	if (iframe->interrupt < 32) { 
-		pr_emerg("Register Dump:\n");
-		pr_emerg("\tRAX: %016lx RBX: %016lx RCX: %016lx\n", iframe->rax, iframe->rbx, iframe->rcx);
-		pr_emerg("\tRDX: %016lx RSI: %016lx RDI: %016lx\n", iframe->rdx, iframe->rsi, iframe->rdi);
-		pr_emerg("\tR08: %016lx R09: %016lx R10: %016lx\n", iframe->r8, iframe->r9, iframe->r10);
-		pr_emerg("\tR11: %016lx R12: %016lx R13: %016lx\n", iframe->r11, iframe->r12, iframe->r13);
-		pr_emerg("\tR14: %016lx R15: %016lx DS/ES: %016lx\n", iframe->r14, iframe->r15, iframe->ds);
-		pr_emerg("\tRBP: %016lx RSP: %016lx SS: %016lx\n", iframe->rbp, iframe->user_rsp, iframe->user_ss);
-		pr_emerg("\tRIP: %016lx RFLAGS: %016lx CS: %016lx\n", iframe->rip, iframe->rflags, iframe->cs);
+		if (exception_handlers[iframe->interrupt]) {
+			exception_handlers[iframe->interrupt](iframe);
+			return;
+		}
 
-		if (iframe->error) pr_emerg("Error code: 0x%lx\n", iframe->error);
-		panic(exceptions[iframe->interrupt]);
+		panic(iframe, "Unhandled %s exception, err 0x%lx", exceptions[iframe->interrupt], iframe->error);
 	} else if (iframe->interrupt >= 32 && iframe->interrupt < 48) {
-		// ISRs 32-47 - Hardware interrupts
 		uint8_t irq = iframe->interrupt - 32;
-		isr_send_eoi(irq);
+
 		if (irq_handlers[irq]) irq_handlers[irq](iframe);
-	} else if (iframe->interrupt == 128) { 
+		else pr_warn("Unhandled IRQ #%d\n", irq);
+
+		isr_send_eoi(irq);
+	} else if (iframe->interrupt == 0x80) { 
 		// ISR 128 - System call
 		pr_notice("SYSCALL!\n");
+	} else {
+		pr_warn("Unknown interrupt vector: %lu", iframe->interrupt);
 	}
 }
 

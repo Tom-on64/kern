@@ -49,7 +49,7 @@ void* pmm_alloc() {
 	if (pmm_head == NULL) return ERR_PTR(-ENOMEM);
 
 	uint64_t* addr = pmm_head;
-	if ((uintptr_t)addr % PAGE_SIZE != 0) panic("pmm_head corrupted.");
+	if ((uintptr_t)addr % PAGE_SIZE != 0) panic(NULL, "pmm_head corrupted.");
 	pmm_head = (uint64_t*)(*addr);
 	pmm_free_pages--;
 

@@ -73,15 +73,16 @@ int vprintk(const char* fmt, va_list ap);
 #define pr_alert(fmt, ...)	printk(KERN_ALERT fmt, ##__VA_ARGS__)
 #define pr_crit(fmt, ...)	printk(KERN_CRIT fmt, ##__VA_ARGS__)
 #define pr_error(fmt, ...)	printk(KERN_ERROR fmt, ##__VA_ARGS__)
-#define pr_warning(fmt, ...)	printk(KERN_WARNING fmt, ##__VA_ARGS__)
+#define pr_warn(fmt, ...)	printk(KERN_WARNING fmt, ##__VA_ARGS__)
 #define pr_notice(fmt, ...)	printk(KERN_NOTICE fmt, ##__VA_ARGS__)
 #define pr_info(fmt, ...)	printk(KERN_INFO fmt, ##__VA_ARGS__)
 #define pr_debug(fmt, ...)	printk(KERN_DEBUG fmt, ##__VA_ARGS__)
 
 #define PANIC_MSG_BUFSZ	1024
 
-void panic(const char* fmt, ...) __noreturn __cold __printf(1, 2);
-void vpanic(const char* fmt, va_list ap)__noreturn __cold;
+struct isr_int_frame;
+void panic(struct isr_int_frame* regs, const char* fmt, ...) __noreturn __cold __printf(2, 3);
+void vpanic(struct isr_int_frame* regs, const char *fmt, va_list ap) __noreturn __cold;
 
 extern uintptr_t __kernel_start, __kernel_text_start, __kernel_rodata_start, __kernel_data_start;
 extern uintptr_t __kernel_end, __kernel_text_end, __kernel_rodata_end, __kernel_data_end;

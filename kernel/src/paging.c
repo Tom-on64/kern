@@ -40,7 +40,7 @@ int pag_init(void) {
 		case LIMINE_MEMMAP_FRAMEBUFFER: flags = PTE_FLAG_WRITE | PTE_FLAG_PWT; break;
 		case LIMINE_MEMMAP_RESERVED_MAPPED: flags = 0; break;
 		default: 
-			pr_warning(
+			pr_warn(
 				"[pag] %p - %p: Unknown memmap type %lu. Will remain unmapped.\n",
 				(void*)entry->base, (void*)entry->base + entry->length, entry->type
 			      );

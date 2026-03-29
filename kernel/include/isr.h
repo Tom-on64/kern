@@ -3,6 +3,7 @@
 
 #include <kernel.h>
 
+#define EXCEPTION_COUNT	32
 #define ISR_COUNT	16
 
 // Interrupt frame (ie. what's on the stack on interrupt)

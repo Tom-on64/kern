@@ -30,7 +30,7 @@ static struct limine_executable_file_request lim_exe_req =
 struct bootloader bootloader = { 0 };
 
 int boot_init(void) {
-	if (LIMINE_BASE_REVISION_SUPPORTED(lim_base_revision) == false) panic("Unsupported Limine base revision.");
+	if (LIMINE_BASE_REVISION_SUPPORTED(lim_base_revision) == false) panic(NULL, "Unsupported Limine base revision.");
 
 	struct limine_paging_mode_response* lim_paging_res = lim_paging_req.response;
 	struct limine_executable_address_response* lim_kaddr_res = lim_kaddr_req.response;
@@ -39,7 +39,7 @@ int boot_init(void) {
 	struct limine_framebuffer_response* lim_fbuf_res = lim_fbuf_req.response;
 	struct limine_executable_file_response* lim_exe_res = lim_exe_req.response;
 
-	if (lim_paging_res->mode != LIMINE_PAGING_MODE_X86_64_4LVL) panic("Expected 4 level paging.");
+	if (lim_paging_res->mode != LIMINE_PAGING_MODE_X86_64_4LVL) panic(NULL, "Expected 4 level paging.");
 	bootloader.hhdm_offset = lim_hhdm_res->offset;
 	bootloader.kernel_phys_base = lim_kaddr_res->physical_base;
 	bootloader.kernel_virt_base = lim_kaddr_res->virtual_base;

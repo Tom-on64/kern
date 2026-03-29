@@ -13,10 +13,10 @@ void _start(void) {
 	int err = 0;
 
 	// Serial console for debugging
-	if ((err = serial_init(COM1)) < 0) panic("Failed to initialize Serial driver. (%d)", err);
+	if ((err = serial_init(COM1)) < 0) panic(NULL, "Failed to initialize Serial driver. (%d)", err);
 
 	// Load structures from bootloader
-	if ((err = boot_init()) < 0) panic("Failed to parse bootloader structures. (%d)", err);
+	if ((err = boot_init()) < 0) panic(NULL, "Failed to parse bootloader structures. (%d)", err);
 
 	// CPUID thingy :p
 	uint32_t eax = 0;
@@ -25,12 +25,12 @@ void _start(void) {
 	pr_info("[kernel] CPUID_GETVENDORID: %s\n", s);
 
 	// System init
-	if ((err = gdt_init()) < 0) panic("Failed to initalize GDT. (%d)", err);
-	if ((err = isr_init()) < 0) panic("Failed to initalize ISRs. (%d)", err);
+	if ((err = gdt_init()) < 0) panic(NULL, "Failed to initalize GDT. (%d)", err);
+	if ((err = isr_init()) < 0) panic(NULL, "Failed to initalize ISRs. (%d)", err);
 
 	// Memory management
-	if ((err = pmm_init()) < 0) panic("Failed to initalize Physical Memory Manager. (%d)", err);
-	if ((err = pag_init()) < 0) panic("Failed to initalize Paging. (%d)", err);
+	if ((err = pmm_init()) < 0) panic(NULL, "Failed to initalize Physical Memory Manager. (%d)", err);
+	if ((err = pag_init()) < 0) panic(NULL, "Failed to initalize Paging. (%d)", err);
 
 	// The most important function in the world.
 	splash();

@@ -22,7 +22,21 @@ int vprintk(const char* fmt, va_list ap) {
 
 	if (loglevel > console_loglevel) return 0;
 
+	// Loglevel colors
+	switch (loglevel) {
+	case LOGLEVEL_EMERG:   debugf("\x1b[1;31m"); break; // bold red
+	case LOGLEVEL_ALERT:   debugf("\x1b[1;31m"); break; // bold red
+	case LOGLEVEL_CRIT:    debugf("\x1b[31m");   break; // red
+	case LOGLEVEL_ERROR:   debugf("\x1b[31m");   break; // red
+	case LOGLEVEL_WARNING: debugf("\x1b[33m");   break; // yellow
+	case LOGLEVEL_NOTICE:  debugf("\x1b[34m");   break; // green
+	case LOGLEVEL_INFO:    debugf("\x1b[37m");   break; // white
+	case LOGLEVEL_DEBUG:   debugf("\x1b[2;32m"); break; // green
+	}
+
 	// TODO: debugf("[%4d.%6d] ", seconds, milliseconds);
-	return vdebugf(fmt, ap);
+	int ret = vdebugf(fmt, ap);
+	debugf("\x1b[0m");
+	return ret;
 }
 
