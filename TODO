@@ -5,8 +5,9 @@ Architectural Milestones
 [-] 64-bit rewrite
 [x] Limine (Bootloader)
 [ ] Decent build system (Makefile/CMake with cross-compiler)
-[ ] kernel.h rewrite & header cleanup
-[ ] debugf() cleanup & kprintf() (Standardized logging levels)
+[x] kernel.h rewrite & header cleanup
+[x] debugf() cleanup, kprintf() & pr_*() (Standardized logging levels)
+[x] errno.h errors and "errno-in-pointer" macros
 
 Low-Level Hardware & Interrupts
 [x] GDT

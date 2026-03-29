@@ -14,8 +14,8 @@ MODULES = $(KERNEL)
 all: $(TARGET)
 $(TARGET): $(SYSROOT) $(MODULES)
 	cp /usr/share/limine/limine-bios.sys $(SYSROOT)/boot
-	echo -e 'timeout: 0\n\n/kern.\n\tprotocol: limine\n\tpath: boot():/boot/kernel.elf\n' > $(SYSROOT)/boot/limine.conf
-	dd if=/dev/zero of=$(TARGET) bs=1M count=$(IMG_SIZE)
+	cp $(LIMINE_CFG) $(SYSROOT)/boot/limine.conf
+	qemu-img create $(TARGET) $(IMG_SIZE)M
 	echo ',,c,*' | sfdisk $(TARGET) >/dev/null
 	mformat -F -i $(TARGET)@@$(OFFSET) ::
 	mcopy -i $(TARGET)@@$(OFFSET) $(SYSROOT)/* ::
@@ -33,10 +33,10 @@ $(SYSROOT):
 	@mkdir $(SYSROOT)/usr/lib
 	@mkdir $(SYSROOT)/usr/sbin
 	@mkdir $(SYSROOT)/usr/share
+	@mkdir $(SYSROOT)/tmp
 	@ln -s usr/bin $(SYSROOT)/bin
 	@ln -s usr/lib $(SYSROOT)/lib
 	@ln -s usr/sbin $(SYSROOT)/sbin
-	@mkdir $(SYSROOT)/tmp
 
 $(MODULES):
 	$(MAKE) -C $@ SYSROOT=$(abspath $(SYSROOT))

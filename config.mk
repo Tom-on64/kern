@@ -28,11 +28,14 @@ LDFLAGS = -melf_x86_64 -nostdlib -static \
 ARFLAGS =
 
 # Kernel config
-CONSOLE_LOGLEVEL=7
+CONSOLE_LOGLEVEL = 7
+
+# Sysroot
+LIMINE_CFG = ./limine.conf
 
 # Disk image
 IMG_NAME = disk.img
-IMG_SIZE = 256	# 256MB
+IMG_SIZE = 256
 
 # Qemu
 Q_MEMORY = 256M
