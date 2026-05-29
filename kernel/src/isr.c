@@ -1,3 +1,4 @@
+#include <exceptions.h>
 #include <kernel.h>
 #include <string.h>
 #include <system.h>
@@ -5,43 +6,7 @@
 #include <idt.h>
 #include <isr.h>
 
-isr_handler_ptr exception_handlers[EXCEPTION_COUNT];
 isr_handler_ptr irq_handlers[ISR_COUNT];
-
-const char* exceptions[] = {
-	"Division By Zero",
-	"Debug",
-	"Non Maskable Interrupt",
-	"Breakpoint",
-	"Into Detected Overflow",
-	"Out of Bounds",
-	"Invalid Opcode",
-	"No Coprocessor",
-	"Double Fault",
-	"Coprocessor Segment Overrun",
-	"Bad TSS",
-	"Segment Not Present",
-	"Stack Fault",
-	"General Protection Fault",
-	"Page Fault",
-	"Unknown Interrupt",
-	"Coprocessor Fault",
-	"Alignment Check",
-	"Machine Check",
-	"SIMD Floating-Point",
-	"Virtualization",
-	"Control Protection",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved",
-	"Reserved"
-};
 
 void pic_disable(void) {
 	outb(0x21, 0xFF); iowait();
@@ -63,7 +28,7 @@ void pic_remap(void) {
 }
 
 int isr_init(void) {
-	memset(exception_handlers, 0, sizeof(exception_handlers));
+	exception_init();
 	memset(irq_handlers, 0, sizeof(irq_handlers));
 
 	idt_init();
@@ -99,18 +64,12 @@ void isr_send_eoi(uint8_t irq) {
 void isr_handle_interrupt(size_t rsp) {
 	struct isr_int_frame* iframe = (void*)rsp;
 
-	if (iframe->interrupt < 32) { 
-		if (exception_handlers[iframe->interrupt]) {
-			exception_handlers[iframe->interrupt](iframe);
-			return;
-		}
-
-		panic(iframe, "Unhandled %s exception, err 0x%lx", exceptions[iframe->interrupt], iframe->error);
-	} else if (iframe->interrupt >= 32 && iframe->interrupt < 48) {
+	if (iframe->interrupt < 32) exception_handle(iframe);
+	else if (iframe->interrupt >= 32 && iframe->interrupt < 48) {
 		uint8_t irq = iframe->interrupt - 32;
 
 		if (irq_handlers[irq]) irq_handlers[irq](iframe);
-		else pr_warn("Unhandled IRQ #%d\n", irq);
+		// else pr_debug("Unhandled IRQ #%d\n", irq);
 
 		isr_send_eoi(irq);
 	} else if (iframe->interrupt == 0x80) { 

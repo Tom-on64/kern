@@ -4,7 +4,7 @@ TODO
 Architectural Milestones
 [-] 64-bit rewrite
 [x] Limine (Bootloader)
-[ ] Decent build system (Makefile/CMake with cross-compiler)
+[ ] Decent build system (feat. cross-compiler)
 [x] kernel.h rewrite & header cleanup
 [x] debugf() cleanup, kprintf() & pr_*() (Standardized logging levels)
 [x] errno.h errors and "errno-in-pointer" macros
@@ -13,7 +13,7 @@ Low-Level Hardware & Interrupts
 [x] GDT
 [x] IDT
 [x] Basic IRQs (Internal/Legacy)
-[ ] Proper fault handling (Exceptions, Page Faults, #GP)
+[x] Proper fault handling (Exceptions, Page Faults, #GP)
 [ ] Check for features with CPUID (NX-bit, SSE, AVX)
 [ ] APIC driver (Local APIC & I/O APIC)
 [ ] ACPI driver (Parsing RSDP/MADT for multi-core/APIC)
@@ -55,7 +55,8 @@ Drivers & IO
 [ ] Storage driver (SATA/AHCI or VirtIO)
 
 The Final TODOs
-[ ] Run DOOM (Requires: VFS, Input, Timer, LibC, and Graphics)
+[ ] Gaming???!!??
+[ ] Run DOOM
 [-] Finish all the TODOs
 
 Legend

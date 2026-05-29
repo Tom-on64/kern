@@ -9,6 +9,7 @@
 #define PTE_FLAG_USER		(1UL << 2) // User-mode (DPL3) access allowed
 #define PTE_FLAG_PWT		(1UL << 3) // Page write-thru
 #define PTE_FLAG_NOCACHE	(1UL << 4) // Cache disable
+#define PTE_FLAG_FETCH		(1UL << 4) // Fetch
 #define PTE_FLAG_ACCESSED	(1UL << 5) // Indicates whether page was read/written
 #define PTE_FLAG_DIRTY		(1UL << 6) // Indicates whether page was written to (valid for PT only)
 #define PTE_FLAG_PAT		(1UL << 7) // Page Attribute Table (valid for PT only)
