@@ -47,5 +47,5 @@ Color codes
 * 5 - Magenta (101)
 * 6 - Cyan    (011)
 * 7 - White   (111)
-* 8 - Default
+* 8 - Default
 
